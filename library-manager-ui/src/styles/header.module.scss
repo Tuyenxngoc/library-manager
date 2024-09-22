@@ -1,0 +1,13 @@
+.wrapper {
+    border-bottom: 1px solid #dbdbdb;
+}
+
+.list {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+
+    li {
+        padding: 0 10px;
+    }
+}

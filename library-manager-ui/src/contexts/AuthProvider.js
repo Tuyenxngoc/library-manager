@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { createContext, useEffect, useState } from 'react';
 
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '~/common/commonConstants';
-import Loading from '~/components/Loading/Loading';
+import Loading from '~/components/Loading';
 import { logoutToken } from '~/services/authService';
 import { getCurrentUserLogin } from '~/services/userService';
 
@@ -11,15 +11,6 @@ const AuthContext = createContext();
 
 const defaultAuth = {
     isAuthenticated: false,
-    player: {
-        id: null,
-        username: '',
-        roleName: '',
-        avatar: '',
-        online: false,
-        points: 1,
-        clanMember: null,
-    },
 };
 
 const AuthProvider = ({ children }) => {
@@ -28,7 +19,6 @@ const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         validateToken();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const validateToken = async () => {
@@ -42,10 +32,8 @@ const AuthProvider = ({ children }) => {
             }
             const response = await getCurrentUserLogin();
             if (response.status === 200) {
-                const { id, username, roleName, avatar, online, points, clanMember } = response.data.data;
                 setAuthData({
                     isAuthenticated: true,
-                    player: { id, username, roleName, avatar, online, points, clanMember },
                 });
             } else {
                 setAuthData(defaultAuth);
@@ -63,29 +51,17 @@ const AuthProvider = ({ children }) => {
         validateToken();
     };
 
-    const logout = async (isLogoutToken = true) => {
-        if (isLogoutToken) {
-            try {
-                await logoutToken();
-            } catch (error) {
-                console.log(error);
-            }
-        }
+    const logout = async () => {
+        await logoutToken();
         setAuthData(defaultAuth);
         localStorage.removeItem(ACCESS_TOKEN);
         localStorage.removeItem(REFRESH_TOKEN);
     };
 
-    const loadUserInfo = () => {
-        validateToken();
-    };
-
     const contextValues = {
         isAuthenticated: authData.isAuthenticated,
-        player: authData.player,
         login,
         logout,
-        loadUserInfo,
     };
 
     if (loading) {

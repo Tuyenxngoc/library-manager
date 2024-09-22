@@ -1,5 +1,6 @@
 :root {
-    --primary-color: #456ad4;
+    --primary-color: #77b748;
+    --text-color: #161823;
 }
 
 * {
@@ -10,4 +11,16 @@
 
 body {
     font-family: sans-serif;
+}
+
+a {
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+ul,
+ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
