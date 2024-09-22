@@ -11,7 +11,7 @@ import { Dropdown, Space, Input, Select } from 'antd';
 import 'bootstrap/dist/js/bootstrap.bundle';
 
 import classNames from 'classnames/bind';
-import styles from '~/styles/header.module.scss';
+import styles from '~/styles/Header.module.scss';
 
 const cx = classNames.bind(styles);
 

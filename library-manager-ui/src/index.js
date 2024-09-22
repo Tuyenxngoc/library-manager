@@ -10,7 +10,7 @@ import { AuthProvider } from '~/contexts/AuthProvider';
 
 import 'normalize.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import '~/styles/global.scss';
+import '~/styles/Global.scss';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

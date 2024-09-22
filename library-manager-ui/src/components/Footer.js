@@ -3,7 +3,7 @@ import { LuPhone } from 'react-icons/lu';
 import { MdMailOutline } from 'react-icons/md';
 
 import classNames from 'classnames/bind';
-import styles from '~/styles/footer.module.scss';
+import styles from '~/styles/Footer.module.scss';
 import images from '~/assets';
 
 const cx = classNames.bind(styles);
