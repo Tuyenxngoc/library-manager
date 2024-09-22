@@ -1,5 +1,11 @@
+import Slider from '~/components/Slider';
+
 function Home() {
-    return <>Home</>;
+    return (
+        <>
+            <Slider />
+        </>
+    );
 }
 
 export default Home;
