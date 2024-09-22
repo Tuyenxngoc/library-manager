@@ -2,20 +2,23 @@ import PropTypes from 'prop-types';
 
 import { createContext, useEffect, useState } from 'react';
 
-import { ACCESS_TOKEN, REFRESH_TOKEN } from '../common/commonConstants.jsx';
-import Loading from '../components/Loading.jsx';
-import { getCurrentUserLogin } from '../service/userService.jsx';
-import { logoutToken } from '../service/authService.jsx';
+import { ACCESS_TOKEN, REFRESH_TOKEN } from '~/common/commonConstants';
+import Loading from '~/components/Loading/Loading';
+import { logoutToken } from '~/services/authService';
+import { getCurrentUserLogin } from '~/services/userService';
 
 const AuthContext = createContext();
 
 const defaultAuth = {
     isAuthenticated: false,
-    user: {
+    player: {
         id: null,
         username: '',
         roleName: '',
         avatar: '',
+        online: false,
+        points: 1,
+        clanMember: null,
     },
 };
 
@@ -25,6 +28,7 @@ const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         validateToken();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const validateToken = async () => {
@@ -36,17 +40,17 @@ const AuthProvider = ({ children }) => {
                 setLoading(false);
                 return;
             }
-            const response = getCurrentUserLogin();
+            const response = await getCurrentUserLogin();
             if (response.status === 200) {
-                const { id, username, roleName, avatar } = response;
+                const { id, username, roleName, avatar, online, points, clanMember } = response.data.data;
                 setAuthData({
                     isAuthenticated: true,
-                    user: { id, username, roleName, avatar },
+                    player: { id, username, roleName, avatar, online, points, clanMember },
                 });
             } else {
                 setAuthData(defaultAuth);
             }
-        } catch {
+        } catch (error) {
             setAuthData(defaultAuth);
         } finally {
             setLoading(false);

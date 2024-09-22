@@ -1,14 +1,12 @@
 import axios from 'axios';
-import { ACCESS_TOKEN, API_URL, REFRESH_TOKEN } from '../common/commonConstants';
+import { ACCESS_TOKEN, API_URL, REFRESH_TOKEN } from '~/common/commonConstants';
 
-const axiosInstance = axios.create({
+export default axios.create({
     baseURL: API_URL,
     headers: {
         'Content-Type': 'application/json',
     },
 });
-
-export default axiosInstance;
 
 export const axiosPrivate = axios.create({
     baseURL: API_URL,
