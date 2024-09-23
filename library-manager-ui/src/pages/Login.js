@@ -1,5 +1,119 @@
+import { useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+
+import { Button, Input, message, Space } from 'antd';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
+
+import { loginUser } from '~/services/authService';
+import useAuth from '~/hooks/useAuth';
+import { handleError } from '~/utils/errorHandler';
+
+const validationSchema = yup.object({
+    cardNumber: yup.string().trim().required('Vui lòng nhập số thẻ'),
+
+    password: yup.string().required('Vui lòng nhập mật khẩu'),
+});
+
+const defaultValue = {
+    cardNumber: '',
+    password: '',
+};
 function Login() {
-    return <>Login</>;
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    const [messageApi, contextHolder] = message.useMessage();
+    const { isAuthenticated, login } = useAuth();
+
+    const from = location.state?.from?.pathname || '/';
+
+    const handleLogin = async (values, { setSubmitting }) => {
+        try {
+            const response = await loginUser(values);
+            if (response.status === 200) {
+                const { accessToken, refreshToken } = response.data.data;
+                login({ accessToken, refreshToken });
+                navigate(from, { replace: true });
+            }
+        } catch (error) {
+            handleError(error, formik, messageApi);
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const formik = useFormik({
+        initialValues: defaultValue,
+        validationSchema: validationSchema,
+        onSubmit: handleLogin,
+    });
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/', { replace: true });
+        }
+    }, [isAuthenticated, navigate]);
+
+    return (
+        <main className="py-5">
+            {contextHolder}
+
+            <div className="container">
+                <div className="row justify-content-center">
+                    <div className="col-6">
+                        <h2>Đăng nhập</h2>
+                        <p>Xin chào, vui lòng nhập nội dung sau để tiếp tục.</p>
+
+                        <form onSubmit={formik.handleSubmit}>
+                            <div className="mb-3">
+                                <label htmlFor="cardNumber">Số thẻ:</label>
+                                <Input
+                                    size="large"
+                                    id="cardNumber"
+                                    name="cardNumber"
+                                    value={formik.values.cardNumber}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    status={formik.touched.cardNumber && formik.errors.cardNumber ? 'error' : undefined}
+                                />
+                                <div className="text-danger">
+                                    {formik.touched.cardNumber && formik.errors.cardNumber}
+                                </div>
+                            </div>
+
+                            <div className="mb-3">
+                                <label htmlFor="password">Mật khẩu:</label>
+                                <Input.Password
+                                    size="large"
+                                    id="password"
+                                    name="password"
+                                    value={formik.values.password}
+                                    onChange={formik.handleChange}
+                                    onBlur={formik.handleBlur}
+                                    status={formik.touched.password && formik.errors.password ? 'error' : undefined}
+                                />
+                                <div className="text-danger">{formik.touched.password && formik.errors.password}</div>
+                            </div>
+
+                            <Space className="p-1">
+                                <Button
+                                    style={{ width: '170px' }}
+                                    size="large"
+                                    type="primary"
+                                    htmlType="submit"
+                                    loading={formik.isSubmitting}
+                                >
+                                    Đăng nhập
+                                </Button>
+                                <Link to="/forget-password">Quên mật khẩu ?</Link>
+                            </Space>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    );
 }
 
 export default Login;

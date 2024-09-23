@@ -157,22 +157,22 @@ function Header() {
                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                             <li className="nav-item">
-                                <Link className="nav-link px-4 text-white active" aria-current="page" to="#">
+                                <Link className="nav-link px-4 text-white active" aria-current="page" to="/news">
                                     Tin tức
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link className="nav-link px-4 text-white" to="#">
+                                <Link className="nav-link px-4 text-white" to="/about">
                                     Giới thiệu
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link className="nav-link px-4 text-white" to="#">
+                                <Link className="nav-link px-4 text-white" to="/holiday-schedule">
                                     Lịch nghỉ lễ
                                 </Link>
                             </li>
                             <li className="nav-item">
-                                <Link className="nav-link px-4 text-white" to="#">
+                                <Link className="nav-link px-4 text-white" to="/rules">
                                     Nội quy
                                 </Link>
                             </li>
