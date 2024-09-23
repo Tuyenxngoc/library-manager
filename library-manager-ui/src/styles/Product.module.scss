@@ -36,6 +36,21 @@
         color: #fff;
         text-align: center;
     }
+
+    .tag-saleoff {
+        position: absolute;
+        z-index: 1;
+        top: 0px;
+        right: 0px;
+        width: 40px;
+        height: 40px;
+        background: #d51c24;
+        border-radius: 50%;
+        font-size: 12px;
+        line-height: 40px;
+        color: #fff;
+        text-align: center;
+    }
 }
 
 .content {
@@ -70,6 +85,7 @@
     }
 
     a {
+        transition: color 0.3s ease;
         color: #666;
     }
 }

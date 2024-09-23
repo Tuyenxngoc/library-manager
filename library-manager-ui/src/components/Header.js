@@ -121,7 +121,12 @@ function Header() {
                     <div className="col-8">
                         <Space.Compact className="w-100">
                             <Select size="large" defaultValue="title" options={options} />
-                            <Search size="large" placeholder="Nhập nội dung tìm kiếm của bạn ở đây" allowClear />
+                            <Search
+                                size="large"
+                                name="search"
+                                placeholder="Nhập nội dung tìm kiếm của bạn ở đây"
+                                allowClear
+                            />
                         </Space.Compact>
 
                         <div className="text-lg-end">

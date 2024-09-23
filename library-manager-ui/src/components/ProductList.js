@@ -42,7 +42,7 @@ function ProductList() {
     };
 
     return (
-        <section className={cx('wrapper')}>
+        <section className={cx('wrapper', 'sectionspace')}>
             <div className="container">
                 <div className="row mb-3">
                     <div className="col-12">
