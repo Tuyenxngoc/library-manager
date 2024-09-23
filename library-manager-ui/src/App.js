@@ -16,6 +16,7 @@ import HolidaySchedule from './pages/HolidaySchedule';
 import Rules from './pages/Rules';
 import Report from './pages/Report';
 import Search from './pages/Search';
+import AdminLayout from './layouts/AdminLayout';
 
 function App() {
     return (
@@ -34,8 +35,10 @@ function App() {
                     <Route path="search" element={<Search />} />
 
                     <Route element={<RequireAuth />}>{/* Đường dẫn yêu cầu đăng nhập */}</Route>
+                </Route>
 
-                    <Route element={<RequireAuth allowedRoles={[ROLES.SuperAdmin, ROLES.Admin]} />}>
+                <Route element={<RequireAuth allowedRoles={[ROLES.SuperAdmin, ROLES.Admin]} />}>
+                    <Route path="admin/" element={<AdminLayout />}>
                         {/* Đường dẫn yêu cầu quyền quản trị */}
                     </Route>
                 </Route>

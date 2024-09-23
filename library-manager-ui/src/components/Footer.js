@@ -65,7 +65,7 @@ function Footer() {
                 <div className="container">
                     <div className="row">
                         <div className="col">
-                            <span>2018 All Rights Reserved By © NHÓM 16</span>
+                            <span>{new Date().getFullYear()} All Rights Reserved By © NHÓM 16</span>
                         </div>
                     </div>
                 </div>
