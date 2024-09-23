@@ -138,7 +138,7 @@ function Header() {
                 </div>
             </div>
 
-            <nav className={cx('navbar', 'p-0', 'navbar-expand-lg', 'navigationarea')}>
+            <nav className={cx('navbar', 'p-lg-0', 'navbar-expand-lg', 'navigationarea')}>
                 <div className="container">
                     <Link className="navbar-brand text-white" to="/">
                         Trang chủ
@@ -156,6 +156,35 @@ function Header() {
                     </button>
                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li className={cx('nav-item', 'dropdown')}>
+                                <Link
+                                    className="nav-link dropdown-toggle px-4 py-3 text-white"
+                                    to="#"
+                                    id="libraryDropdown"
+                                    role="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                >
+                                    Thư viện
+                                </Link>
+                                <ul className="dropdown-menu" aria-labelledby="libraryDropdown">
+                                    <li>
+                                        <Link className="dropdown-item" to="/library/books">
+                                            Sách
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link className="dropdown-item" to="/library/journals">
+                                            Tạp chí
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link className="dropdown-item" to="/library/reports">
+                                            Báo cáo
+                                        </Link>
+                                    </li>
+                                </ul>
+                            </li>
                             <li className={cx('nav-item')}>
                                 <Link className="nav-link px-4 py-3 text-white active" aria-current="page" to="/news">
                                     Tin tức

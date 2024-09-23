@@ -8,9 +8,13 @@ import styles from '~/styles/Post.module.scss';
 
 const cx = classNames.bind(styles);
 
-function Post({ className, data }) {
+function Post({ className, data, layout = 'vertical' }) {
     return (
-        <div className={cx('wrapper', className)}>
+        <div
+            className={cx('wrapper', className, {
+                horizontal: layout === 'horizontal',
+            })}
+        >
             <div className={cx('postimg')}>
                 <Link to="/">
                     <img

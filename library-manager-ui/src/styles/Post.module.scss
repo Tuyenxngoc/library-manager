@@ -5,6 +5,7 @@
 }
 
 .postimg {
+    width: 100%;
     padding: 5px;
     &:hover {
         box-shadow: 0 1px 7px 0 rgba(0, 0, 0, 0.35);
@@ -71,4 +72,17 @@
     line-height: 1.5;
     color: #666;
     text-overflow: ellipsis;
+}
+
+.horizontal {
+    display: flex;
+    flex-direction: row;
+    .postimg {
+        width: 50%;
+    }
+
+    .postcontent {
+        margin-top: 0;
+        margin-left: 16px;
+    }
 }
