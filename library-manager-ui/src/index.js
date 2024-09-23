@@ -15,7 +15,14 @@ import '~/styles/Global.scss';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>
-        <ConfigProvider locale={viVN}>
+        <ConfigProvider
+            locale={viVN}
+            theme={{
+                token: {
+                    colorPrimary: '#77b748',
+                },
+            }}
+        >
             <AuthProvider>
                 <App />
             </AuthProvider>
