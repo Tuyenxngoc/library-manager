@@ -17,11 +17,18 @@ function About() {
     return (
         <>
             <Parallax bgImage={backgrounds.bgparallax7} strength={500}>
-                <div className="container py-5">
-                    <div className="row justify-content-center">
-                        <div className="col-auto py-5 text-center">
-                            <h1>Về chúng tôi</h1>
-                            <Breadcrumb items={items} />
+                <div className="innerbanner">
+                    <div className="container">
+                        <div className="row justify-content-center">
+                            <div className="col-auto">
+                                <h1>Về chúng tôi</h1>
+                            </div>
+                        </div>
+
+                        <div className="row justify-content-center">
+                            <div className="col-auto">
+                                <Breadcrumb items={items} />
+                            </div>
                         </div>
                     </div>
                 </div>

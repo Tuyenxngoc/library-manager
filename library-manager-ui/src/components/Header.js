@@ -83,16 +83,16 @@ function Header() {
                         <div className="col-auto">
                             <ul className={cx('list')}>
                                 <li>
-                                    <a href="/">
+                                    <Link to="/report">
                                         <MdMailOutline />
                                         Liên hệ
-                                    </a>
+                                    </Link>
                                 </li>
                                 <li>
-                                    <a href="/">
+                                    <Link to="/">
                                         <MdHelpOutline />
                                         Trợ giúp
-                                    </a>
+                                    </Link>
                                 </li>
                             </ul>
                         </div>
@@ -130,15 +130,15 @@ function Header() {
                         </Space.Compact>
 
                         <div className="text-lg-end">
-                            <a href="/Search" style={{ color: '#55acee', fontSize: '13px' }}>
+                            <Link to="/search" style={{ color: '#55acee', fontSize: '13px' }}>
                                 + Tìm kiếm nâng cao
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <nav className="navbar navbar-expand-lg" style={{ backgroundColor: 'var(--primary-color)' }}>
+            <nav className={cx('navbar', 'p-0', 'navbar-expand-lg', 'navigationarea')}>
                 <div className="container">
                     <Link className="navbar-brand text-white" to="/">
                         Trang chủ
@@ -156,23 +156,23 @@ function Header() {
                     </button>
                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-                            <li className="nav-item">
-                                <Link className="nav-link px-4 text-white active" aria-current="page" to="/news">
+                            <li className={cx('nav-item')}>
+                                <Link className="nav-link px-4 py-3 text-white active" aria-current="page" to="/news">
                                     Tin tức
                                 </Link>
                             </li>
-                            <li className="nav-item">
-                                <Link className="nav-link px-4 text-white" to="/about">
+                            <li className={cx('nav-item')}>
+                                <Link className="nav-link px-4 py-3 text-white" to="/about">
                                     Giới thiệu
                                 </Link>
                             </li>
-                            <li className="nav-item">
-                                <Link className="nav-link px-4 text-white" to="/holiday-schedule">
+                            <li className={cx('nav-item')}>
+                                <Link className="nav-link px-4 py-3 text-white" to="/holiday-schedule">
                                     Lịch nghỉ lễ
                                 </Link>
                             </li>
-                            <li className="nav-item">
-                                <Link className="nav-link px-4 text-white" to="/rules">
+                            <li className={cx('nav-item')}>
+                                <Link className="nav-link px-4 py-3 text-white" to="/rules">
                                     Nội quy
                                 </Link>
                             </li>

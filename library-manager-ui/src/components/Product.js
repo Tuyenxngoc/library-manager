@@ -15,7 +15,7 @@ function Product({ className, data }) {
                     <img src={data.imageUrl} alt={data.title} />
                 </Link>
                 <div className={cx('tags')}>
-                    {data.quantity === 0 && <div className={cx('tag-soldout')}>Hết hàng</div>}
+                    {data.quantity === 0 && <div className={cx('tag-soldout')}>Hết sách</div>}
                     <div className={cx('tag-saleoff')}>HOT</div>
                 </div>
             </div>

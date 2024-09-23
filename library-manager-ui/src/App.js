@@ -14,6 +14,8 @@ import News from './pages/News';
 import About from './pages/About';
 import HolidaySchedule from './pages/HolidaySchedule';
 import Rules from './pages/Rules';
+import Report from './pages/Report';
+import Search from './pages/Search';
 
 function App() {
     return (
@@ -28,6 +30,8 @@ function App() {
                     <Route path="about" element={<About />} />
                     <Route path="holiday-schedule" element={<HolidaySchedule />} />
                     <Route path="rules" element={<Rules />} />
+                    <Route path="report" element={<Report />} />
+                    <Route path="search" element={<Search />} />
 
                     <Route element={<RequireAuth />}>{/* Đường dẫn yêu cầu đăng nhập */}</Route>
 
