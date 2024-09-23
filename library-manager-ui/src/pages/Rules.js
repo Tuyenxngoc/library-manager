@@ -3,6 +3,11 @@ import { backgrounds } from '~/assets';
 import Breadcrumb from '~/components/Breadcrumb';
 import SectionHeader from '~/components/SectionHeader';
 
+import classNames from 'classnames/bind';
+import styles from '~/styles/Rules.module.scss';
+
+const cx = classNames.bind(styles);
+
 function Rules() {
     const items = [
         {
@@ -33,7 +38,7 @@ function Rules() {
                         <SectionHeader title="Nội quy của thư viện" subtitle="Nội quy" />
                     </div>
                     <div className="col-12">
-                        <div className="rules">
+                        <div className={cx('rules')}>
                             <p>
                                 <strong>
                                     Bạn đọc đến đọc sách, ngoài việc chấp hành các quy định chung của thư viện cần thực
