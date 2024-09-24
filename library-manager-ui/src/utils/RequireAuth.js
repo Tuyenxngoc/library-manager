@@ -17,6 +17,9 @@ function RequireAuth({ allowedRoles }) {
         }
         return <Outlet />;
     } else {
+        if (location.pathname === '/admin') {
+            return <Navigate to="/admin/login" state={{ from: location }} replace />;
+        }
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 }

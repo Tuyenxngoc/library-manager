@@ -4,7 +4,7 @@ import { Button, Input, message, Space } from 'antd';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
-import { forgetPassword } from '~/services/authService';
+import { forgotPassword } from '~/services/authService';
 import { handleError } from '~/utils/errorHandler';
 
 const validationSchema = yup.object({
@@ -17,12 +17,12 @@ const defaultValue = {
     email: '',
 };
 
-function ForgetPassword() {
+function ForgotPassword() {
     const [messageApi, contextHolder] = message.useMessage();
 
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
-            const response = await forgetPassword(values);
+            const response = await forgotPassword(values);
             if (response.status === 200 && response?.data?.data?.message) {
                 messageApi.success(response.data.data.message);
             }
@@ -103,4 +103,4 @@ function ForgetPassword() {
     );
 }
 
-export default ForgetPassword;
+export default ForgotPassword;

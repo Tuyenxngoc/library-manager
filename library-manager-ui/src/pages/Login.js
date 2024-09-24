@@ -106,7 +106,7 @@ function Login() {
                                 >
                                     Đăng nhập
                                 </Button>
-                                <Link to="/forget-password">Quên mật khẩu ?</Link>
+                                <Link to="/forgot-password">Quên mật khẩu ?</Link>
                             </Space>
                         </form>
                     </div>

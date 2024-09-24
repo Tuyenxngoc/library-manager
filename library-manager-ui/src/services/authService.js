@@ -28,8 +28,8 @@ export const logoutToken = () => {
     return axiosPrivate.post('auth/logout');
 };
 
-export const forgetPassword = (values) => {
-    return axios.post('auth/forget-password', values);
+export const forgotPassword = (values) => {
+    return axios.post('auth/forgot-password', values);
 };
 
 export const changePassword = (values) => {

@@ -7,7 +7,7 @@ import { ROLES } from './common/roleConstants';
 
 import Home from './pages/Home';
 import Login from './pages/Login';
-import ForgetPassword from './pages/ForgetPassword';
+import ForgotPassword from './pages/ForgotPassword';
 import AccessDenied from './pages/AccessDenied';
 import NotFound from './pages/NotFound';
 import News from './pages/News';
@@ -17,6 +17,8 @@ import Rules from './pages/Rules';
 import Report from './pages/Report';
 import Search from './pages/Search';
 import AdminLayout from './layouts/AdminLayout';
+import AdminLogin from './pages/AdminLogin';
+import AdminForgotPassword from './pages/AdminForgotPassword';
 
 function App() {
     return (
@@ -25,7 +27,7 @@ function App() {
                 <Route element={<DefaultLayout />}>
                     <Route index element={<Home />} />
                     <Route path="login" element={<Login />} />
-                    <Route path="forget-password" element={<ForgetPassword />} />
+                    <Route path="forgot-password" element={<ForgotPassword />} />
 
                     <Route path="news" element={<News />} />
                     <Route path="about" element={<About />} />
@@ -42,6 +44,9 @@ function App() {
                         {/* Đường dẫn yêu cầu quyền quản trị */}
                     </Route>
                 </Route>
+
+                <Route path="admin/login" element={<AdminLogin />} />
+                <Route path="admin/forgot-password" element={<AdminForgotPassword />} />
 
                 <Route path="access-denied" element={<AccessDenied />} />
                 <Route path="*" element={<NotFound />} />
