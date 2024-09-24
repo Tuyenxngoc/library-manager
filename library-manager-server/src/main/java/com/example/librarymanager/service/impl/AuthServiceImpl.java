@@ -172,7 +172,6 @@ public class AuthServiceImpl implements AuthService {
         User user = userMapper.toUser(requestDto);
         user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         user.setRole(roleService.getRole(RoleConstant.ROLE_USER.name()));
-        user.setVerificationCode(code);
         user.setIsEnabled(false);
         user.setIsLocked(false);
         userRepository.save(user);

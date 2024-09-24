@@ -7,6 +7,8 @@ import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -42,10 +44,6 @@ public class User extends DateAuditing {
     @JsonIgnore
     private String password;
 
-    @Column(name = "verification_code", length = 64)
-    @JsonIgnore
-    private String verificationCode;
-
     @Column(name = "is_enabled", nullable = false)
     private Boolean isEnabled = false;
 
@@ -63,4 +61,7 @@ public class User extends DateAuditing {
     @JsonIgnore
     private Role role;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Log> logs = new ArrayList<>();
 }
