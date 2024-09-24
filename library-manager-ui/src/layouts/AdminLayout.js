@@ -6,6 +6,12 @@ import { AiFillDashboard } from 'react-icons/ai';
 import { IoMdSettings } from 'react-icons/io';
 import { FaUsers } from 'react-icons/fa';
 import { FaUser } from 'react-icons/fa';
+import { FaHistory } from 'react-icons/fa';
+import { BsNewspaper } from 'react-icons/bs';
+import { FaChartBar } from 'react-icons/fa';
+import { FaRecycle } from 'react-icons/fa';
+import { BiCategory } from 'react-icons/bi';
+import { FaBook } from 'react-icons/fa';
 
 const { Header, Content, Footer, Sider } = Layout;
 function getItem(label, key, icon, children) {
@@ -24,10 +30,16 @@ const items = [
         getItem('Quản lý người dùng', '4'),
     ]),
     getItem('Quản lý bạn đọc', 'sub2', <FaUser />, [
-        getItem('Thẻ bạn đọc', '6'),
-        getItem('Xử lý vi phạm', '7'),
-        getItem('Vào ra thư viện', '8'),
+        getItem('Thẻ bạn đọc', '5'),
+        getItem('Xử lý vi phạm', '6'),
+        getItem('Vào ra thư viện', '7'),
     ]),
+    getItem('Quản lý danh mục', 'sub3', <BiCategory />, [getItem('todo', '6')]),
+    getItem('Quản lý ấn phẩm', 'sub4', <FaBook />, [getItem('todo', '6')]),
+    getItem('Quản lý lưu thông', 'sub5', <FaRecycle />, [getItem('todo', '6')]),
+    getItem('Thống kê báo cáo', 'sub6', <FaChartBar />, [getItem('todo', '6')]),
+    getItem('Quản lý tin tức', 'sub7', <BsNewspaper />, [getItem('todo', '6')]),
+    getItem('Lịch sử truy cập', '1', <FaHistory />),
 ];
 
 function AdminLayout() {
@@ -43,7 +55,7 @@ function AdminLayout() {
             }}
         >
             {/* Sider */}
-            <Sider collapsible width={250} collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
+            <Sider collapsible width={220} collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
                 <h2 className="text-white">Library Manager</h2>
                 <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
             </Sider>
