@@ -2,10 +2,12 @@ package com.example.librarymanager.domain.entity;
 
 import com.example.librarymanager.constant.Gender;
 import com.example.librarymanager.domain.entity.common.FlagUserDateAuditing;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -52,5 +54,9 @@ public class Author extends FlagUserDateAuditing {
 
     @Column(name = "notes")
     private String notes; // Ghi chú
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<BookAuthor> bookAuthors;
 
 }

@@ -27,4 +27,8 @@ public class CategoryGroup {
     @JsonIgnore
     private List<Category> categories;
 
+    @OneToMany(mappedBy = "categoryGroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<BookDefinition> bookDefinitions;
+
 }

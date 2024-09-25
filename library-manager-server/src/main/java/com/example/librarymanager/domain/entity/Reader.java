@@ -3,6 +3,7 @@ package com.example.librarymanager.domain.entity;
 import com.example.librarymanager.constant.CardType;
 import com.example.librarymanager.constant.Gender;
 import com.example.librarymanager.domain.entity.common.FlagUserDateAuditing;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,6 +11,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -57,4 +60,7 @@ public class Reader extends FlagUserDateAuditing {
     @Column(name = "expiry_date")
     private LocalDate expiryDate; // Ngày hết hạn
 
+    @OneToMany(mappedBy = "reader", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<BorrowReceipt> borrowReceipts = new ArrayList<>();
 }

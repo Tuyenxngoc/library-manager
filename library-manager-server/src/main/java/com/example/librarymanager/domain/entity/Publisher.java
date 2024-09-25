@@ -1,7 +1,11 @@
 package com.example.librarymanager.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -28,5 +32,9 @@ public class Publisher {
 
     @Column(name = "notes")
     private String notes;  // Ghi chú
+
+    @OneToMany(mappedBy = "publisher", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<BookDefinition> bookDefinitions = new ArrayList<>();
 
 }

@@ -1,9 +1,12 @@
 package com.example.librarymanager.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -17,7 +20,7 @@ public class ImportReceipt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "import_receipt_id")
-    private Long id;  // Số phiếu nhập (ID)
+    private Long id;  // Số phiếu nhập
 
     @Column(name = "receipt_number", nullable = false)
     private String receiptNumber;  // Số phiếu nhập
@@ -33,5 +36,9 @@ public class ImportReceipt {
 
     @Column(name = "import_reason")
     private String importReason;  // Lý do nhập
+
+    @OneToMany(mappedBy = "importReceipt", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Book> book = new ArrayList<>();  // Sách đã nhập
 
 }
