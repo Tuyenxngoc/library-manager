@@ -42,3 +42,12 @@ ol {
         font-weight: bold;
     }
 }
+
+.socialicons {
+    display: flex;
+    align-items: center;
+
+    li {
+        padding: 0 4px;
+    }
+}

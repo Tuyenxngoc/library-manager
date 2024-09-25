@@ -30,7 +30,7 @@ function Footer() {
                             </li>
                         </ul>
 
-                        <ul className={cx('socialicons')}>
+                        <ul className="socialicons">
                             <li className="facebook">
                                 <a href="/">
                                     <img width={30} src={images.facebook} alt="icon" />

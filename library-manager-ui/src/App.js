@@ -19,6 +19,7 @@ import Search from './pages/Search';
 import AdminLayout from './layouts/AdminLayout';
 import AdminLogin from './pages/AdminLogin';
 import AdminForgotPassword from './pages/AdminForgotPassword';
+import BookDetail from './pages/BookDetail';
 
 function App() {
     return (
@@ -35,6 +36,7 @@ function App() {
                     <Route path="rules" element={<Rules />} />
                     <Route path="report" element={<Report />} />
                     <Route path="search" element={<Search />} />
+                    <Route path="book/:bookId" element={<BookDetail />} />
 
                     <Route element={<RequireAuth />}>{/* Đường dẫn yêu cầu đăng nhập */}</Route>
                 </Route>
