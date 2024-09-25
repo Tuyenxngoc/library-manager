@@ -1,6 +1,5 @@
 package com.example.librarymanager.domain.entity;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
