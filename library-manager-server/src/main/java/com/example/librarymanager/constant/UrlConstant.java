@@ -9,14 +9,11 @@ public class UrlConstant {
 
         public static final String LOGIN = PRE_FIX + "/login";
         public static final String LOGOUT = PRE_FIX + "/logout";
-        public static final String REGISTER = PRE_FIX + "/register";
         public static final String FORGET_PASSWORD = PRE_FIX + "/forget-password";
         public static final String CHANGE_PASSWORD = PRE_FIX + "/change-password";
         public static final String REFRESH_TOKEN = PRE_FIX + "/refresh-token";
-        public static final String CONFIRM = PRE_FIX + "/confirm";
-        public static final String RESEND_CONFIRMATION_EMAIL = PRE_FIX + "/resend-code";
-        public static final String CHECK_EMAIL_CONFIRMED = PRE_FIX + "/check-email";
-        public static final String GOOGLE_LOGIN = "/auth/google-login";
+
+        public static final String ADMIN_LOGIN = ADMIN_URL + LOGIN;
     }
 
     public static class User {

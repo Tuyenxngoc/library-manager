@@ -2,14 +2,14 @@ package com.example.librarymanager.service;
 
 public interface JwtTokenService {
 
-    void saveAccessToken(String accessToken, String userId);
+    void saveAccessToken(String accessToken, String userIdOrCardNumber);
 
-    void saveRefreshToken(String refreshToken, String userId);
+    void saveRefreshToken(String refreshToken, String userIdOrCardNumber);
 
-    boolean isAccessTokenExists(String accessToken, String userId);
+    boolean isAccessTokenExists(String accessToken, String userIdOrCardNumber);
 
-    boolean isRefreshTokenExists(String refreshToken, String userId);
+    boolean isRefreshTokenExists(String refreshToken, String userIdOrCardNumber);
 
-    void deleteTokens(String userId);
+    void deleteTokens(String userIdOrCardNumber);
 
 }

@@ -35,30 +35,30 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     }
 
     @Override
-    public void saveAccessToken(String accessToken, String userId) {
-        redisTemplate.opsForValue().set(getAccessTokenKey(userId), accessToken, expirationTimeAccessToken, TimeUnit.MINUTES);
+    public void saveAccessToken(String accessToken, String userIdOrCardNumber) {
+        redisTemplate.opsForValue().set(getAccessTokenKey(userIdOrCardNumber), accessToken, expirationTimeAccessToken, TimeUnit.MINUTES);
     }
 
     @Override
-    public void saveRefreshToken(String refreshToken, String userId) {
-        redisTemplate.opsForValue().set(getRefreshTokenKey(userId), refreshToken, expirationTimeRefreshToken, TimeUnit.MINUTES);
+    public void saveRefreshToken(String refreshToken, String userIdOrCardNumber) {
+        redisTemplate.opsForValue().set(getRefreshTokenKey(userIdOrCardNumber), refreshToken, expirationTimeRefreshToken, TimeUnit.MINUTES);
     }
 
     @Override
-    public boolean isAccessTokenExists(String accessToken, String userId) {
-        return Boolean.TRUE.equals(redisTemplate.hasKey(getAccessTokenKey(userId))) &&
-                accessToken.equals(redisTemplate.opsForValue().get(getAccessTokenKey(userId)));
+    public boolean isAccessTokenExists(String accessToken, String userIdOrCardNumber) {
+        return Boolean.TRUE.equals(redisTemplate.hasKey(getAccessTokenKey(userIdOrCardNumber))) &&
+                accessToken.equals(redisTemplate.opsForValue().get(getAccessTokenKey(userIdOrCardNumber)));
     }
 
     @Override
-    public boolean isRefreshTokenExists(String refreshToken, String userId) {
-        return Boolean.TRUE.equals(redisTemplate.hasKey(getRefreshTokenKey(userId))) &&
-                refreshToken.equals(redisTemplate.opsForValue().get(getRefreshTokenKey(userId)));
+    public boolean isRefreshTokenExists(String refreshToken, String userIdOrCardNumber) {
+        return Boolean.TRUE.equals(redisTemplate.hasKey(getRefreshTokenKey(userIdOrCardNumber))) &&
+                refreshToken.equals(redisTemplate.opsForValue().get(getRefreshTokenKey(userIdOrCardNumber)));
     }
 
     @Override
-    public void deleteTokens(String userId) {
-        redisTemplate.delete(getAccessTokenKey(userId));
-        redisTemplate.delete(getRefreshTokenKey(userId));
+    public void deleteTokens(String userIdOrCardNumber) {
+        redisTemplate.delete(getAccessTokenKey(userIdOrCardNumber));
+        redisTemplate.delete(getRefreshTokenKey(userIdOrCardNumber));
     }
 }

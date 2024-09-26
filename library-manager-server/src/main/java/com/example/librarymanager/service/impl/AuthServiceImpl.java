@@ -1,26 +1,24 @@
 package com.example.librarymanager.service.impl;
 
 import com.example.librarymanager.constant.ErrorMessage;
-import com.example.librarymanager.constant.RoleConstant;
 import com.example.librarymanager.constant.SuccessMessage;
 import com.example.librarymanager.domain.dto.common.DataMailDto;
 import com.example.librarymanager.domain.dto.request.auth.*;
 import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.dto.response.auth.LoginResponseDto;
 import com.example.librarymanager.domain.dto.response.auth.TokenRefreshResponseDto;
+import com.example.librarymanager.domain.entity.Reader;
 import com.example.librarymanager.domain.entity.User;
-import com.example.librarymanager.domain.mapper.UserMapper;
 import com.example.librarymanager.exception.BadRequestException;
-import com.example.librarymanager.exception.ConflictException;
 import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.exception.UnauthorizedException;
+import com.example.librarymanager.repository.ReaderRepository;
 import com.example.librarymanager.repository.UserRepository;
 import com.example.librarymanager.security.CustomUserDetails;
 import com.example.librarymanager.security.jwt.JwtTokenProvider;
 import com.example.librarymanager.service.AuthService;
 import com.example.librarymanager.service.EmailRateLimiterService;
 import com.example.librarymanager.service.JwtTokenService;
-import com.example.librarymanager.service.RoleService;
 import com.example.librarymanager.util.RandomPasswordUtil;
 import com.example.librarymanager.util.SendMailUtil;
 import jakarta.mail.MessagingException;
@@ -41,11 +39,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -67,21 +63,41 @@ public class AuthServiceImpl implements AuthService {
 
     UserRepository userRepository;
 
-    UserMapper userMapper;
-
     PasswordEncoder passwordEncoder;
-
-    RoleService roleService;
 
     SendMailUtil sendMailUtil;
 
+    ReaderRepository readerRepository;
+
     @Override
-    public LoginResponseDto login(LoginRequestDto request) {
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new UnauthorizedException(ErrorMessage.Auth.ERR_INCORRECT_USERNAME_PASSWORD));
+    public LoginResponseDto readerLogin(ReaderLoginRequestDto request) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getCardNumber(), request.getPassword())
+            );
 
-        checkUserLocked(user);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+            String accessToken = jwtTokenProvider.generateToken(customUserDetails, Boolean.FALSE);
+            String refreshToken = jwtTokenProvider.generateToken(customUserDetails, Boolean.TRUE);
 
+            jwtTokenService.saveAccessToken(accessToken, customUserDetails.getCardNumber());
+            jwtTokenService.saveRefreshToken(refreshToken, customUserDetails.getCardNumber());
+
+            return new LoginResponseDto(
+                    accessToken,
+                    refreshToken,
+                    customUserDetails.getAuthorities()
+            );
+        } catch (AuthenticationException e) {
+            throw new UnauthorizedException(ErrorMessage.Auth.ERR_INCORRECT_USERNAME_PASSWORD);
+        } catch (Exception e) {
+            throw new RuntimeException(ErrorMessage.ERR_EXCEPTION_GENERAL);
+        }
+    }
+
+    @Override
+    public LoginResponseDto adminLogin(AdminLoginRequestDto request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
@@ -115,7 +131,12 @@ public class AuthServiceImpl implements AuthService {
     ) {
         if (authentication != null && authentication.getPrincipal() != null) {
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-            jwtTokenService.deleteTokens(customUserDetails.getUserId());
+            if (customUserDetails.getUserId() != null) {
+                jwtTokenService.deleteTokens(customUserDetails.getUserId());
+            }
+            if (customUserDetails.getCardNumber() != null) {
+                jwtTokenService.deleteTokens(customUserDetails.getCardNumber());
+            }
         }
 
         SecurityContextLogoutHandler logout = new SecurityContextLogoutHandler();
@@ -132,7 +153,7 @@ public class AuthServiceImpl implements AuthService {
         if (jwtTokenProvider.validateToken(refreshToken)) {
             String userId = jwtTokenProvider.extractSubjectFromJwt(refreshToken);
 
-            if (userId != null && jwtTokenService.isRefreshTokenExists(refreshToken, userId)) {
+            if (userId != null && jwtTokenService.isRefreshTokenExists(refreshToken, userId)) {//Kiểm tra nếu có userId
                 User user = userRepository.findById(userId)
                         .orElseThrow(() -> new BadRequestException(ErrorMessage.Auth.ERR_INVALID_REFRESH_TOKEN));
                 CustomUserDetails userDetails = CustomUserDetails.create(user);
@@ -144,45 +165,31 @@ public class AuthServiceImpl implements AuthService {
                 jwtTokenService.saveRefreshToken(newRefreshToken, user.getId());
 
                 return new TokenRefreshResponseDto(newAccessToken, newRefreshToken);
-            } else {
-                throw new BadRequestException(ErrorMessage.Auth.ERR_INVALID_REFRESH_TOKEN);
+            } else {//Nếu không kiểm tra cardNumber
+                String cardNumber = jwtTokenProvider.extractClaimCardNumber(refreshToken);
+
+                if (cardNumber != null && jwtTokenService.isRefreshTokenExists(refreshToken, cardNumber)) {
+                    Reader reader = readerRepository.findByCardNumber(cardNumber)
+                            .orElseThrow(() -> new BadRequestException(ErrorMessage.Auth.ERR_INVALID_REFRESH_TOKEN));
+
+                    CustomUserDetails userDetails = CustomUserDetails.create(reader);
+
+                    String newAccessToken = jwtTokenProvider.generateToken(userDetails, Boolean.FALSE);
+                    String newRefreshToken = jwtTokenProvider.generateToken(userDetails, Boolean.TRUE);
+
+                    jwtTokenService.saveAccessToken(newAccessToken, cardNumber);
+                    jwtTokenService.saveRefreshToken(newRefreshToken, cardNumber);
+
+                    return new TokenRefreshResponseDto(newAccessToken, newRefreshToken);
+
+                }
+
             }
-        } else {
-            throw new BadRequestException(ErrorMessage.Auth.ERR_INVALID_REFRESH_TOKEN);
-        }
-    }
 
-    @Override
-    public User register(RegisterRequestDto requestDto, String siteURL) {
-        if (!requestDto.getPassword().equals(requestDto.getRepeatPassword())) {
-            throw new BadRequestException(ErrorMessage.INVALID_REPEAT_PASSWORD);
-        }
-        boolean isUsernameExists = userRepository.existsByUsername(requestDto.getUsername());
-        if (isUsernameExists) {
-            throw new ConflictException(ErrorMessage.Auth.ERR_DUPLICATE_USERNAME);
-        }
-        boolean isEmailExists = userRepository.existsByEmail(requestDto.getEmail());
-        if (isEmailExists) {
-            throw new ConflictException(ErrorMessage.Auth.ERR_DUPLICATE_EMAIL);
         }
 
-        String code = UUID.randomUUID().toString();
-
-        //Create new User
-        User user = userMapper.toUser(requestDto);
-        user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
-        user.setRole(roleService.getRole(RoleConstant.ROLE_USER.name()));
-        user.setIsEnabled(false);
-        user.setIsLocked(false);
-        userRepository.save(user);
-
-        Map<String, Object> properties = new HashMap<>();
-        properties.put("username", requestDto.getUsername());
-        properties.put("password", requestDto.getPassword());
-        properties.put("url", siteURL + "/verify?code=" + code);
-        sendEmail(requestDto.getEmail(), "Đăng ký thành công", properties, "registerSuccess.html");
-
-        return user;
+        //Trả về lỗi refresh token không hợp lệ
+        throw new BadRequestException(ErrorMessage.Auth.ERR_INVALID_REFRESH_TOKEN);
     }
 
     @Override
@@ -252,30 +259,6 @@ public class AuthServiceImpl implements AuthService {
                 e.printStackTrace();
             }
         });
-    }
-
-    private void checkUserLocked(User user) {
-        if (user.getIsLocked()) {
-            LocalDate lockUntil = user.getLockUntil();
-
-            // Nếu lockUntil là null, tài khoản bị khóa vĩnh viễn
-            if (lockUntil == null) {
-                throw new UnauthorizedException(ErrorMessage.Auth.ERR_ACCOUNT_LOCKED, null, null);
-            }
-
-            // Nếu thời gian hiện tại đã qua lockUntil, mở khóa tài khoản
-            if (LocalDate.now().isAfter(lockUntil)) {
-                user.setIsLocked(false);
-                user.setLockUntil(null);
-                user.setLockReason(null);
-
-                userRepository.save(user);
-            } else {
-                // Nếu tài khoản vẫn bị khóa, ném ngoại lệ với lý do và thời gian khóa
-                String lockReason = user.getLockReason();
-                throw new UnauthorizedException(ErrorMessage.Auth.ERR_ACCOUNT_LOCKED, lockUntil, lockReason);
-            }
-        }
     }
 
 }

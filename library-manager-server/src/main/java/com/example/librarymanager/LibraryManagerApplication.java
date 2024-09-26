@@ -3,6 +3,7 @@ package com.example.librarymanager;
 import com.example.librarymanager.config.CloudinaryConfig;
 import com.example.librarymanager.config.MailConfig;
 import com.example.librarymanager.config.properties.AdminInfo;
+import com.example.librarymanager.service.ReaderService;
 import com.example.librarymanager.service.RoleService;
 import com.example.librarymanager.service.UserService;
 import lombok.AccessLevel;
@@ -33,6 +34,8 @@ public class LibraryManagerApplication {
 
     UserService userService;
 
+    ReaderService readerService;
+
     public static void main(String[] args) {
         Environment env = SpringApplication.run(LibraryManagerApplication.class, args).getEnvironment();
         String appName = env.getProperty("spring.application.name");
@@ -51,6 +54,7 @@ public class LibraryManagerApplication {
         return args -> {
             roleService.initRoles();
             userService.initAdmin(adminInfo);
+            readerService.initReaders();
         };
     }
 

@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,15 +45,6 @@ public class User extends DateAuditing {
 
     @Column(name = "is_enabled", nullable = false)
     private Boolean isEnabled = false;
-
-    @Column(name = "is_locked", nullable = false)
-    private Boolean isLocked = false;
-
-    @Column(name = "lock_until")
-    private LocalDate lockUntil;
-
-    @Column(name = "lock_reason")
-    private String lockReason;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", foreignKey = @ForeignKey(name = "FK_USER_ROLE_ID"), referencedColumnName = "role_id", nullable = false)

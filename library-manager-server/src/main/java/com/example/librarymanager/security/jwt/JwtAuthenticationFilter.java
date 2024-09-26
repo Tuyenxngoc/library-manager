@@ -40,13 +40,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (accessToken != null && tokenProvider.validateToken(accessToken)) {
                 String userId = tokenProvider.extractSubjectFromJwt(accessToken);
 
-                if (userId != null && tokenService.isAccessTokenExists(accessToken, userId)) {
+                if (userId != null && tokenService.isAccessTokenExists(accessToken, userId)) {//Nếu có id trong token
                     UserDetails userDetails = customUserDetailsService.loadUserByUserId(userId);
                     UsernamePasswordAuthenticationToken authenticationToken =
                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                } else {//Nếu không có thì đọc card number
+                    String cardNumber = tokenProvider.extractClaimCardNumber(accessToken);
+                    if (cardNumber != null && tokenService.isAccessTokenExists(accessToken, cardNumber)) {
+                        UserDetails userDetails = customUserDetailsService.loadUserByCardNumber(cardNumber);
+                        UsernamePasswordAuthenticationToken authenticationToken =
+                                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+                        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    }
                 }
             }
         } catch (Exception ex) {

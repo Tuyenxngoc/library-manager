@@ -20,7 +20,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RestApiV1
 @RequiredArgsConstructor
@@ -32,8 +31,14 @@ public class AuthController {
 
     @Operation(summary = "API Login")
     @PostMapping(UrlConstant.Auth.LOGIN)
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDto request) {
-        return VsResponseUtil.success(authService.login(request));
+    public ResponseEntity<?> login(@Valid @RequestBody ReaderLoginRequestDto request) {
+        return VsResponseUtil.success(authService.readerLogin(request));
+    }
+
+    @Operation(summary = "API Admin Login")
+    @PostMapping(UrlConstant.Auth.ADMIN_LOGIN)
+    public ResponseEntity<?> adminLogin(@Valid @RequestBody AdminLoginRequestDto request) {
+        return VsResponseUtil.success(authService.adminLogin(request));
     }
 
     @Operation(summary = "API Logout")
@@ -50,15 +55,6 @@ public class AuthController {
     @PostMapping(UrlConstant.Auth.REFRESH_TOKEN)
     public ResponseEntity<?> refresh(@Valid @RequestBody TokenRefreshRequestDto tokenRefreshRequestDto) {
         return VsResponseUtil.success(authService.refresh(tokenRefreshRequestDto));
-    }
-
-    @Operation(summary = "API Register")
-    @PostMapping(UrlConstant.Auth.REGISTER)
-    public ResponseEntity<?> register(
-            @Valid @RequestBody RegisterRequestDto requestDto,
-            @RequestParam("siteURL") String siteURL
-    ) {
-        return VsResponseUtil.success(authService.register(requestDto, siteURL));
     }
 
     @Operation(summary = "API forget password")

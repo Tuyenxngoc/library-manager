@@ -5,7 +5,7 @@ import { Button, Input, message, Space } from 'antd';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
-import { loginUser } from '~/services/authService';
+import { readerLogin } from '~/services/authService';
 import useAuth from '~/hooks/useAuth';
 import { handleError } from '~/utils/errorHandler';
 
@@ -30,7 +30,7 @@ function Login() {
 
     const handleLogin = async (values, { setSubmitting }) => {
         try {
-            const response = await loginUser(values);
+            const response = await readerLogin(values);
             if (response.status === 200) {
                 const { accessToken, refreshToken } = response.data.data;
                 login({ accessToken, refreshToken });

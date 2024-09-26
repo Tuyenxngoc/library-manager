@@ -21,6 +21,7 @@ public class Book {
     @Column(name = "book_id")
     private Long id;
 
+    @Column(name = "dkcb")
     private String dkcb;//Số đăng ký cá biệt sách
 
     @Enumerated(EnumType.STRING)

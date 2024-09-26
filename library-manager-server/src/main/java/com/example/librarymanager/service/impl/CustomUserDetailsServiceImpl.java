@@ -1,8 +1,10 @@
 package com.example.librarymanager.service.impl;
 
 import com.example.librarymanager.constant.ErrorMessage;
+import com.example.librarymanager.domain.entity.Reader;
 import com.example.librarymanager.domain.entity.User;
 import com.example.librarymanager.exception.NotFoundException;
+import com.example.librarymanager.repository.ReaderRepository;
 import com.example.librarymanager.repository.UserRepository;
 import com.example.librarymanager.security.CustomUserDetails;
 import com.example.librarymanager.service.CustomUserDetailsService;
@@ -22,13 +24,20 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService, CustomU
 
     UserRepository userRepository;
 
+    ReaderRepository readerRepository;
+
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.User.ERR_NOT_FOUND_USERNAME, username));
+    public UserDetails loadUserByUsername(String usernameOrCardNumber) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(usernameOrCardNumber).orElse(null);
+        if (user != null) {
+            return CustomUserDetails.create(user);
+        } else {
+            Reader reader = readerRepository.findByCardNumber(usernameOrCardNumber)
+                    .orElseThrow(() -> new NotFoundException(ErrorMessage.Reader.ERR_NOT_FOUND_CARD_NUMBER, usernameOrCardNumber));
 
-        return CustomUserDetails.create(user);
+            return CustomUserDetails.create(reader);
+        }
     }
 
     @Override
@@ -38,6 +47,14 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService, CustomU
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.User.ERR_NOT_FOUND_ID, userId));
 
         return CustomUserDetails.create(user);
+    }
+
+    @Override
+    public UserDetails loadUserByCardNumber(String cardNumber) throws UsernameNotFoundException {
+        Reader reader = readerRepository.findByCardNumber(cardNumber)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.Reader.ERR_NOT_FOUND_CARD_NUMBER, cardNumber));
+
+        return CustomUserDetails.create(reader);
     }
 
 }

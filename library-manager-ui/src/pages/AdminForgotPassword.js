@@ -10,8 +10,8 @@ import * as yup from 'yup';
 import classNames from 'classnames/bind';
 import styles from '~/styles/AdminLogin.module.scss';
 import useAuth from '~/hooks/useAuth';
-import { loginUser } from '~/services/authService';
 import { handleError } from '~/utils/errorHandler';
+import { forgotPassword } from '~/services/authService';
 
 const cx = classNames.bind(styles);
 
@@ -34,7 +34,7 @@ function AdminForgotPassword() {
 
     const handleLogin = async (values, { setSubmitting }) => {
         try {
-            const response = await loginUser(values);
+            const response = await forgotPassword(values);
             if (response.status === 200) {
                 const { accessToken, refreshToken } = response.data.data;
                 login({ accessToken, refreshToken });

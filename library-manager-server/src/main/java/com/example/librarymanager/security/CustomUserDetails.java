@@ -1,5 +1,7 @@
 package com.example.librarymanager.security;
 
+import com.example.librarymanager.constant.RoleConstant;
+import com.example.librarymanager.domain.entity.Reader;
 import com.example.librarymanager.domain.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
@@ -17,7 +19,7 @@ public class CustomUserDetails implements UserDetails {
     private final String userId;
 
     @Getter
-    private final String email;
+    private final String cardNumber;
 
     @JsonIgnore
     private final String username;
@@ -25,23 +27,26 @@ public class CustomUserDetails implements UserDetails {
     @JsonIgnore
     private final String password;
 
-    private final boolean isEnabled;
-
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public CustomUserDetails(String userId, String email, String username, String password, boolean isEnabled, Collection<? extends GrantedAuthority> authorities) {
+    public CustomUserDetails(String userId, String cardNumber, String username, String password, Collection<? extends GrantedAuthority> authorities) {
         this.userId = userId;
-        this.email = email;
+        this.cardNumber = cardNumber;
         this.username = username;
         this.password = password;
-        this.isEnabled = isEnabled;
         this.authorities = authorities;
     }
 
     public static CustomUserDetails create(User user) {
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(user.getRole().getName()));
-        return new CustomUserDetails(user.getId(), user.getEmail(), user.getUsername(), user.getPassword(), user.getIsEnabled(), authorities);
+        return new CustomUserDetails(user.getId(), null, user.getUsername(), user.getPassword(), authorities);
+    }
+
+    public static CustomUserDetails create(Reader reader) {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(RoleConstant.ROLE_READER.name()));
+        return new CustomUserDetails(null, reader.getCardNumber(), reader.getFullName(), reader.getPassword(), authorities);
     }
 
     @Override
@@ -58,25 +63,4 @@ public class CustomUserDetails implements UserDetails {
     public String getUsername() {
         return username;
     }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return isEnabled;
-    }
-
 }

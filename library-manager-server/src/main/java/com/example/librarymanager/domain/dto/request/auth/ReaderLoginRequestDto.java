@@ -12,11 +12,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequestDto {
+public class ReaderLoginRequestDto {
 
     @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)
     @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
-    private String username;
+    private String cardNumber;
 
     @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)
     @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)

@@ -44,14 +44,10 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/swagger-ui.html",
             //auth
-            "/api/v1/auth/register",
-            "/api/v1/auth/confirm",
-            "/api/v1/auth/resend-code",
-            "/api/v1/auth/check-email",
-            "/api/v1/auth/refresh-token",
             "/api/v1/auth/login",
-            "/api/v1/auth/google-login",
+            "/api/v1/admin/auth/login",
             "/api/v1/auth/forget-password",
+            "/api/v1/auth/refresh-token",
             //resources
             "/images/**",
             "/files/**",

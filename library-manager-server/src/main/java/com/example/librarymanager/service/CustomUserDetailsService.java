@@ -7,4 +7,6 @@ public interface CustomUserDetailsService {
 
     UserDetails loadUserByUserId(String userId) throws UsernameNotFoundException;
 
+    UserDetails loadUserByCardNumber(String cardNumber) throws UsernameNotFoundException;
+
 }

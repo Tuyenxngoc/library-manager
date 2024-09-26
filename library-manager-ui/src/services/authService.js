@@ -1,27 +1,11 @@
 import axios, { axiosPrivate } from '~/apis/configHttp.js';
 
-export const loginUser = (values) => {
+export const readerLogin = (values) => {
     return axios.post('auth/login', values);
 };
 
-export const loginWithGoogle = (values) => {
-    return axios.post('auth/google-login', values);
-};
-
-export const register = (url, values) => {
-    return axios.post(`auth/register?siteURL=${url}`, values);
-};
-
-export const confirmEmail = (code) => {
-    return axios.get(`auth/confirm?code=${code}`);
-};
-
-export const resendConfirmationEmail = (email, url) => {
-    return axios.post(`auth/resend-code?email=${email}&siteURL=${url}`);
-};
-
-export const checkEmailConfirmed = (email) => {
-    return axios.get(`auth/check-email?email=${email}`);
+export const adminLogin = (values) => {
+    return axios.post('admin/auth/login', values);
 };
 
 export const logoutToken = () => {

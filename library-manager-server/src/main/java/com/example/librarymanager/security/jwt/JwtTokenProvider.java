@@ -20,6 +20,7 @@ public class JwtTokenProvider {
     private static final String TYPE_ACCESS = "access";
     private static final String TYPE_REFRESH = "refresh";
     private static final String USERNAME_KEY = "username";
+    private static final String CARD_NUMBER_KEY = "card-number";
     private static final String AUTHORITIES_KEY = "auth";
 
     @Value("${jwt.secret:76947ef7-7af1-4745-bfda-ab2d5cb09290}")
@@ -38,6 +39,7 @@ public class JwtTokenProvider {
         Map<String, Object> claim = new HashMap<>();
         claim.put(CLAIM_TYPE, isRefreshToken ? TYPE_REFRESH : TYPE_ACCESS);
         claim.put(USERNAME_KEY, userDetails.getUsername());
+        claim.put(CARD_NUMBER_KEY, userDetails.getCardNumber());
         claim.put(AUTHORITIES_KEY, authorities);
         if (isRefreshToken) {
             return Jwts.builder()
@@ -80,7 +82,19 @@ public class JwtTokenProvider {
     }
 
     public String extractClaimUsername(String token) {
-        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody().get(USERNAME_KEY).toString();
+        Object userName = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody().get(USERNAME_KEY);
+        if (userName != null) {
+            return userName.toString();
+        }
+        return null;
+    }
+
+    public String extractClaimCardNumber(String token) {
+        Object cardNumber = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody().get(CARD_NUMBER_KEY);
+        if (cardNumber != null) {
+            return cardNumber.toString();
+        }
+        return null;
     }
 
 }

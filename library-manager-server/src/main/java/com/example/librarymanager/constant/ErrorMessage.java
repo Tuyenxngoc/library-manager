@@ -86,4 +86,8 @@ public class ErrorMessage {
         public static final String INVALID_EMAIL = "exception.user.invalid.email";
         public static final String ERR_NOT_ALLOWED_SUPER_ADMIN = "exception.user.not.allowed.super.admin";
     }
+
+    public static class Reader {
+        public static final String ERR_NOT_FOUND_CARD_NUMBER = "exception.user.not.found.card.number";
+    }
 }
