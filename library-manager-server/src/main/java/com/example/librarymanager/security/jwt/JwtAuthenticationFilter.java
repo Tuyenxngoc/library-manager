@@ -37,14 +37,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String accessToken = JwtUtil.getJwtFromRequest(request);
 
+            //Kiểm tra token hợp lệ
             if (accessToken != null && tokenProvider.validateToken(accessToken)) {
                 String userId = tokenProvider.extractSubjectFromJwt(accessToken);
-
                 if (userId != null && tokenService.isAccessTokenExists(accessToken, userId)) {//Nếu có id trong token
                     UserDetails userDetails = customUserDetailsService.loadUserByUserId(userId);
                     UsernamePasswordAuthenticationToken authenticationToken =
                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
                     authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                 } else {//Nếu không có thì đọc card number
@@ -53,7 +52,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         UserDetails userDetails = customUserDetailsService.loadUserByCardNumber(cardNumber);
                         UsernamePasswordAuthenticationToken authenticationToken =
                                 new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
                         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                     }
