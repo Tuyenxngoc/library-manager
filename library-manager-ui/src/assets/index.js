@@ -5,6 +5,7 @@ const images = {
     linkedin: require('./images/linkedin.png'),
     rss: require('./images/rss.png'),
     twitter: require('./images/twitter.png'),
+    logo: require('./images/logo.svg').default,
 };
 
 export const slides = [

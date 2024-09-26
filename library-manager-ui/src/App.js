@@ -20,6 +20,9 @@ import AdminLayout from './layouts/AdminLayout';
 import AdminLogin from './pages/AdminLogin';
 import AdminForgotPassword from './pages/AdminForgotPassword';
 import BookDetail from './pages/BookDetail';
+import InwardBook from './pages/InwardBook';
+import Author from './pages/Author';
+import AuthorForm from './pages/AuthorForm';
 
 function App() {
     return (
@@ -44,6 +47,18 @@ function App() {
                 <Route element={<RequireAuth allowedRoles={[ROLES.SuperAdmin, ROLES.Admin]} />}>
                     <Route path="admin/" element={<AdminLayout />}>
                         {/* Đường dẫn yêu cầu quyền quản trị */}
+
+                        <Route path="Book/">
+                            <Route path="BookList" element={<h2>BookList</h2>} />
+                            <Route path="Inwardbook" element={<InwardBook />} />
+                        </Route>
+
+                        {/* Tác giả */}
+                        <Route path="author">
+                            <Route index element={<Author />} />
+                            <Route path="new" element={<AuthorForm />} />
+                            <Route path="edit/:id" element={<AuthorForm />} />
+                        </Route>
                     </Route>
                 </Route>
 

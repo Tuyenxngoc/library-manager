@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from 'react';
 import { Parallax } from 'react-parallax';
 
 import { ImBooks, ImUserPlus } from 'react-icons/im';
@@ -25,42 +24,6 @@ const COUNTERS = [
 ];
 
 function Home() {
-    const [counts, setCounts] = useState(Array(COUNTERS.length).fill(0));
-    const counterRef = useRef(null);
-
-    useEffect(() => {
-        const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) {
-                COUNTERS.forEach((item, index) => {
-                    let currentCount = 0;
-                    const interval = setInterval(() => {
-                        if (currentCount < item.count) {
-                            currentCount += Math.ceil(item.count / 100);
-                            setCounts((prev) => {
-                                const newCounts = [...prev];
-                                newCounts[index] = Math.min(currentCount, item.count);
-                                return newCounts;
-                            });
-                        } else {
-                            clearInterval(interval);
-                        }
-                    }, 20);
-                });
-                observer.unobserve(counterRef.current);
-            }
-        });
-
-        if (counterRef.current) {
-            observer.observe(counterRef.current);
-        }
-
-        return () => {
-            if (counterRef.current) {
-                observer.unobserve(counterRef.current);
-            }
-        };
-    }, []);
-
     return (
         <>
             <Slider />
@@ -69,7 +32,7 @@ function Home() {
 
             <Parallax bgImage={backgrounds.bgparallax4} strength={500}>
                 <div className="container py-5">
-                    <div className="row" ref={counterRef}>
+                    <div className="row">
                         {COUNTERS.map((item, index) => (
                             <div key={index} className={cx('col-3', 'collectioncounter', item.className)}>
                                 <div className={cx('collectioncountericon')}>
@@ -81,7 +44,7 @@ function Home() {
                                 <div className={cx('titlepluscounter')}>
                                     <h2>{item.title}</h2>
                                     <h3>
-                                        <FormattedNumber number={counts[index]} />
+                                        <FormattedNumber number={item.count} />
                                     </h3>
                                 </div>
                             </div>

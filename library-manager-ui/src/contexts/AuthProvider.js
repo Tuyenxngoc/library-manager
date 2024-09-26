@@ -11,6 +11,10 @@ const AuthContext = createContext();
 
 const defaultAuth = {
     isAuthenticated: false,
+    user: {
+        name: '',
+        roleName: '',
+    },
 };
 
 const AuthProvider = ({ children }) => {
@@ -32,8 +36,13 @@ const AuthProvider = ({ children }) => {
             }
             const response = await getCurrentUserLogin();
             if (response.status === 200) {
+                const { name, roleName } = response.data.data;
                 setAuthData({
                     isAuthenticated: true,
+                    user: {
+                        name,
+                        roleName,
+                    },
                 });
             } else {
                 setAuthData(defaultAuth);
@@ -60,6 +69,7 @@ const AuthProvider = ({ children }) => {
 
     const contextValues = {
         isAuthenticated: authData.isAuthenticated,
+        user: authData.user,
         login,
         logout,
     };

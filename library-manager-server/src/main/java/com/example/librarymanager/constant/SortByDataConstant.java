@@ -9,4 +9,11 @@ public enum SortByDataConstant implements SortByInterface {
         }
     },
 
+    AUTHOR {
+        @Override
+        public String getSortBy(String sortBy) {
+            return "createdDate";
+        }
+    }
+
 }

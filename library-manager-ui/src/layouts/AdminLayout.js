@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 
 import { AiFillDashboard } from 'react-icons/ai';
@@ -12,6 +12,7 @@ import { FaChartBar } from 'react-icons/fa';
 import { FaRecycle } from 'react-icons/fa';
 import { BiCategory } from 'react-icons/bi';
 import { FaBook } from 'react-icons/fa';
+import images from '~/assets';
 
 const { Header, Content, Footer, Sider } = Layout;
 function getItem(label, key, icon, children) {
@@ -24,22 +25,36 @@ function getItem(label, key, icon, children) {
 }
 const items = [
     getItem('Trang chủ', '1', <AiFillDashboard />),
-    getItem('Thiết lập thệ thống', '2', <IoMdSettings />),
+    getItem('Thiết lập hệ thống', '2', <IoMdSettings />),
     getItem('Quản lý người dùng', 'sub1', <FaUsers />, [
-        getItem('Quẩn lý nhóm', '3'),
-        getItem('Quản lý người dùng', '4'),
+        getItem('Quản lý nhóm', 'sub1a'),
+        getItem('Quản lý người dùng', 'sub1b'),
     ]),
     getItem('Quản lý bạn đọc', 'sub2', <FaUser />, [
-        getItem('Thẻ bạn đọc', '5'),
-        getItem('Xử lý vi phạm', '6'),
-        getItem('Vào ra thư viện', '7'),
+        getItem('Thẻ bạn đọc', 'sub2a'),
+        getItem('Xử lý vi phạm', 'sub2b'),
+        getItem('Vào ra thư viện', 'sub2c'),
     ]),
-    getItem('Quản lý danh mục', 'sub3', <BiCategory />, [getItem('todo', '6')]),
-    getItem('Quản lý ấn phẩm', 'sub4', <FaBook />, [getItem('todo', '6')]),
-    getItem('Quản lý lưu thông', 'sub5', <FaRecycle />, [getItem('todo', '6')]),
-    getItem('Thống kê báo cáo', 'sub6', <FaChartBar />, [getItem('todo', '6')]),
-    getItem('Quản lý tin tức', 'sub7', <BsNewspaper />, [getItem('todo', '6')]),
-    getItem('Lịch sử truy cập', '1', <FaHistory />),
+    getItem('Quản lý danh mục', 'sub3', <BiCategory />, [
+        getItem('Biên mục', 'sub3a'),
+        getItem('Loại sách', 'sub3b'),
+        getItem('Bộ sách', 'sub3c'),
+        getItem('Tác giả', 'author'),
+    ]),
+    getItem('Quản lý sách', 'sub4', <FaBook />, [
+        getItem('Danh sách sách', 'sub4a'),
+        getItem('Danh sách sách điện tử', 'sub4b'),
+        getItem('Nhập sách', 'Book/Inwardbook'),
+        getItem('Kiểm kê sách', 'sub4d'),
+        getItem('Xuất sách', 'sub4e'),
+    ]),
+    getItem('Quản lý lưu thông', 'sub5', <FaRecycle />, [
+        getItem('Mượn sách', 'sub5a'),
+        getItem('Trả-Gia hạn sách', 'sub5b'),
+    ]),
+    getItem('Thống kê báo cáo', 'sub6', <FaChartBar />, [getItem('todo', 'sub6a')]),
+    getItem('Quản lý tin tức', 'sub7', <BsNewspaper />, [getItem('todo', 'sub7a')]),
+    getItem('Lịch sử truy cập', '8', <FaHistory />),
 ];
 
 function AdminLayout() {
@@ -47,6 +62,12 @@ function AdminLayout() {
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
+
+    const navigate = useNavigate();
+
+    const handleMenuItemClick = ({ key }) => {
+        navigate(key);
+    };
 
     return (
         <Layout
@@ -56,8 +77,16 @@ function AdminLayout() {
         >
             {/* Sider */}
             <Sider collapsible width={220} collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
-                <h2 className="text-white">Library Manager</h2>
-                <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
+                <div>
+                    <img src={images.logo} alt="logo" width={34} />
+                </div>
+                <Menu
+                    theme="dark"
+                    defaultSelectedKeys={['1']}
+                    mode="inline"
+                    items={items}
+                    onClick={handleMenuItemClick}
+                />
             </Sider>
 
             <Layout>
@@ -79,10 +108,22 @@ function AdminLayout() {
                         style={{
                             margin: '16px 0',
                         }}
-                    >
-                        <Breadcrumb.Item>User</Breadcrumb.Item>
-                        <Breadcrumb.Item>Bill</Breadcrumb.Item>
-                    </Breadcrumb>
+                        items={[
+                            {
+                                title: 'Home',
+                            },
+                            {
+                                title: <a href="">Application Center</a>,
+                            },
+                            {
+                                title: <a href="">Application List</a>,
+                            },
+                            {
+                                title: 'An Application',
+                            },
+                        ]}
+                    />
+
                     <div
                         style={{
                             padding: 24,

@@ -34,7 +34,7 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService, CustomU
             return CustomUserDetails.create(user);
         } else {
             Reader reader = readerRepository.findByCardNumber(usernameOrCardNumber)
-                    .orElseThrow(() -> new NotFoundException(ErrorMessage.Reader.ERR_NOT_FOUND_CARD_NUMBER, usernameOrCardNumber));
+                    .orElseThrow(() -> new UsernameNotFoundException("Reader not found"));
 
             return CustomUserDetails.create(reader);
         }

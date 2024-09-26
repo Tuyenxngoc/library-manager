@@ -78,6 +78,11 @@ public class AuthServiceImpl implements AuthService {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+
+            if (customUserDetails.getCardNumber() == null) {
+                throw new UnauthorizedException();
+            }
+
             String accessToken = jwtTokenProvider.generateToken(customUserDetails, Boolean.FALSE);
             String refreshToken = jwtTokenProvider.generateToken(customUserDetails, Boolean.TRUE);
 
@@ -89,7 +94,7 @@ public class AuthServiceImpl implements AuthService {
                     refreshToken,
                     customUserDetails.getAuthorities()
             );
-        } catch (AuthenticationException e) {
+        } catch (AuthenticationException | UnauthorizedException e) {
             throw new UnauthorizedException(ErrorMessage.Auth.ERR_INCORRECT_USERNAME_PASSWORD);
         } catch (Exception e) {
             throw new RuntimeException(ErrorMessage.ERR_EXCEPTION_GENERAL);
@@ -105,6 +110,11 @@ public class AuthServiceImpl implements AuthService {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+
+            if (customUserDetails.getUserId() == null) {
+                throw new UnauthorizedException();
+            }
+
             String accessToken = jwtTokenProvider.generateToken(customUserDetails, Boolean.FALSE);
             String refreshToken = jwtTokenProvider.generateToken(customUserDetails, Boolean.TRUE);
 
@@ -116,7 +126,7 @@ public class AuthServiceImpl implements AuthService {
                     refreshToken,
                     customUserDetails.getAuthorities()
             );
-        } catch (AuthenticationException e) {
+        } catch (AuthenticationException | UnauthorizedException e) {
             throw new UnauthorizedException(ErrorMessage.Auth.ERR_INCORRECT_USERNAME_PASSWORD);
         } catch (Exception e) {
             throw new RuntimeException(ErrorMessage.ERR_EXCEPTION_GENERAL);

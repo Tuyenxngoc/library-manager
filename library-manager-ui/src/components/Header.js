@@ -41,7 +41,7 @@ const options = [
 ];
 
 function Header() {
-    const { isAuthenticated, logout } = useAuth();
+    const { isAuthenticated, user, logout } = useAuth();
 
     const items = isAuthenticated
         ? [
@@ -104,7 +104,7 @@ function Header() {
                             >
                                 <Space>
                                     <FaRegUser />
-                                    Tài khoản
+                                    {isAuthenticated ? user.name : 'Tài khoản'}
                                     <FaAngleDown />
                                 </Space>
                             </Dropdown>

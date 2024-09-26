@@ -1,15 +1,19 @@
 package com.example.librarymanager.service;
 
+import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
+import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
+import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.entity.Author;
-
-import java.util.List;
+import jakarta.validation.Valid;
 
 public interface AuthorService {
     Author findById(Long id);
 
-    List<Author> findAll();
+    PaginationResponseDto<Author> findAll(PaginationFullRequestDto requestDto);
 
     Author save(Author author);
 
-    void delete(Long id);
+    Author update(Long id, @Valid Author requestDto);
+
+    CommonResponseDto delete(Long id);
 }
