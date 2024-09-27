@@ -4,7 +4,7 @@ import com.example.librarymanager.annotation.RestApiV1;
 import com.example.librarymanager.base.VsResponseUtil;
 import com.example.librarymanager.constant.UrlConstant;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
-import com.example.librarymanager.domain.entity.Author;
+import com.example.librarymanager.domain.dto.request.AuthorRequestDto;
 import com.example.librarymanager.service.AuthorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,7 +26,7 @@ public class AuthorController {
 
     @Operation(summary = "API Create Author")
     @PostMapping(UrlConstant.Author.CREATE)
-    public ResponseEntity<?> createAuthor(@Valid @RequestBody Author requestDto) {
+    public ResponseEntity<?> createAuthor(@Valid @RequestBody AuthorRequestDto requestDto) {
         return VsResponseUtil.success(authorService.save(requestDto));
     }
 
@@ -34,7 +34,7 @@ public class AuthorController {
     @PutMapping(UrlConstant.Author.UPDATE)
     public ResponseEntity<?> updateAuthor(
             @PathVariable Long id,
-            @Valid @RequestBody Author requestDto
+            @Valid @RequestBody AuthorRequestDto requestDto
     ) {
         return VsResponseUtil.success(authorService.update(id, requestDto));
     }

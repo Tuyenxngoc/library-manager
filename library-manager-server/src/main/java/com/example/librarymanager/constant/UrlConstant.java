@@ -38,7 +38,7 @@ public class UrlConstant {
         public static final String DELETE = PRE_FIX + "/{id}";
     }
 
-    public static class Author{
+    public static class Author {
         private static final String PRE_FIX = "/authors";
 
         public static final String CREATE = PRE_FIX;

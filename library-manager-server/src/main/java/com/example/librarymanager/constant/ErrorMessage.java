@@ -90,4 +90,10 @@ public class ErrorMessage {
     public static class Reader {
         public static final String ERR_NOT_FOUND_CARD_NUMBER = "exception.user.not.found.card.number";
     }
+
+    public static class Author {
+        public static final String ERR_DUPLICATE_CODE = "exception.author.duplicate.code";
+        public static final String ERR_NOT_FOUND_ID = "exception.author.not.found.id";
+        public static final String ERR_HAS_LINKED_BOOKS = "exception.author.has.linked";
+    }
 }

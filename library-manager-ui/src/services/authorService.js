@@ -11,3 +11,11 @@ export const getAuthors = (params) => {
 export const updateAuthor = (id, values) => {
     return axiosPrivate.put(`authors/${id}`, values);
 };
+
+export const createAuthor = (values) => {
+    return axiosPrivate.post('authors', values);
+};
+
+export const deleteAuthor = (id) => {
+    return axiosPrivate.delete(`authors/${id}`);
+};
