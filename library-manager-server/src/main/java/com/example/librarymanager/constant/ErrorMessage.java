@@ -96,4 +96,17 @@ public class ErrorMessage {
         public static final String ERR_NOT_FOUND_ID = "exception.author.not.found.id";
         public static final String ERR_HAS_LINKED_BOOKS = "exception.author.has.linked";
     }
+
+    public static class Category {
+        public static final String ERR_DUPLICATE_NAME = "exception.category.duplicate.name";
+        public static final String ERR_DUPLICATE_CODE = "exception.category.duplicate.code";
+        public static final String ERR_NOT_FOUND_ID = "exception.category.not.found.id";
+        public static final String ERR_HAS_LINKED_BOOKS = "exception.category.has.linked";
+    }
+
+    public static class CategoryGroup {
+        public static final String ERR_NOT_FOUND_ID = "exception.category.group.not.found.id";
+        public static final String ERR_DUPLICATE_GROUP_NAME = "exception.category.group.duplicate.name";
+        public static final String ERR_HAS_LINKED_CATEGORIES = "exception.category.group.has.linked";
+    }
 }

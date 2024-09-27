@@ -5,24 +5,27 @@ import DefaultLayout from './layouts/DefaultLayout';
 import RequireAuth from './utils/RequireAuth';
 import { ROLES } from './common/roleConstants';
 
-import Home from './pages/Home';
-import Login from './pages/Login';
-import ForgotPassword from './pages/ForgotPassword';
-import AccessDenied from './pages/AccessDenied';
-import NotFound from './pages/NotFound';
-import News from './pages/News';
-import About from './pages/About';
-import HolidaySchedule from './pages/HolidaySchedule';
-import Rules from './pages/Rules';
-import Report from './pages/Report';
-import Search from './pages/Search';
+import Home from './pages/Misc/Home';
+import Login from './pages/Auth/Login';
+import ForgotPassword from './pages/Auth/ForgotPassword';
+import AccessDenied from './pages/Misc/AccessDenied';
+import NotFound from './pages/Misc/NotFound';
+import News from './pages/Misc/News';
+import About from './pages/Misc/About';
+import HolidaySchedule from './pages/Misc/HolidaySchedule';
+import Rules from './pages/Misc/Rules';
+import Report from './pages/Misc/Report';
+import Search from './pages/Misc/Search';
 import AdminLayout from './layouts/AdminLayout';
-import AdminLogin from './pages/AdminLogin';
-import AdminForgotPassword from './pages/AdminForgotPassword';
-import BookDetail from './pages/BookDetail';
-import InwardBook from './pages/InwardBook';
-import Author from './pages/Author';
-import AuthorForm from './pages/AuthorForm';
+import AdminLogin from './pages/Auth/AdminLogin';
+import AdminForgotPassword from './pages/Auth/AdminForgotPassword';
+import BookDetail from './pages/Books/BookDetail';
+import InwardBook from './pages/Misc/InwardBook';
+import Author from './pages/Authors/Author';
+import AuthorForm from './pages/Authors/AuthorForm';
+import BookSet from './pages/BookSet/BookSet';
+import BookSetForm from './pages/BookSet/BookSetForm';
+import Category from './pages/Category/Category';
 
 function App() {
     return (
@@ -54,10 +57,22 @@ function App() {
                         </Route>
 
                         {/* Tác giả */}
-                        <Route path="author">
+                        <Route path="authors">
                             <Route index element={<Author />} />
                             <Route path="new" element={<AuthorForm />} />
                             <Route path="edit/:id" element={<AuthorForm />} />
+                        </Route>
+
+                        {/* Bộ sách */}
+                        <Route path="collections">
+                            <Route index element={<BookSet />} />
+                            <Route path="new" element={<BookSetForm />} />
+                            <Route path="edit/:id" element={<BookSetForm />} />
+                        </Route>
+
+                        {/* Bộ sách */}
+                        <Route path="categories">
+                            <Route index element={<Category />} />
                         </Route>
                     </Route>
                 </Route>

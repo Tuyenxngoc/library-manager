@@ -48,4 +48,26 @@ public class UrlConstant {
         public static final String DELETE = PRE_FIX + "/{id}";
     }
 
+    public static class Category {
+        private static final String PRE_FIX = "/categories";
+
+        public static final String CREATE = PRE_FIX;
+        public static final String GET_ALL = PRE_FIX;
+        public static final String GET_BY_ID = PRE_FIX + "/{id}";
+        public static final String UPDATE = PRE_FIX + "/{id}";
+        public static final String DELETE = PRE_FIX + "/{id}";
+        public static final String TOGGLE_ACTIVE = PRE_FIX + "/{id}/toggle-active";
+    }
+
+    public static class CategoryGroup {
+        private static final String PRE_FIX = "/category-groups";
+
+        public static final String CREATE = PRE_FIX;
+        public static final String GET_ALL = PRE_FIX;
+        public static final String GET_BY_ID = PRE_FIX + "/{id}";
+        public static final String UPDATE = PRE_FIX + "/{id}";
+        public static final String DELETE = PRE_FIX + "/{id}";
+        public static final String TOGGLE_ACTIVE = PRE_FIX + "/{id}/toggle-active";
+    }
+
 }

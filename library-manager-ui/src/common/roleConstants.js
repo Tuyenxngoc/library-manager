@@ -2,6 +2,7 @@ export const ROLES = {
     SuperAdmin: 'ROLE_SUPER_ADMIN',
     Admin: 'ROLE_ADMIN',
     User: 'ROLE_USER',
+    Reader: 'ROLE_READER',
 };
 
 export const ROLE_LABELS = {

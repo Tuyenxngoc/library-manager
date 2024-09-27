@@ -13,7 +13,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "books")
+@Table(name = "books",
+        uniqueConstraints = @UniqueConstraint(name = "UN_BOOK_BOOK_CODE", columnNames = "book_code"))
 public class Book {
 
     @Id
@@ -21,12 +22,16 @@ public class Book {
     @Column(name = "book_id")
     private Long id;
 
-    @Column(name = "dkcb")
-    private String dkcb;//Số đăng ký cá biệt sách
+    @Column(name = "book_code")
+    private String bookCode; // Số đăng ký cá biệt sách
 
     @Enumerated(EnumType.STRING)
     @Column(name = "book_condition")
     private BookCondition bookCondition; // Tình trạng sách
+
+    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private BookBorrow bookBorrow;// Phiếu mượn sách chi tiết
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_definition_id", foreignKey = @ForeignKey(name = "FK_BOOK_BOOK_DEFINITION_ID"), referencedColumnName = "book_definition_id", nullable = false)
@@ -42,8 +47,4 @@ public class Book {
     @JoinColumn(name = "export_receipt_id", foreignKey = @ForeignKey(name = "FK_BOOK_EXPORT_RECEIPT_ID"), referencedColumnName = "export_receipt_id", nullable = false)
     @JsonIgnore
     private ExportReceipt exportReceipt;// Phiếu xuất
-
-    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL)
-    private BookBorrow bookBorrow;// Phiếu mượn sách chi tiết
-
 }

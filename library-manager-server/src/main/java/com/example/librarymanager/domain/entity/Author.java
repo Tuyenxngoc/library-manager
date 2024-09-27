@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "authors",
-        uniqueConstraints = @UniqueConstraint(name = "UN_CODE", columnNames = "code"))
+        uniqueConstraints = @UniqueConstraint(name = "UN_AUTHOR_CODE", columnNames = "code"))
 public class Author extends FlagUserDateAuditing {
 
     @Id

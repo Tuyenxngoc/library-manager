@@ -22,7 +22,7 @@ public class ExportReceipt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "export_receipt_id")
-    private Long id;  // Số phiếu xuất (ID)
+    private Long id;  // Số phiếu xuất
 
     @Column(name = "receipt_number", nullable = false)
     private String receiptNumber;  // Số phiếu xuất

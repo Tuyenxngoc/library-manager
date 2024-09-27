@@ -1,15 +1,23 @@
 package com.example.librarymanager.service;
 
+import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
+import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
+import com.example.librarymanager.domain.dto.request.CategoryRequestDto;
+import com.example.librarymanager.domain.dto.response.CommonResponseDto;
+import com.example.librarymanager.domain.dto.response.GetCategoryResponseDto;
 import com.example.librarymanager.domain.entity.Category;
-
-import java.util.List;
 
 public interface CategoryService {
     Category findById(Long id);
 
-    List<Category> findAll();
+    PaginationResponseDto<GetCategoryResponseDto> findAll(PaginationFullRequestDto requestDto);
 
-    Category save(Category category);
+    CommonResponseDto save(CategoryRequestDto requestDto);
 
-    void delete(Long id);
+    CommonResponseDto delete(Long id);
+
+    CommonResponseDto update(Long id, CategoryRequestDto requestDto);
+
+    CommonResponseDto toggleActiveStatus(Long id);
+
 }

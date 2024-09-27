@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 
 import { AiFillDashboard } from 'react-icons/ai';
@@ -23,51 +23,58 @@ function getItem(label, key, icon, children) {
         label,
     };
 }
+
 const items = [
-    getItem('Trang chủ', '1', <AiFillDashboard />),
-    getItem('Thiết lập hệ thống', '2', <IoMdSettings />),
-    getItem('Quản lý người dùng', 'sub1', <FaUsers />, [
-        getItem('Quản lý nhóm', 'sub1a'),
-        getItem('Quản lý người dùng', 'sub1b'),
+    getItem('Trang chủ', '/admin/home', <AiFillDashboard />),
+    getItem('Thiết lập hệ thống', '/admin/settings', <IoMdSettings />),
+    getItem('Quản lý người dùng', '/admin/users', <FaUsers />, [
+        getItem('Quản lý nhóm', '/admin/users/groups'),
+        getItem('Quản lý người dùng', '/admin/users/manage'),
     ]),
-    getItem('Quản lý bạn đọc', 'sub2', <FaUser />, [
-        getItem('Thẻ bạn đọc', 'sub2a'),
-        getItem('Xử lý vi phạm', 'sub2b'),
-        getItem('Vào ra thư viện', 'sub2c'),
+    getItem('Quản lý bạn đọc', '/admin/readers', <FaUser />, [
+        getItem('Thẻ bạn đọc', '/admin/readers/cards'),
+        getItem('Xử lý vi phạm', '/admin/readers/violations'),
+        getItem('Vào ra thư viện', '/admin/readers/access'),
     ]),
-    getItem('Quản lý danh mục', 'sub3', <BiCategory />, [
-        getItem('Biên mục', 'sub3a'),
-        getItem('Loại sách', 'sub3b'),
-        getItem('Bộ sách', 'sub3c'),
-        getItem('Tác giả', 'author'),
+    getItem('Quản lý danh mục', '/admin', <BiCategory />, [
+        getItem('Biên mục', '/admin/catalog'),
+        getItem('Loại sách', '/admin/categories'),
+        getItem('Bộ sách', '/admin/collections'),
+        getItem('Tác giả', '/admin/authors'),
     ]),
-    getItem('Quản lý sách', 'sub4', <FaBook />, [
-        getItem('Danh sách sách', 'sub4a'),
-        getItem('Danh sách sách điện tử', 'sub4b'),
-        getItem('Nhập sách', 'Book/Inwardbook'),
-        getItem('Kiểm kê sách', 'sub4d'),
-        getItem('Xuất sách', 'sub4e'),
+    getItem('Quản lý sách', '/admin/books', <FaBook />, [
+        getItem('Danh sách sách', '/admin/books/list'),
+        getItem('Danh sách sách điện tử', '/admin/books/electronic'),
+        getItem('Nhập sách', '/admin/books/inward'),
+        getItem('Kiểm kê sách', '/admin/books/inventory'),
+        getItem('Xuất sách', '/admin/books/outward'),
     ]),
-    getItem('Quản lý lưu thông', 'sub5', <FaRecycle />, [
-        getItem('Mượn sách', 'sub5a'),
-        getItem('Trả-Gia hạn sách', 'sub5b'),
+    getItem('Quản lý lưu thông', '/admin/circulation', <FaRecycle />, [
+        getItem('Mượn sách', '/admin/circulation/borrow'),
+        getItem('Trả-Gia hạn sách', '/admin/circulation/return-renew'),
     ]),
-    getItem('Thống kê báo cáo', 'sub6', <FaChartBar />, [getItem('todo', 'sub6a')]),
-    getItem('Quản lý tin tức', 'sub7', <BsNewspaper />, [getItem('todo', 'sub7a')]),
-    getItem('Lịch sử truy cập', '8', <FaHistory />),
+    getItem('Thống kê báo cáo', '/admin/reports', <FaChartBar />, [getItem('Báo cáo', '/admin/reports/statistics')]),
+    getItem('Quản lý tin tức', '/admin/news', <BsNewspaper />, [getItem('Tin tức', '/admin/news/articles')]),
+    getItem('Lịch sử truy cập', '/admin/history', <FaHistory />),
 ];
 
 function AdminLayout() {
-    const [collapsed, setCollapsed] = useState(false);
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
 
     const navigate = useNavigate();
+    const location = useLocation();
+    const [collapsed, setCollapsed] = useState(false);
+    const [selectedKey, setSelectedKey] = useState(location.pathname);
 
     const handleMenuItemClick = ({ key }) => {
         navigate(key);
     };
+
+    useEffect(() => {
+        setSelectedKey(location.pathname);
+    }, [location.pathname]);
 
     return (
         <Layout
@@ -77,12 +84,12 @@ function AdminLayout() {
         >
             {/* Sider */}
             <Sider collapsible width={220} collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
-                <div>
+                <div className="text-center">
                     <img src={images.logo} alt="logo" width={34} />
                 </div>
                 <Menu
                     theme="dark"
-                    defaultSelectedKeys={['1']}
+                    selectedKeys={[selectedKey]}
                     mode="inline"
                     items={items}
                     onClick={handleMenuItemClick}
@@ -113,10 +120,10 @@ function AdminLayout() {
                                 title: 'Home',
                             },
                             {
-                                title: <a href="">Application Center</a>,
+                                title: <Link to="">Application Center</Link>,
                             },
                             {
-                                title: <a href="">Application List</a>,
+                                title: <Link to="">Application List</Link>,
                             },
                             {
                                 title: 'An Application',

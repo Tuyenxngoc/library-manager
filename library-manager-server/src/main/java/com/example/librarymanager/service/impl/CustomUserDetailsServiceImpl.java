@@ -1,9 +1,7 @@
 package com.example.librarymanager.service.impl;
 
-import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.domain.entity.Reader;
 import com.example.librarymanager.domain.entity.User;
-import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.ReaderRepository;
 import com.example.librarymanager.repository.UserRepository;
 import com.example.librarymanager.security.CustomUserDetails;
@@ -44,7 +42,7 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService, CustomU
     @Transactional
     public UserDetails loadUserByUserId(String userId) throws UsernameNotFoundException {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.User.ERR_NOT_FOUND_ID, userId));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         return CustomUserDetails.create(user);
     }
@@ -52,7 +50,7 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService, CustomU
     @Override
     public UserDetails loadUserByCardNumber(String cardNumber) throws UsernameNotFoundException {
         Reader reader = readerRepository.findByCardNumber(cardNumber)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.Reader.ERR_NOT_FOUND_CARD_NUMBER, cardNumber));
+                .orElseThrow(() -> new UsernameNotFoundException("Reader not found"));
 
         return CustomUserDetails.create(reader);
     }

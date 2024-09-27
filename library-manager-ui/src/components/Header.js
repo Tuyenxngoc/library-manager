@@ -12,6 +12,7 @@ import 'bootstrap/dist/js/bootstrap.bundle';
 
 import classNames from 'classnames/bind';
 import styles from '~/styles/Header.module.scss';
+import { ROLES } from '~/common/roleConstants';
 
 const cx = classNames.bind(styles);
 
@@ -42,8 +43,9 @@ const options = [
 
 function Header() {
     const { isAuthenticated, user, logout } = useAuth();
+    const hasRequiredRole = isAuthenticated && user.roleName === ROLES.Reader;
 
-    const items = isAuthenticated
+    const items = hasRequiredRole
         ? [
               {
                   key: '1',
@@ -104,7 +106,7 @@ function Header() {
                             >
                                 <Space>
                                     <FaRegUser />
-                                    {isAuthenticated ? user.name : 'Tài khoản'}
+                                    {hasRequiredRole ? user.name : 'Tài khoản'}
                                     <FaAngleDown />
                                 </Space>
                             </Dropdown>

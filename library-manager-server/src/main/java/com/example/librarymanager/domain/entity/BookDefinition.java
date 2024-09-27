@@ -21,38 +21,22 @@ public class BookDefinition {//Biên mục
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "book_definition_id")
-    private Long id;  // Mã biên mục (ID)
+    private Long id;  // Mã biên mục
 
     @Column(name = "title", nullable = false)
     private String title;  // Nhan đề của biên mục
 
-    @OneToMany(mappedBy = "bookDefinition", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
-    private List<BookAuthor> bookAuthors;  // Tác giả
-
-    //Kí hiệu phân loại...todo
-
+    @Column(name = "publishing_year")
     private String publishingYear; // Năm xuất bản
 
+    @Column(name = "price")
     private Double price; // Giá bán
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "publisher_id", foreignKey = @ForeignKey(name = "FK_BOOK_DEFINITION_PUBLISHER_ID"), referencedColumnName = "publisher_id", nullable = false)
-    @JsonIgnore
-    private Publisher publisher;  // Nhà xuất bản
-
-    //Kí hiệu tên sách
 
     @Column(name = "edition")
     private String edition; // Lần xuất bản
 
     @Column(name = "reference_price")
     private Double referencePrice; // Giá tham khảo
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_group_id", foreignKey = @ForeignKey(name = "FK_BOOK_DEFINITION_CATEGORY_GROUP_ID"), referencedColumnName = "category_group_id", nullable = false)
-    @JsonIgnore
-    private CategoryGroup categoryGroup; // Nhóm loại sách
 
     @Column(name = "publication_place")
     private String publicationPlace; // Nơi xuất bản Hà Nội, vv
@@ -68,8 +52,6 @@ public class BookDefinition {//Biên mục
 
     @Column(name = "parallel_title")
     private String parallelTitle; // Nhan đề song song
-
-    //Đồng tác giả...todo
 
     @Lob
     @Column(name = "summary")
@@ -100,4 +82,24 @@ public class BookDefinition {//Biên mục
     @JsonIgnore
     private List<Book> books = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "book_set_id", foreignKey = @ForeignKey(name = "FK_BOOK_DEFINITION_BOOK_SET_ID"), referencedColumnName = "book_set_id", nullable = false)
+    @JsonIgnore
+    private BookSet bookSet;//Bộ sách
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", foreignKey = @ForeignKey(name = "FK_BOOK_DEFINITION_CATEGORY_ID"), referencedColumnName = "category_id", nullable = false)
+    @JsonIgnore
+    private Category category; // Danh mục
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "publisher_id", foreignKey = @ForeignKey(name = "FK_BOOK_DEFINITION_PUBLISHER_ID"), referencedColumnName = "publisher_id", nullable = false)
+    @JsonIgnore
+    private Publisher publisher;  // Nhà xuất bản
+
+    @OneToMany(mappedBy = "bookDefinition", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<BookAuthor> bookAuthors;  // Tác giả
+
+    //Kí hiệu phân loại, Kí hiệu tên sách, đồng tác giả, ..todo
 }
