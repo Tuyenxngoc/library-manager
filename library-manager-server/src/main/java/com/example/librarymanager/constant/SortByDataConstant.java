@@ -24,13 +24,37 @@ public enum SortByDataConstant implements SortByInterface {
         }
     },
 
+    CATEGORY_GROUP {
+        @Override
+        public String getSortBy(String sortBy) {
+            return switch (sortBy) {
+                case "groupName" -> "groupName";
+                case "activeFlag" -> "activeFlag";
+                default -> "createdDate";
+            };
+        }
+    },
+
     CATEGORY {
         @Override
         public String getSortBy(String sortBy) {
             return switch (sortBy) {
-                case "name" -> "name";
+                case "categoryName" -> "categoryName";
+                case "categoryCode" -> "categoryCode";
+                case "activeFlag" -> "activeFlag";
                 default -> "createdDate";
             };
         }
-    }
+    },
+
+    BOOK_SET {
+        @Override
+        public String getSortBy(String sortBy) {
+            return switch (sortBy) {
+                case "name" -> "name";
+                case "activeFlag" -> "activeFlag";
+                default -> "createdDate";
+            };
+        }
+    },
 }

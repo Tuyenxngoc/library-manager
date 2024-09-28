@@ -33,7 +33,7 @@ function AdminLogin() {
     const [messageApi, contextHolder] = message.useMessage();
     const { isAuthenticated, login } = useAuth();
 
-    const from = location.state?.from?.pathname || '/';
+    const from = location.state?.from?.pathname || '/admin';
 
     const handleLogin = async (values, { setSubmitting }) => {
         try {
@@ -58,7 +58,7 @@ function AdminLogin() {
 
     useEffect(() => {
         if (isAuthenticated) {
-            navigate('/', { replace: true });
+            navigate('/admin', { replace: true });
         }
     }, [isAuthenticated, navigate]);
 

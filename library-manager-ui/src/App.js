@@ -24,7 +24,6 @@ import InwardBook from './pages/Misc/InwardBook';
 import Author from './pages/Authors/Author';
 import AuthorForm from './pages/Authors/AuthorForm';
 import BookSet from './pages/BookSet/BookSet';
-import BookSetForm from './pages/BookSet/BookSetForm';
 import Category from './pages/Category/Category';
 
 function App() {
@@ -66,11 +65,9 @@ function App() {
                         {/* Bộ sách */}
                         <Route path="collections">
                             <Route index element={<BookSet />} />
-                            <Route path="new" element={<BookSetForm />} />
-                            <Route path="edit/:id" element={<BookSetForm />} />
                         </Route>
 
-                        {/* Bộ sách */}
+                        {/* Danh mục */}
                         <Route path="categories">
                             <Route index element={<Category />} />
                         </Route>

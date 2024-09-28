@@ -109,4 +109,10 @@ public class ErrorMessage {
         public static final String ERR_DUPLICATE_GROUP_NAME = "exception.category.group.duplicate.name";
         public static final String ERR_HAS_LINKED_CATEGORIES = "exception.category.group.has.linked";
     }
+
+    public static class BookSet {
+        public static final String ERR_NOT_FOUND_ID = "exception.book.set.not.found.id";
+        public static final String ERR_DUPLICATE_NAME = "exception.book.set.duplicate.name";
+        public static final String ERR_HAS_LINKED_BOOKS = "exception.book.set.has.linked";
+    }
 }

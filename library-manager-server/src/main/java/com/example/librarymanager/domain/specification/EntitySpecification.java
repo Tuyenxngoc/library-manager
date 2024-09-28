@@ -58,4 +58,20 @@ public class EntitySpecification {
             return predicate;
         };
     }
+
+    public static Specification<BookSet> filterBookSets(String keyword, String searchBy) {
+        return (root, query, builder) -> {
+            query.distinct(true);
+
+            Predicate predicate = builder.conjunction();
+
+            if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(searchBy)) {
+                switch (searchBy) {
+                    case BookSet_.NAME ->
+                            predicate = builder.and(predicate, builder.like(root.get(BookSet_.name), "%" + keyword + "%"));
+                }
+            }
+            return predicate;
+        };
+    }
 }

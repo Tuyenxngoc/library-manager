@@ -1,5 +1,6 @@
 package com.example.librarymanager.domain.entity;
 
+import com.example.librarymanager.domain.entity.common.FlagUserDateAuditing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,7 @@ import java.util.List;
 @Entity
 @Table(name = "book_sets",
         uniqueConstraints = @UniqueConstraint(name = "UN_BOOK_SET_NAME", columnNames = "name"))
-public class BookSet {
+public class BookSet extends FlagUserDateAuditing {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

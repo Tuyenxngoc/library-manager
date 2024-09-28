@@ -80,13 +80,13 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
 
     @Override
     public PaginationResponseDto<CategoryGroup> findAll(PaginationFullRequestDto requestDto) {
-        Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.CATEGORY);
+        Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.CATEGORY_GROUP);
 
         Page<CategoryGroup> page = categoryGroupRepository.findAll(
                 EntitySpecification.filterCategoryGroups(requestDto.getKeyword(), requestDto.getSearchBy()),
                 pageable);
 
-        PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.AUTHOR, page);
+        PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.CATEGORY_GROUP, page);
 
         PaginationResponseDto<CategoryGroup> responseDto = new PaginationResponseDto<>();
         responseDto.setItems(page.getContent());

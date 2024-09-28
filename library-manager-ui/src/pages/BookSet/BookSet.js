@@ -1,32 +1,50 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button, Flex, Input, message, Popconfirm, Select, Space, Table } from 'antd';
+import { Button, Flex, Form, Input, message, Modal, Popconfirm, Space, Switch, Table } from 'antd';
 import { MdOutlineModeEdit } from 'react-icons/md';
 import { FaRegTrashAlt } from 'react-icons/fa';
-import { FaPrint } from 'react-icons/fa';
-
 import queryString from 'query-string';
-
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
-import { deleteAuthor, getAuthors } from '~/services/authorService';
-
-const options = [{ value: 'name', label: 'Tên' }];
+import { createBookSet, deleteBookSet, getBookSets, toggleActiveFlag, updateBookSet } from '~/services/bookSetService';
 
 function BookSet() {
-    const navigate = useNavigate();
-
     const [meta, setMeta] = useState(INITIAL_META);
     const [filters, setFilters] = useState(INITIAL_FILTERS);
 
-    const [authors, setAuthors] = useState([]);
-
-    const [searchInput, setSearchInput] = useState('');
-    const [activeFilterOption, setActiveFilterOption] = useState(options[0].value);
+    const [entityData, setEntityData] = useState(null);
 
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState(null);
 
     const [messageApi, contextHolder] = message.useMessage();
+
+    // Modal thêm mới
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [addForm] = Form.useForm();
+
+    // Modal chỉnh sửa
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editingItem, setEditingItem] = useState(null);
+    const [editForm] = Form.useForm();
+
+    const showAddModal = () => {
+        setIsAddModalOpen(true);
+    };
+
+    const closeAddModal = () => {
+        setIsAddModalOpen(false);
+        addForm.resetFields();
+    };
+
+    const showEditModal = (record) => {
+        setEditingItem(record);
+        editForm.setFieldsValue(record);
+        setIsEditModalOpen(true);
+    };
+
+    const closeEditModal = () => {
+        setIsEditModalOpen(false);
+        editForm.resetFields();
+    };
 
     const handleChangePage = (newPage) => {
         setFilters((prev) => ({ ...prev, pageNum: newPage }));
@@ -49,25 +67,67 @@ function BookSet() {
         }));
     };
 
-    const handleSearch = (searchBy, keyword) => {
-        setFilters((prev) => ({
-            ...prev,
-            pageNum: 1,
-            searchBy: searchBy || activeFilterOption,
-            keyword: keyword || searchInput,
-        }));
+    const handleCreateEntity = async (values) => {
+        try {
+            const response = await createBookSet(values);
+            if (response.status === 201) {
+                const { data, message } = response.data.data;
+                messageApi.success(message);
+
+                // Cập nhật lại danh sách sau khi thêm mới
+                setEntityData((prevData) => [...prevData, data]);
+                closeAddModal();
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi thêm mới.';
+            messageApi.error(errorMessage);
+        }
+    };
+
+    const handleUpdateEntity = async (values) => {
+        try {
+            const response = await updateBookSet(editingItem.id, values);
+            if (response.status === 200) {
+                const { data, message } = response.data.data;
+                messageApi.success(message);
+
+                // Cập nhật lại danh sách sau khi sửa
+                setEntityData((prevData) => prevData.map((item) => (item.id === editingItem.id ? data : item)));
+                closeEditModal();
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi cập nhật.';
+            messageApi.error(errorMessage);
+        }
     };
 
     const handleDeleteEntity = async (authorId) => {
         try {
-            const response = await deleteAuthor(authorId);
+            const response = await deleteBookSet(authorId);
             if (response.status === 200) {
-                setAuthors((prev) => prev.filter((a) => a.id !== authorId));
+                setEntityData((prev) => prev.filter((a) => a.id !== authorId));
 
                 messageApi.success(response.data.data.message);
             }
         } catch (error) {
-            messageApi.error(error.message);
+            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi xóa.';
+            messageApi.error(errorMessage);
+        }
+    };
+
+    const handleToggleActiveFlag = async (checked, record) => {
+        try {
+            const response = await toggleActiveFlag(record.id);
+            if (response.status === 200) {
+                const { data, message } = response.data.data;
+                setEntityData((prevData) =>
+                    prevData.map((item) => (item.id === record.id ? { ...item, activeFlag: data } : item)),
+                );
+                messageApi.success(message);
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi cập nhật.';
+            messageApi.error(errorMessage);
         }
     };
 
@@ -77,9 +137,9 @@ function BookSet() {
             setErrorMessage(null);
             try {
                 const params = queryString.stringify(filters);
-                const response = await getAuthors(params);
+                const response = await getBookSets(params);
                 const { meta, items } = response.data.data;
-                setAuthors(items);
+                setEntityData(items);
                 setMeta(meta);
             } catch (error) {
                 setErrorMessage(error.message);
@@ -93,29 +153,41 @@ function BookSet() {
 
     const columns = [
         {
-            title: 'Tên',
-            dataIndex: 'code',
-            key: 'code',
+            title: 'Tên loại sách',
+            dataIndex: 'name',
+            key: 'name',
             sorter: true,
             showSorterTooltip: false,
         },
         {
             title: 'Số lượng nhan đề trong bộ',
-            dataIndex: 'fullName',
-            key: 'fullName',
+            dataIndex: 'bookCount',
+            key: 'bookCount',
             sorter: true,
             showSorterTooltip: false,
+        },
+        {
+            title: 'Trạng thái',
+            dataIndex: 'activeFlag',
+            key: 'activeFlag',
+            sorter: true,
+            showSorterTooltip: false,
+            render: (text, record) => (
+                <Space>
+                    {text ? 'Đang theo giõi' : 'Ngừng theo giõi'}
+                    <Switch checked={text} onChange={(checked) => handleToggleActiveFlag(checked, record)} />
+                </Space>
+            ),
         },
         {
             title: '',
             key: 'action',
             render: (_, record) => (
                 <Space>
-                    <Button type="text" icon={<MdOutlineModeEdit />} onClick={() => navigate(`edit/${record.id}`)} />
-
+                    <Button type="text" icon={<MdOutlineModeEdit />} onClick={() => showEditModal(record)} />
                     <Popconfirm
-                        title="Xóa tác giả"
-                        description="Bạn có chắc muốn xóa tác giả này không?"
+                        title="Xóa bộ sách"
+                        description="Bạn có chắc muốn xóa bộ sách này không?"
                         onConfirm={() => handleDeleteEntity(record.id)}
                         okText="Xóa"
                         cancelText="Hủy"
@@ -139,40 +211,42 @@ function BookSet() {
         <div>
             {contextHolder}
 
-            <Flex wrap justify="space-between" align="center">
+            {/* Modal thêm mới */}
+            <Modal title="Thêm mới bộ sách" open={isAddModalOpen} onOk={addForm.submit} onCancel={closeAddModal}>
+                <Form form={addForm} layout="vertical" onFinish={handleCreateEntity}>
+                    <Form.Item
+                        label="Tên bộ sách"
+                        name="name"
+                        rules={[{ required: true, message: 'Vui lòng nhập tên bộ sách' }]}
+                    >
+                        <Input placeholder="Nhập tên bộ sách" />
+                    </Form.Item>
+                </Form>
+            </Modal>
+
+            {/* Modal chỉnh sửa */}
+            <Modal title="Sửa bộ sách" open={isEditModalOpen} onOk={editForm.submit} onCancel={closeEditModal}>
+                <Form form={editForm} layout="vertical" onFinish={handleUpdateEntity}>
+                    <Form.Item
+                        label="Tên bộ sách"
+                        name="name"
+                        rules={[{ required: true, message: 'Vui lòng nhập tên bộ sách' }]}
+                    >
+                        <Input placeholder="Nhập tên bộ sách" />
+                    </Form.Item>
+                </Form>
+            </Modal>
+
+            <Flex className="py-2" wrap justify="space-between" align="center">
                 <h2>Bộ sách</h2>
-                <Space>
-                    <Space.Compact className="my-2">
-                        <Select
-                            options={options}
-                            disabled={isLoading}
-                            value={activeFilterOption}
-                            onChange={(value) => setActiveFilterOption(value)}
-                        />
-                        <Input
-                            allowClear
-                            name="searchInput"
-                            placeholder="Nhập từ cần tìm..."
-                            value={searchInput}
-                            disabled={isLoading}
-                            onChange={(e) => setSearchInput(e.target.value)}
-                        />
-                        <Button type="primary" loading={isLoading} onClick={() => handleSearch()}>
-                            Tìm
-                        </Button>
-                    </Space.Compact>
-
-                    <Button type="primary" onClick={() => navigate('new')}>
-                        Thêm mới
-                    </Button>
-
-                    <Button icon={<FaPrint />} />
-                </Space>
+                <Button type="primary" onClick={showAddModal}>
+                    Thêm mới
+                </Button>
             </Flex>
 
             <Table
                 rowKey="id"
-                dataSource={authors}
+                dataSource={entityData}
                 columns={columns}
                 loading={isLoading}
                 onChange={handleSortChange}
