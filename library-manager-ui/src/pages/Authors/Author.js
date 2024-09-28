@@ -27,7 +27,7 @@ function Author() {
     const [meta, setMeta] = useState(INITIAL_META);
     const [filters, setFilters] = useState(INITIAL_FILTERS);
 
-    const [authors, setAuthors] = useState([]);
+    const [entityData, setEntityData] = useState(null);
 
     const [searchInput, setSearchInput] = useState('');
     const [activeFilterOption, setActiveFilterOption] = useState(options[0].value);
@@ -67,16 +67,17 @@ function Author() {
         }));
     };
 
-    const handleDeleteEntity = async (authorId) => {
+    const handleDeleteEntity = async (id) => {
         try {
-            const response = await deleteAuthor(authorId);
+            const response = await deleteAuthor(id);
             if (response.status === 200) {
-                setAuthors((prev) => prev.filter((a) => a.id !== authorId));
+                setEntityData((prev) => prev.filter((a) => a.id !== id));
 
                 messageApi.success(response.data.data.message);
             }
         } catch (error) {
-            messageApi.error(error.message);
+            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi xóa.';
+            messageApi.error(errorMessage);
         }
     };
 
@@ -88,7 +89,7 @@ function Author() {
                 const params = queryString.stringify(filters);
                 const response = await getAuthors(params);
                 const { meta, items } = response.data.data;
-                setAuthors(items);
+                setEntityData(items);
                 setMeta(meta);
             } catch (error) {
                 setErrorMessage(error.message);
@@ -209,8 +210,9 @@ function Author() {
             </Flex>
 
             <Table
+                bordered
                 rowKey="id"
-                dataSource={authors}
+                dataSource={entityData}
                 columns={columns}
                 loading={isLoading}
                 onChange={handleSortChange}

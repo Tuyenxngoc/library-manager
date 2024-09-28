@@ -37,7 +37,7 @@ const items = [
         getItem('Vào ra thư viện', '/admin/readers/access'),
     ]),
     getItem('Quản lý danh mục', '/admin', <BiCategory />, [
-        getItem('Biên mục', '/admin/catalog'),
+        getItem('Biên mục', '/admin/book-definition'),
         getItem('Loại sách', '/admin/categories'),
         getItem('Bộ sách', '/admin/collections'),
         getItem('Tác giả', '/admin/authors'),

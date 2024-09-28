@@ -101,11 +101,11 @@ function BookSet() {
         }
     };
 
-    const handleDeleteEntity = async (authorId) => {
+    const handleDeleteEntity = async (id) => {
         try {
-            const response = await deleteBookSet(authorId);
+            const response = await deleteBookSet(id);
             if (response.status === 200) {
-                setEntityData((prev) => prev.filter((a) => a.id !== authorId));
+                setEntityData((prev) => prev.filter((a) => a.id !== id));
 
                 messageApi.success(response.data.data.message);
             }
@@ -245,6 +245,7 @@ function BookSet() {
             </Flex>
 
             <Table
+                bordered
                 rowKey="id"
                 dataSource={entityData}
                 columns={columns}

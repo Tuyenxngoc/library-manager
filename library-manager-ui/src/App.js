@@ -26,6 +26,8 @@ import AuthorForm from './pages/Authors/AuthorForm';
 import BookSet from './pages/BookSet/BookSet';
 import Category from './pages/Category/Category';
 import Publisher from './pages/Publisher/Publisher';
+import BookDefinition from './pages/BookDefinition/BookDefinition';
+import BookDefinitionForm from './pages/BookDefinition/BookDefinitionForm';
 
 function App() {
     return (
@@ -76,6 +78,13 @@ function App() {
                         {/* Nhà xuất bản */}
                         <Route path="publishers">
                             <Route index element={<Publisher />} />
+                        </Route>
+
+                        {/* Biên mục */}
+                        <Route path="book-definition">
+                            <Route index element={<BookDefinition />} />
+                            <Route path="new" element={<BookDefinitionForm />} />
+                            <Route path="edit/:id" element={<BookDefinitionForm />} />
                         </Route>
                     </Route>
                 </Route>

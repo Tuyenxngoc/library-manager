@@ -45,6 +45,8 @@ function AuthorForm() {
 
             if (response.status === 200) {
                 messageApi.success(response.data.data.message);
+            } else if (response.status === 201) {
+                messageApi.success(response.data.data.message);
             }
         } catch (error) {
             handleError(error, formik, messageApi);

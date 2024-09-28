@@ -107,11 +107,11 @@ function BookCategoryGroup() {
         }
     };
 
-    const handleDeleteEntity = async (authorId) => {
+    const handleDeleteEntity = async (id) => {
         try {
-            const response = await deleteCategoryGroup(authorId);
+            const response = await deleteCategoryGroup(id);
             if (response.status === 200) {
-                setEntityData((prev) => prev.filter((a) => a.id !== authorId));
+                setEntityData((prev) => prev.filter((a) => a.id !== id));
 
                 messageApi.success(response.data.data.message);
             }
@@ -254,6 +254,7 @@ function BookCategoryGroup() {
             </Flex>
 
             <Table
+                bordered
                 rowKey="id"
                 dataSource={entityData}
                 columns={columns}

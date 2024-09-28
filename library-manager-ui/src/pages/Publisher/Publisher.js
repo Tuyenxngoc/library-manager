@@ -107,11 +107,11 @@ function Publisher() {
         }
     };
 
-    const handleDeleteEntity = async (authorId) => {
+    const handleDeleteEntity = async (id) => {
         try {
-            const response = await deletePublisher(authorId);
+            const response = await deletePublisher(id);
             if (response.status === 200) {
-                setEntityData((prev) => prev.filter((a) => a.id !== authorId));
+                setEntityData((prev) => prev.filter((a) => a.id !== id));
 
                 messageApi.success(response.data.data.message);
             }
@@ -320,6 +320,7 @@ function Publisher() {
             </Flex>
 
             <Table
+                bordered
                 rowKey="id"
                 dataSource={entityData}
                 columns={columns}
