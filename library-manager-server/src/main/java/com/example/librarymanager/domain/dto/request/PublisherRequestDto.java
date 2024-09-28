@@ -12,10 +12,19 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryGroupRequestDto {
+public class PublisherRequestDto {
 
     @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)
     @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
-    private String groupName;
+    private String code;
 
+    @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)
+    @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
+    private String name;
+
+    private String address;
+
+    private String city;
+
+    private String notes;
 }

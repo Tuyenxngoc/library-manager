@@ -69,7 +69,7 @@ public class AuthorServiceImpl implements AuthorService {
         authorRepository.save(author);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
-        return new CommonResponseDto(message);
+        return new CommonResponseDto(message, author);
     }
 
     @Override
@@ -109,6 +109,6 @@ public class AuthorServiceImpl implements AuthorService {
         authorRepository.save(author);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
-        return new CommonResponseDto(message);
+        return new CommonResponseDto(message, author);
     }
 }

@@ -25,6 +25,7 @@ import Author from './pages/Authors/Author';
 import AuthorForm from './pages/Authors/AuthorForm';
 import BookSet from './pages/BookSet/BookSet';
 import Category from './pages/Category/Category';
+import Publisher from './pages/Publisher/Publisher';
 
 function App() {
     return (
@@ -70,6 +71,11 @@ function App() {
                         {/* Danh mục */}
                         <Route path="categories">
                             <Route index element={<Category />} />
+                        </Route>
+
+                        {/* Nhà xuất bản */}
+                        <Route path="publishers">
+                            <Route index element={<Publisher />} />
                         </Route>
                     </Route>
                 </Route>

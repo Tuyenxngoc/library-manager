@@ -41,6 +41,7 @@ const items = [
         getItem('Loại sách', '/admin/categories'),
         getItem('Bộ sách', '/admin/collections'),
         getItem('Tác giả', '/admin/authors'),
+        getItem('Nhà xuất bản', '/admin/publishers'),
     ]),
     getItem('Quản lý sách', '/admin/books', <FaBook />, [
         getItem('Danh sách sách', '/admin/books/list'),

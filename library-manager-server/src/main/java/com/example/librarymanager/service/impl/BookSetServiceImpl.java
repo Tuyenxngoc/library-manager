@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -52,11 +53,11 @@ public class BookSetServiceImpl implements BookSetService {
 
     @Override
     public CommonResponseDto update(Long id, BookSetRequestDto requestDto) {
-        if (bookSetRepository.existsByName(requestDto.getName())) {
+        BookSet bookSet = findById(id);
+
+        if (!Objects.equals(bookSet.getName(), requestDto.getName()) && bookSetRepository.existsByName(requestDto.getName())) {
             throw new ConflictException(ErrorMessage.BookSet.ERR_DUPLICATE_NAME);
         }
-
-        BookSet bookSet = findById(id);
 
         bookSet.setName(requestDto.getName());
 

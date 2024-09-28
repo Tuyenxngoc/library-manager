@@ -13,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +28,7 @@ public class AuthorController {
     @Operation(summary = "API Create Author")
     @PostMapping(UrlConstant.Author.CREATE)
     public ResponseEntity<?> createAuthor(@Valid @RequestBody AuthorRequestDto requestDto) {
-        return VsResponseUtil.success(authorService.save(requestDto));
+        return VsResponseUtil.success(HttpStatus.CREATED, authorService.save(requestDto));
     }
 
     @Operation(summary = "API Update Author")

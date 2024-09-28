@@ -74,4 +74,29 @@ public class EntitySpecification {
             return predicate;
         };
     }
+
+    public static Specification<Publisher> filterPublishers(String keyword, String searchBy) {
+        return (root, query, builder) -> {
+            query.distinct(true);
+
+            Predicate predicate = builder.conjunction();
+
+            if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(searchBy)) {
+                switch (searchBy) {
+                    case Publisher_.CODE ->
+                            predicate = builder.and(predicate, builder.like(root.get(Publisher_.code), "%" + keyword + "%"));
+
+                    case Publisher_.NAME ->
+                            predicate = builder.and(predicate, builder.like(root.get(Publisher_.name), "%" + keyword + "%"));
+
+                    case Publisher_.ADDRESS ->
+                            predicate = builder.and(predicate, builder.like(root.get(Publisher_.address), "%" + keyword + "%"));
+
+                    case Publisher_.CITY ->
+                            predicate = builder.and(predicate, builder.like(root.get(Publisher_.city), "%" + keyword + "%"));
+                }
+            }
+            return predicate;
+        };
+    }
 }

@@ -1,5 +1,6 @@
 package com.example.librarymanager.domain.entity;
 
+import com.example.librarymanager.domain.entity.common.FlagUserDateAuditing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,13 +14,17 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "publishers")
-public class Publisher {
+@Table(name = "publishers",
+        uniqueConstraints = @UniqueConstraint(name = "UN_PUBLISHER_CODE", columnNames = "code"))
+public class Publisher extends FlagUserDateAuditing {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "publisher_id")
     private Long id;  // Mã nhà xuất bản
+
+    @Column(name = "code", nullable = false)
+    private String code;  // Mã hiệu
 
     @Column(name = "name", nullable = false)
     private String name;  // Tên nhà xuất bản
