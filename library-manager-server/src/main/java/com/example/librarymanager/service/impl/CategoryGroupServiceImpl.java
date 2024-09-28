@@ -10,6 +10,7 @@ import com.example.librarymanager.domain.dto.request.CategoryGroupRequestDto;
 import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.entity.CategoryGroup;
 import com.example.librarymanager.domain.mapper.CategoryGroupMapper;
+import com.example.librarymanager.domain.specification.EntitySpecification;
 import com.example.librarymanager.exception.BadRequestException;
 import com.example.librarymanager.exception.ConflictException;
 import com.example.librarymanager.exception.NotFoundException;
@@ -81,7 +82,9 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
     public PaginationResponseDto<CategoryGroup> findAll(PaginationFullRequestDto requestDto) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.CATEGORY);
 
-        Page<CategoryGroup> page = categoryGroupRepository.findAll(pageable);
+        Page<CategoryGroup> page = categoryGroupRepository.findAll(
+                EntitySpecification.filterCategoryGroups(requestDto.getKeyword(), requestDto.getSearchBy()),
+                pageable);
 
         PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.AUTHOR, page);
 

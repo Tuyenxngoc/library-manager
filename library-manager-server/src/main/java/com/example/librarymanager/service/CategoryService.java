@@ -19,5 +19,4 @@ public interface CategoryService {
     CommonResponseDto update(Long id, CategoryRequestDto requestDto);
 
     CommonResponseDto toggleActiveStatus(Long id);
-
 }

@@ -185,8 +185,8 @@ function BookCategoryGroup() {
                 <Space>
                     <Button type="text" icon={<MdOutlineModeEdit />} onClick={() => showEditModal(record)} />
                     <Popconfirm
-                        title="Xóa tác giả"
-                        description="Bạn có chắc muốn xóa tác giả này không?"
+                        title="Xóa nhóm loại sách"
+                        description="Bạn có chắc muốn xóa nhóm loại sách này không?"
                         onConfirm={() => handleDeleteEntity(record.id)}
                         okText="Xóa"
                         cancelText="Hủy"

@@ -12,7 +12,7 @@ import com.example.librarymanager.domain.dto.response.GetCategoryResponseDto;
 import com.example.librarymanager.domain.entity.Category;
 import com.example.librarymanager.domain.entity.CategoryGroup;
 import com.example.librarymanager.domain.mapper.CategoryMapper;
-import com.example.librarymanager.domain.specification.AuthorSpecification;
+import com.example.librarymanager.domain.specification.EntitySpecification;
 import com.example.librarymanager.exception.BadRequestException;
 import com.example.librarymanager.exception.ConflictException;
 import com.example.librarymanager.exception.NotFoundException;
@@ -53,7 +53,7 @@ public class CategoryServiceImpl implements CategoryService {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.CATEGORY);
 
         Page<Category> page = categoryRepository.findAll(
-                AuthorSpecification.filterCategories(requestDto.getKeyword(), requestDto.getSearchBy()),
+                EntitySpecification.filterCategories(requestDto.getKeyword(), requestDto.getSearchBy()),
                 pageable);
 
         List<GetCategoryResponseDto> items = page.getContent().stream()
@@ -71,7 +71,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CommonResponseDto save(CategoryRequestDto requestDto) {
-        CategoryGroup categoryGroup = categoryGroupRepository.findById(requestDto.getParentId())
+        CategoryGroup categoryGroup = categoryGroupRepository.findByIdAndActiveFlagIsTrue(requestDto.getParentId())
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.CategoryGroup.ERR_NOT_FOUND_ID, requestDto.getParentId()));
 
         if (categoryRepository.existsByCategoryName(requestDto.getCategoryName())) {
@@ -88,7 +88,7 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepository.save(category);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
-        return new CommonResponseDto(message, category);
+        return new CommonResponseDto(message, new GetCategoryResponseDto(category));
     }
 
     @Override
@@ -119,11 +119,19 @@ public class CategoryServiceImpl implements CategoryService {
             throw new ConflictException(ErrorMessage.Category.ERR_DUPLICATE_CODE);
         }
 
+        if (!Objects.equals(category.getCategoryGroup().getId(), requestDto.getParentId())) {
+            CategoryGroup categoryGroup = categoryGroupRepository.findByIdAndActiveFlagIsTrue(requestDto.getParentId())
+                    .orElseThrow(() -> new NotFoundException(ErrorMessage.CategoryGroup.ERR_NOT_FOUND_ID, requestDto.getParentId()));
+            category.setCategoryGroup(categoryGroup);
+        }
+
         category.setCategoryName(requestDto.getCategoryName());
         category.setCategoryCode(requestDto.getCategoryCode());
 
+        categoryRepository.save(category);
+
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
-        return new CommonResponseDto(message, category);
+        return new CommonResponseDto(message, new GetCategoryResponseDto(category));
     }
 
     @Override

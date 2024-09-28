@@ -1,15 +1,12 @@
 package com.example.librarymanager.domain.specification;
 
 
-import com.example.librarymanager.domain.entity.Author;
-import com.example.librarymanager.domain.entity.Author_;
-import com.example.librarymanager.domain.entity.Category;
-import com.example.librarymanager.domain.entity.Category_;
+import com.example.librarymanager.domain.entity.*;
 import jakarta.persistence.criteria.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
-public class AuthorSpecification {
+public class EntitySpecification {
 
     public static Specification<Author> filterAuthors(String keyword, String searchBy) {
         return (root, query, builder) -> {
@@ -46,4 +43,19 @@ public class AuthorSpecification {
         };
     }
 
+    public static Specification<CategoryGroup> filterCategoryGroups(String keyword, String searchBy) {
+        return (root, query, builder) -> {
+            query.distinct(true);
+
+            Predicate predicate = builder.conjunction();
+
+            if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(searchBy)) {
+                switch (searchBy) {
+                    case CategoryGroup_.GROUP_NAME ->
+                            predicate = builder.and(predicate, builder.like(root.get(CategoryGroup_.groupName), "%" + keyword + "%"));
+                }
+            }
+            return predicate;
+        };
+    }
 }

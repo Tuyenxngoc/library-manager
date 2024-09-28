@@ -35,6 +35,7 @@ function BookCategory() {
     const [editingItem, setEditingItem] = useState(null);
     const [editForm] = Form.useForm();
     const [parentCategories, setParentCategories] = useState([]);
+    const [isFetching, setIsFetching] = useState(false);
 
     const showAddModal = () => {
         setIsAddModalOpen(true);
@@ -47,7 +48,12 @@ function BookCategory() {
 
     const showEditModal = (record) => {
         setEditingItem(record);
-        editForm.setFieldsValue(record);
+        const item = {
+            categoryName: record.categoryName,
+            categoryCode: record.categoryCode,
+            parentId: record.categoryGroup?.id,
+        };
+        editForm.setFieldsValue(item);
         setIsEditModalOpen(true);
     };
 
@@ -141,6 +147,20 @@ function BookCategory() {
         }
     };
 
+    const fetchParentCategories = async (keyword = '') => {
+        setIsFetching(true);
+        try {
+            const params = queryString.stringify({ keyword, searchBy: 'groupName' });
+            const response = await getCategoryGroups(params);
+            const { items } = response.data.data;
+            setParentCategories(items);
+        } catch (error) {
+            messageApi.error(error.message || 'Có lỗi xảy ra khi tải nhóm loại sách.');
+        } finally {
+            setIsFetching(false);
+        }
+    };
+
     useEffect(() => {
         const fetchEntities = async () => {
             setIsLoading(true);
@@ -162,18 +182,7 @@ function BookCategory() {
     }, [filters]);
 
     useEffect(() => {
-        const fetchParentCategories = async () => {
-            try {
-                const response = await getCategoryGroups();
-                const { items } = response.data.data;
-                setParentCategories(items);
-            } catch (error) {
-                console.log(error.message);
-            }
-        };
-
         fetchParentCategories();
-
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -220,8 +229,8 @@ function BookCategory() {
                 <Space>
                     <Button type="text" icon={<MdOutlineModeEdit />} onClick={() => showEditModal(record)} />
                     <Popconfirm
-                        title="Xóa tác giả"
-                        description="Bạn có chắc muốn xóa tác giả này không?"
+                        title="Xóa loại sách"
+                        description="Bạn có chắc muốn xóa loại sách này không?"
                         onConfirm={() => handleDeleteEntity(record.id)}
                         okText="Xóa"
                         cancelText="Hủy"
@@ -265,14 +274,23 @@ function BookCategory() {
                     <Form.Item
                         label="Nhóm loại sách"
                         name="parentId"
-                        rules={[{ required: true, message: 'Vui lòng nhóm loại sách' }]}
+                        rules={[{ required: true, message: 'Vui lòng chọn nhóm loại sách' }]}
                     >
-                        <Select placeholder="Nhóm loại sách" allowClear>
-                            {parentCategories.map((parent) => (
-                                <Option key={parent.id} value={parent.id}>
-                                    {parent.groupName}
-                                </Option>
-                            ))}
+                        <Select
+                            showSearch
+                            placeholder="Nhóm loại sách"
+                            allowClear
+                            onSearch={fetchParentCategories}
+                            loading={isFetching}
+                            filterOption={false}
+                        >
+                            {parentCategories
+                                .filter((parent) => parent.activeFlag)
+                                .map((parent) => (
+                                    <Option key={parent.id} value={parent.id}>
+                                        {parent.groupName}
+                                    </Option>
+                                ))}
                         </Select>
                     </Form.Item>
                 </Form>
@@ -298,14 +316,26 @@ function BookCategory() {
                     <Form.Item
                         label="Nhóm loại sách"
                         name="parentId"
-                        rules={[{ required: true, message: 'Vui lòng nhóm loại sách' }]}
+                        rules={[{ required: true, message: 'Vui lòng chọn nhóm loại sách' }]}
                     >
-                        <Select placeholder="Nhóm loại sách" allowClear>
-                            {parentCategories.map((parent) => (
-                                <Option key={parent.id} value={parent.id}>
-                                    {parent.groupName}
-                                </Option>
-                            ))}
+                        <Select
+                            showSearch
+                            placeholder="Nhóm loại sách"
+                            allowClear
+                            onSearch={fetchParentCategories}
+                            loading={isFetching}
+                            filterOption={false}
+                        >
+                            {parentCategories
+                                .filter((parent) => {
+                                    const parentId = editForm.getFieldValue('parentId');
+                                    return parent.activeFlag || parent.id === parentId;
+                                })
+                                .map((parent) => (
+                                    <Option key={parent.id} value={parent.id}>
+                                        {parent.groupName}
+                                    </Option>
+                                ))}
                         </Select>
                     </Form.Item>
                 </Form>
