@@ -41,8 +41,8 @@ public class BookDefinition {//Biên mục
     @Column(name = "publication_place")
     private String publicationPlace; // Nơi xuất bản Hà Nội, vv
 
-    @Column(name = "author_sign")
-    private String authorSign; // Ký hiệu tác giả
+    @Column(name = "book_code")
+    private String bookCode; // Kí hiệu tên sách
 
     @Column(name = "page_count")
     private Integer pageCount; // Số trang
@@ -72,6 +72,9 @@ public class BookDefinition {//Biên mục
     @Column(name = "language")
     private String language; // Ngôn ngữ
 
+    @Column(name = "image_url")
+    private String imageUrl;// Ảnh bìa
+
     @Column(name = "series")
     private String series; // Tùng thư
 
@@ -83,7 +86,7 @@ public class BookDefinition {//Biên mục
     private List<Book> books = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_set_id", foreignKey = @ForeignKey(name = "FK_BOOK_DEFINITION_BOOK_SET_ID"), referencedColumnName = "book_set_id", nullable = false)
+    @JoinColumn(name = "book_set_id", foreignKey = @ForeignKey(name = "FK_BOOK_DEFINITION_BOOK_SET_ID"), referencedColumnName = "book_set_id")
     @JsonIgnore
     private BookSet bookSet;//Bộ sách
 
@@ -93,7 +96,7 @@ public class BookDefinition {//Biên mục
     private Category category; // Danh mục
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "publisher_id", foreignKey = @ForeignKey(name = "FK_BOOK_DEFINITION_PUBLISHER_ID"), referencedColumnName = "publisher_id", nullable = false)
+    @JoinColumn(name = "publisher_id", foreignKey = @ForeignKey(name = "FK_BOOK_DEFINITION_PUBLISHER_ID"), referencedColumnName = "publisher_id")
     @JsonIgnore
     private Publisher publisher;  // Nhà xuất bản
 
@@ -101,5 +104,5 @@ public class BookDefinition {//Biên mục
     @JsonIgnore
     private List<BookAuthor> bookAuthors;  // Tác giả
 
-    //Kí hiệu phân loại, Kí hiệu tên sách, đồng tác giả, ..todo
+    //Kí hiệu phân loại, ..todo
 }

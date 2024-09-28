@@ -6,6 +6,7 @@ const images = {
     rss: require('./images/rss.png'),
     twitter: require('./images/twitter.png'),
     logo: require('./images/logo.svg').default,
+    placeimg: require('./images/placeimg.svg').default,
 };
 
 export const slides = [

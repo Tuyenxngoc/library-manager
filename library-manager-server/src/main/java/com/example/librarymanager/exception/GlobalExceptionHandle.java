@@ -10,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.springframework.context.MessageSource;
+import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -71,8 +72,13 @@ public class GlobalExceptionHandle {
         Map<String, String> result = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
-            String errorMessage = messageSource.getMessage(Objects.requireNonNull(error.getDefaultMessage()), null,
-                    LocaleContextHolder.getLocale());
+            String errorMessage;
+            try {
+                errorMessage = messageSource.getMessage(Objects.requireNonNull(error.getDefaultMessage()), null,
+                        LocaleContextHolder.getLocale());
+            } catch (NoSuchMessageException e) {
+                errorMessage = error.getDefaultMessage();
+            }
             result.put(fieldName, errorMessage);
         });
         return VsResponseUtil.error(HttpStatus.BAD_REQUEST, result);
