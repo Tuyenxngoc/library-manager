@@ -28,6 +28,8 @@ public class BookDefinitionRequestDto {
 
     private Long bookSetId; // Bộ sách
 
+    private Long classificationSymbolId; // Kí hiệu phân loại
+
     private Integer pageCount; // Số trang
 
     private Double price; // Giá bán
@@ -75,6 +77,9 @@ public class BookDefinitionRequestDto {
 
     @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
     private String additionalInfo; // Thông tin khác
+
+    @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
+    private String series; // Tùng thư
 
     //Kí hiệu phân loại
 }

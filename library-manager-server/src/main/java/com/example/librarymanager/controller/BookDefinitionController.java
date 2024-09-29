@@ -39,9 +39,10 @@ public class BookDefinitionController {
     @PutMapping(UrlConstant.BookDefinition.UPDATE)
     public ResponseEntity<?> updateBookDefinition(
             @PathVariable Long id,
-            @Valid @RequestBody BookDefinitionRequestDto requestDto
+            @Valid @ModelAttribute BookDefinitionRequestDto requestDto,
+            @RequestParam(value = "image", required = false) MultipartFile image
     ) {
-        return VsResponseUtil.success(bookDefinitionService.update(id, requestDto));
+        return VsResponseUtil.success(bookDefinitionService.update(id, requestDto, image));
     }
 
     @Operation(summary = "API Delete Book Definition")

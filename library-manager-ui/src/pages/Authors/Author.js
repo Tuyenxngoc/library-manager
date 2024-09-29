@@ -151,10 +151,13 @@ function Author() {
             render: (_, record) => (
                 <Space>
                     <Button type="text" icon={<MdOutlineModeEdit />} onClick={() => navigate(`edit/${record.id}`)} />
-
                     <Popconfirm
-                        title="Xóa tác giả"
-                        description="Bạn có chắc muốn xóa tác giả này không?"
+                        title="Thông báo"
+                        description={
+                            <div>
+                                Bạn có chắc muốn xóa <b>{record.fullName}</b> không?
+                            </div>
+                        }
                         onConfirm={() => handleDeleteEntity(record.id)}
                         okText="Xóa"
                         cancelText="Hủy"

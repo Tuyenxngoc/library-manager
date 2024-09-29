@@ -85,6 +85,7 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = categoryMapper.toCategory(requestDto);
         category.setCategoryGroup(categoryGroup);
 
+        category.setActiveFlag(true);
         categoryRepository.save(category);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());

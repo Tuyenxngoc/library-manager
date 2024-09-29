@@ -213,8 +213,12 @@ function Publisher() {
                 <Space>
                     <Button type="text" icon={<MdOutlineModeEdit />} onClick={() => showEditModal(record)} />
                     <Popconfirm
-                        title="Xóa nhà xuất bản"
-                        description="Bạn có chắc muốn xóa nhà xuất bản này không?"
+                        title="Thông báo"
+                        description={
+                            <div>
+                                Bạn có chắc muốn xóa <b>{record.name}</b> không?
+                            </div>
+                        }
                         onConfirm={() => handleDeleteEntity(record.id)}
                         okText="Xóa"
                         cancelText="Hủy"

@@ -1,21 +1,18 @@
 import { useEffect, useState } from 'react';
-import { Alert, Button, Flex, Form, Input, message, Modal, Popconfirm, Select, Space, Switch, Table } from 'antd';
+import { Button, Flex, Form, Input, message, Modal, Popconfirm, Select, Space, Switch, Table } from 'antd';
 import { MdOutlineModeEdit } from 'react-icons/md';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import queryString from 'query-string';
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
 import {
-    createCategory,
-    deleteCategory,
-    getCategories,
+    createClassificationSymbol,
+    deleteClassificationSymbol,
+    getClassificationSymbols,
     toggleActiveFlag,
-    updateCategory,
-} from '~/services/categoryService';
-import { getCategoryGroups } from '~/services/categoryGroupService';
+    updateClassificationSymbol,
+} from '~/services/classificationSymbolService';
 
-const { Option } = Select;
-
-function BookCategory({ active }) {
+function ClassificationSymbol() {
     const [meta, setMeta] = useState(INITIAL_META);
     const [filters, setFilters] = useState(INITIAL_FILTERS);
 
@@ -34,8 +31,6 @@ function BookCategory({ active }) {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
     const [editForm] = Form.useForm();
-    const [parentCategories, setParentCategories] = useState([]);
-    const [isFetching, setIsFetching] = useState(false);
 
     const showAddModal = () => {
         setIsAddModalOpen(true);
@@ -48,12 +43,7 @@ function BookCategory({ active }) {
 
     const showEditModal = (record) => {
         setEditingItem(record);
-        const item = {
-            categoryName: record.categoryName,
-            categoryCode: record.categoryCode,
-            parentId: record.categoryGroup?.id,
-        };
-        editForm.setFieldsValue(item);
+        editForm.setFieldsValue(record);
         setIsEditModalOpen(true);
     };
 
@@ -85,7 +75,7 @@ function BookCategory({ active }) {
 
     const handleCreateEntity = async (values) => {
         try {
-            const response = await createCategory(values);
+            const response = await createClassificationSymbol(values);
             if (response.status === 201) {
                 const { data, message } = response.data.data;
                 messageApi.success(message);
@@ -102,7 +92,7 @@ function BookCategory({ active }) {
 
     const handleUpdateEntity = async (values) => {
         try {
-            const response = await updateCategory(editingItem.id, values);
+            const response = await updateClassificationSymbol(editingItem.id, values);
             if (response.status === 200) {
                 const { data, message } = response.data.data;
                 messageApi.success(message);
@@ -119,7 +109,7 @@ function BookCategory({ active }) {
 
     const handleDeleteEntity = async (id) => {
         try {
-            const response = await deleteCategory(id);
+            const response = await deleteClassificationSymbol(id);
             if (response.status === 200) {
                 setEntityData((prev) => prev.filter((a) => a.id !== id));
 
@@ -147,27 +137,13 @@ function BookCategory({ active }) {
         }
     };
 
-    const fetchParentCategories = async (keyword = '') => {
-        setIsFetching(true);
-        try {
-            const params = queryString.stringify({ keyword, searchBy: 'groupName' });
-            const response = await getCategoryGroups(params);
-            const { items } = response.data.data;
-            setParentCategories(items);
-        } catch (error) {
-            messageApi.error(error.message || 'Có lỗi xảy ra khi tải nhóm loại sách.');
-        } finally {
-            setIsFetching(false);
-        }
-    };
-
     useEffect(() => {
         const fetchEntities = async () => {
             setIsLoading(true);
             setErrorMessage(null);
             try {
                 const params = queryString.stringify(filters);
-                const response = await getCategories(params);
+                const response = await getClassificationSymbols(params);
                 const { meta, items } = response.data.data;
                 setEntityData(items);
                 setMeta(meta);
@@ -181,33 +157,27 @@ function BookCategory({ active }) {
         fetchEntities();
     }, [filters]);
 
-    useEffect(() => {
-        fetchParentCategories();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [active]);
-
     const columns = [
         {
-            title: 'Tên',
-            dataIndex: 'categoryName',
-            key: 'categoryName',
+            title: 'Cấp',
+            dataIndex: 'level',
+            key: 'level',
             sorter: true,
             showSorterTooltip: false,
         },
         {
-            title: 'Kí hiệu',
-            dataIndex: 'categoryCode',
-            key: 'categoryCode',
+            title: 'Tên phân loại',
+            dataIndex: 'name',
+            key: 'name',
             sorter: true,
             showSorterTooltip: false,
         },
         {
-            title: 'Thuộc nhóm',
-            dataIndex: 'categoryGroup',
-            key: 'categoryGroup',
+            title: 'Kí hiệu phân loại',
+            dataIndex: 'code',
+            key: 'code',
             sorter: true,
             showSorterTooltip: false,
-            render: (text) => <span>{text.name}</span>,
         },
         {
             title: 'Trạng thái',
@@ -232,7 +202,7 @@ function BookCategory({ active }) {
                         title="Thông báo"
                         description={
                             <div>
-                                Bạn có chắc muốn xóa <b>{record.categoryName}</b> không?
+                                Bạn có chắc muốn xóa <b>{record.name}</b> không?
                             </div>
                         }
                         onConfirm={() => handleDeleteEntity(record.id)}
@@ -259,95 +229,71 @@ function BookCategory({ active }) {
             {contextHolder}
 
             {/* Modal thêm mới */}
-            <Modal title="Thêm mới loại sách" open={isAddModalOpen} onOk={addForm.submit} onCancel={closeAddModal}>
+            <Modal
+                title="Thêm mới kí hiệu phân loại"
+                open={isAddModalOpen}
+                onOk={addForm.submit}
+                onCancel={closeAddModal}
+            >
                 <Form form={addForm} layout="vertical" onFinish={handleCreateEntity}>
                     <Form.Item
-                        label="Tên loại sách"
-                        name="categoryName"
-                        rules={[{ required: true, message: 'Vui lòng nhập tên loại sách' }]}
+                        label="Tên kí hiệu phân loại"
+                        name="name"
+                        rules={[{ required: true, message: 'Vui lòng nhập tên kí hiệu phân loại' }]}
                     >
-                        <Input placeholder="Nhập tên loại sách" />
+                        <Input placeholder="Nhập tên kí hiệu phân loại" />
                     </Form.Item>
                     <Form.Item
-                        label="Kí hiệu sách"
-                        name="categoryCode"
-                        rules={[{ required: true, message: 'Vui lòng nhập kí hiệu sách' }]}
+                        label="Mã kí hiệu phân loại"
+                        name="code"
+                        rules={[{ required: true, message: 'Vui lòng nhập mã kí hiệu phân loại' }]}
                     >
-                        <Input placeholder="Nhập tên kí hiệu sách" />
+                        <Input placeholder="Nhập mã kí hiệu phân loại" />
                     </Form.Item>
-                    <Form.Item
-                        label="Nhóm loại sách"
-                        name="parentId"
-                        rules={[{ required: true, message: 'Vui lòng chọn nhóm loại sách' }]}
-                    >
-                        <Select
-                            showSearch
-                            placeholder="Nhóm loại sách"
-                            allowClear
-                            onSearch={fetchParentCategories}
-                            loading={isFetching}
-                            filterOption={false}
-                        >
-                            {parentCategories
-                                .filter((parent) => parent.activeFlag)
-                                .map((parent) => (
-                                    <Option key={parent.id} value={parent.id}>
-                                        {parent.groupName}
-                                    </Option>
-                                ))}
+                    <Form.Item label="Cấp" name="level">
+                        <Select placeholder="Chọn cấp" allowClear>
+                            <Select.Option value={1}>Cấp 1</Select.Option>
+                            <Select.Option value={2}>Cấp 2</Select.Option>
+                            <Select.Option value={3}>Cấp 3</Select.Option>
                         </Select>
                     </Form.Item>
                 </Form>
             </Modal>
 
             {/* Modal chỉnh sửa */}
-            <Modal title="Sửa loại sách" open={isEditModalOpen} onOk={editForm.submit} onCancel={closeEditModal}>
+            <Modal
+                title="Sửa kí hiệu phân loại"
+                open={isEditModalOpen}
+                onOk={editForm.submit}
+                onCancel={closeEditModal}
+            >
                 <Form form={editForm} layout="vertical" onFinish={handleUpdateEntity}>
                     <Form.Item
-                        label="Tên loại sách"
-                        name="categoryName"
-                        rules={[{ required: true, message: 'Vui lòng nhập tên loại sách' }]}
+                        label="Tên kí hiệu phân loại"
+                        name="name"
+                        rules={[{ required: true, message: 'Vui lòng nhập tên kí hiệu phân loại' }]}
                     >
-                        <Input placeholder="Nhập tên loại sách" />
+                        <Input placeholder="Nhập tên kí hiệu phân loại" />
                     </Form.Item>
                     <Form.Item
-                        label="Kí hiệu sách"
-                        name="categoryCode"
-                        rules={[{ required: true, message: 'Vui lòng nhập kí hiệu sách' }]}
+                        label="Mã kí hiệu phân loại"
+                        name="code"
+                        rules={[{ required: true, message: 'Vui lòng nhập mã kí hiệu phân loại' }]}
                     >
-                        <Input placeholder="Nhập tên kí hiệu sách" />
+                        <Input placeholder="Nhập mã kí hiệu phân loại" />
                     </Form.Item>
-                    <Form.Item
-                        label="Nhóm loại sách"
-                        name="parentId"
-                        rules={[{ required: true, message: 'Vui lòng chọn nhóm loại sách' }]}
-                    >
-                        <Select
-                            showSearch
-                            placeholder="Nhóm loại sách"
-                            allowClear
-                            onSearch={fetchParentCategories}
-                            loading={isFetching}
-                            filterOption={false}
-                        >
-                            {parentCategories
-                                .filter((parent) => {
-                                    const parentId = editForm.getFieldValue('parentId');
-                                    return parent.activeFlag || parent.id === parentId;
-                                })
-                                .map((parent) => (
-                                    <Option key={parent.id} value={parent.id}>
-                                        {parent.groupName}
-                                    </Option>
-                                ))}
+                    <Form.Item label="Cấp" name="level">
+                        <Select placeholder="Chọn cấp" allowClear>
+                            <Select.Option value={1}>Cấp 1</Select.Option>
+                            <Select.Option value={2}>Cấp 2</Select.Option>
+                            <Select.Option value={3}>Cấp 3</Select.Option>
                         </Select>
                     </Form.Item>
                 </Form>
             </Modal>
 
-            <Alert showIcon message={<div>Mỗi loại sách tương ứng với một sổ đăng ký cá biệt.</div>} type="info" />
-
-            <Flex className="py-2" wrap justify="flex-end" align="center">
+            <Flex className="py-2" wrap justify="space-between" align="center">
+                <h2>Kí hiệu phân loại</h2>
                 <Button type="primary" onClick={showAddModal}>
                     Thêm mới
                 </Button>
@@ -373,4 +319,4 @@ function BookCategory({ active }) {
     );
 }
 
-export default BookCategory;
+export default ClassificationSymbol;

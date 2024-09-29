@@ -45,6 +45,7 @@ public class BookSetServiceImpl implements BookSetService {
 
         BookSet bookSet = bookSetMapper.toBookSet(requestDto);
 
+        bookSet.setActiveFlag(true);
         bookSetRepository.save(bookSet);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());

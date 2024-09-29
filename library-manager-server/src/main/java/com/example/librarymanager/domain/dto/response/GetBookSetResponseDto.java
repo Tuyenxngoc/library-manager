@@ -22,8 +22,6 @@ public class GetBookSetResponseDto {
 
     private String lastModifiedBy;
 
-    private Boolean deleteFlag;
-
     private Boolean activeFlag;
 
     private Long id;
@@ -37,7 +35,6 @@ public class GetBookSetResponseDto {
         this.lastModifiedDate = bookSet.getLastModifiedDate();
         this.createdBy = bookSet.getCreatedBy();
         this.lastModifiedBy = bookSet.getLastModifiedBy();
-        this.deleteFlag = bookSet.getDeleteFlag();
         this.activeFlag = bookSet.getActiveFlag();
 
         this.id = bookSet.getId();

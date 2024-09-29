@@ -5,7 +5,7 @@ public enum CardType {
     TEACHER("Thẻ giáo viên"),
     OTHER("Khác");
 
-    private String displayName;
+    private final String displayName;
 
     CardType(String displayName) {
         this.displayName = displayName;

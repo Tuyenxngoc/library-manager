@@ -2,7 +2,7 @@ package com.example.librarymanager.domain.entity;
 
 import com.example.librarymanager.constant.CardType;
 import com.example.librarymanager.constant.Gender;
-import com.example.librarymanager.domain.entity.common.FlagUserDateAuditing;
+import com.example.librarymanager.domain.entity.common.UserDateAuditing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -20,8 +20,8 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "readers",
-        uniqueConstraints = @UniqueConstraint(name = "UN_CARD_NUMBER", columnNames = "card_number"))
-public class Reader extends FlagUserDateAuditing {
+        uniqueConstraints = @UniqueConstraint(name = "UN_READER_CARD_NUMBER", columnNames = "card_number"))
+public class Reader extends UserDateAuditing {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,6 +59,9 @@ public class Reader extends FlagUserDateAuditing {
 
     @Column(name = "expiry_date")
     private LocalDate expiryDate; // Ngày hết hạn
+
+    @Column(name = "active_flag", nullable = false)
+    private Boolean activeFlag = Boolean.TRUE;
 
     @OneToMany(mappedBy = "reader", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore

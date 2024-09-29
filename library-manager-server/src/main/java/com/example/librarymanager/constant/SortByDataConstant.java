@@ -72,4 +72,30 @@ public enum SortByDataConstant implements SortByInterface {
             };
         }
     },
+
+    BOOK_DEFINITION {
+        @Override
+        public String getSortBy(String sortBy) {
+            return switch (sortBy) {
+                case "title" -> "title";
+                case "bookCode" -> "bookCode";
+                case "activeFlag" -> "activeFlag";
+                default -> "createdDate";
+            };
+        }
+    },
+
+    CLASSIFICATION_SYMBOL {
+        @Override
+        public String getSortBy(String sortBy) {
+            return switch (sortBy) {
+                case "name" -> "name";
+                case "code" -> "code";
+                case "level" -> "level";
+                case "activeFlag" -> "activeFlag";
+                default -> "createdDate";
+            };
+        }
+    },
+
 }

@@ -1,25 +1,31 @@
 package com.example.librarymanager.service.impl;
 
 import com.example.librarymanager.constant.ErrorMessage;
+import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.constant.SuccessMessage;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
+import com.example.librarymanager.domain.dto.pagination.PagingMeta;
 import com.example.librarymanager.domain.dto.request.BookDefinitionRequestDto;
 import com.example.librarymanager.domain.dto.response.CommonResponseDto;
+import com.example.librarymanager.domain.dto.response.GetBookDefinitionResponseDto;
 import com.example.librarymanager.domain.entity.*;
 import com.example.librarymanager.domain.mapper.BookDefinitionMapper;
+import com.example.librarymanager.domain.specification.EntitySpecification;
 import com.example.librarymanager.exception.BadRequestException;
 import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.*;
 import com.example.librarymanager.service.BookDefinitionService;
+import com.example.librarymanager.util.PaginationUtil;
 import com.example.librarymanager.util.UploadFileUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -42,7 +48,7 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
 
     private final AuthorRepository authorRepository;
 
-    private final BookAuthorRepository bookAuthorRepository;
+    private final ClassificationSymbolRepository classificationSymbolRepository;
 
     @Override
     public CommonResponseDto save(BookDefinitionRequestDto requestDto, MultipartFile file) {
@@ -78,71 +84,96 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
             bookDefinition.setPublisher(publisher);
         }
 
+        //Lưu danh mục phân loại
+        if(requestDto.getClassificationSymbolId() != null){
+            ClassificationSymbol classificationSymbol = classificationSymbolRepository.findById(requestDto.getClassificationSymbolId())
+                    .orElseThrow(() -> new NotFoundException(ErrorMessage.ClassificationSymbol.ERR_NOT_FOUND_ID, requestDto.getClassificationSymbolId()));
+            bookDefinition.setClassificationSymbol(classificationSymbol);
+        }
+
         //Lưu danh sách tác giả
         if (requestDto.getAuthorIds() != null) {
-            List<Author> authorList = new ArrayList<>();
             requestDto.getAuthorIds().forEach(authorId -> {
                 Author author = authorRepository.findById(authorId)
                         .orElseThrow(() -> new NotFoundException(ErrorMessage.Author.ERR_NOT_FOUND_ID, authorId));
-                authorList.add(author);
-            });
 
-            for (Author author : authorList) {
                 BookAuthor bookAuthor = new BookAuthor();
                 bookAuthor.setAuthor(author);
                 bookAuthor.setBookDefinition(bookDefinition);
 
-                bookAuthorRepository.save(bookAuthor);
-            }
+                bookDefinition.getBookAuthors().add(bookAuthor);
+            });
         }
 
+        bookDefinition.setActiveFlag(true);
         bookDefinitionRepository.save(bookDefinition);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
-        return new CommonResponseDto(message, bookDefinition);
+        return new CommonResponseDto(message);
     }
 
     @Override
-    public CommonResponseDto update(Long id, BookDefinitionRequestDto requestDto) {
+    public CommonResponseDto update(Long id, BookDefinitionRequestDto requestDto, MultipartFile image) {
         return null;
     }
 
     @Override
     public CommonResponseDto delete(Long id) {
-        return null;
+        BookDefinition bookDefinition = findEntityById(id);
+
+        if (!bookDefinition.getBooks().isEmpty()) {
+            throw new BadRequestException(ErrorMessage.BookDefinition.ERR_HAS_LINKED_BOOKS);
+        }
+
+        bookDefinitionRepository.delete(bookDefinition);
+
+        String message = messageSource.getMessage(SuccessMessage.DELETE, null, LocaleContextHolder.getLocale());
+        return new CommonResponseDto(message);
     }
 
     @Override
-    public PaginationResponseDto<BookDefinition> findAll(PaginationFullRequestDto requestDto) {
-        return null;
+    public PaginationResponseDto<GetBookDefinitionResponseDto> findAll(PaginationFullRequestDto requestDto) {
+        Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BOOK_DEFINITION);
+
+        Page<BookDefinition> page = bookDefinitionRepository.findAll(
+                EntitySpecification.filterBookDefinitions(requestDto.getKeyword(), requestDto.getSearchBy()),
+                pageable);
+
+        List<GetBookDefinitionResponseDto> items = page.getContent().stream()
+                .map(GetBookDefinitionResponseDto::new)
+                .toList();
+
+        PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.BOOK_DEFINITION, page);
+
+        PaginationResponseDto<GetBookDefinitionResponseDto> responseDto = new PaginationResponseDto<>();
+        responseDto.setItems(items);
+        responseDto.setMeta(pagingMeta);
+
+        return responseDto;
     }
 
     @Override
-    public BookDefinition findById(Long id) {
-        return null;
+    public GetBookDefinitionResponseDto findById(Long id) {
+        BookDefinition bookDefinition = findEntityById(id);
+
+        return new GetBookDefinitionResponseDto(bookDefinition);
+    }
+
+    private BookDefinition findEntityById(Long id) {
+        return bookDefinitionRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.BookDefinition.ERR_NOT_FOUND_ID, id));
     }
 
     @Override
     public CommonResponseDto toggleActiveStatus(Long id) {
-        return null;
-    }
+        BookDefinition bookDefinition = findEntityById(id);
 
-    private long parseSize(String size) {
-        try {
-            size = size.toUpperCase();
-            long parseLong = Long.parseLong(size.substring(0, size.length() - 2));
-            if (size.endsWith("KB")) {
-                return parseLong * 1024;
-            } else if (size.endsWith("MB")) {
-                return parseLong * 1024 * 1024;
-            } else if (size.endsWith("GB")) {
-                return parseLong * 1024 * 1024 * 1024;
-            } else {
-                return parseLong;
-            }
-        } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
-            return 2 * 1024 * 1024;
-        }
+        bookDefinition.setActiveFlag(!bookDefinition.getActiveFlag());
+
+        bookDefinitionRepository.save(bookDefinition);
+
+        String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
+        return new CommonResponseDto(message, bookDefinition.getActiveFlag());
     }
 
 }

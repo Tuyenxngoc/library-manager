@@ -5,13 +5,12 @@ import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.request.PublisherRequestDto;
 import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.entity.Publisher;
-import jakarta.validation.Valid;
 
 public interface PublisherService {
 
-    CommonResponseDto save(@Valid PublisherRequestDto requestDto);
+    CommonResponseDto save(PublisherRequestDto requestDto);
 
-    CommonResponseDto update(Long id, @Valid PublisherRequestDto requestDto);
+    CommonResponseDto update(Long id, PublisherRequestDto requestDto);
 
     CommonResponseDto delete(Long id);
 

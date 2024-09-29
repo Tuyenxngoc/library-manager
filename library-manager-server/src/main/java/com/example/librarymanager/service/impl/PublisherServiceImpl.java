@@ -44,6 +44,7 @@ public class PublisherServiceImpl implements PublisherService {
 
         Publisher publisher = publisherMapper.toPublisher(requestDto);
 
+        publisher.setActiveFlag(true);
         publisherRepository.save(publisher);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());

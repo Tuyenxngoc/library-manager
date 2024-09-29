@@ -5,13 +5,12 @@ import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.request.CategoryGroupRequestDto;
 import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.entity.CategoryGroup;
-import jakarta.validation.Valid;
 
 public interface CategoryGroupService {
 
     CommonResponseDto save(CategoryGroupRequestDto requestDto);
 
-    CommonResponseDto update(Long id, @Valid CategoryGroupRequestDto requestDto);
+    CommonResponseDto update(Long id, CategoryGroupRequestDto requestDto);
 
     CommonResponseDto delete(Long id);
 

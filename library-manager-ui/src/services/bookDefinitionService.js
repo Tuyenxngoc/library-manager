@@ -24,8 +24,6 @@ export const createBookDefinition = (values) => {
         }
     }
 
-    console.log(formData);
-
     return axiosPrivate.post('book-definitions', formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
@@ -35,4 +33,8 @@ export const createBookDefinition = (values) => {
 
 export const deleteBookDefinition = (id) => {
     return axiosPrivate.delete(`book-definitions/${id}`);
+};
+
+export const toggleActiveFlag = (id) => {
+    return axiosPrivate.patch(`book-definitions/${id}/toggle-active`);
 };

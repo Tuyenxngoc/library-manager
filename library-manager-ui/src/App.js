@@ -28,6 +28,7 @@ import Category from './pages/Category/Category';
 import Publisher from './pages/Publisher/Publisher';
 import BookDefinition from './pages/BookDefinition/BookDefinition';
 import BookDefinitionForm from './pages/BookDefinition/BookDefinitionForm';
+import ClassificationSymbol from './pages/ClassificationSymbol/ClassificationSymbol';
 
 function App() {
     return (
@@ -83,8 +84,14 @@ function App() {
                         {/* Biên mục */}
                         <Route path="book-definition">
                             <Route index element={<BookDefinition />} />
-                            <Route path="new" element={<BookDefinitionForm />} />
-                            <Route path="edit/:id" element={<BookDefinitionForm />} />
+                            <Route path="new" element={<BookDefinitionForm mode="new" />} />
+                            <Route path="edit/:id" element={<BookDefinitionForm mode="edit" />} />
+                            <Route path="copy/:id" element={<BookDefinitionForm mode="copy" />} />
+                        </Route>
+
+                        {/* Kí hiệu phân loại */}
+                        <Route path="classifications">
+                            <Route index element={<ClassificationSymbol />} />
                         </Route>
                     </Route>
                 </Route>

@@ -66,6 +66,7 @@ public class AuthorServiceImpl implements AuthorService {
             throw new ConflictException(ErrorMessage.Author.ERR_DUPLICATE_CODE);
         }
 
+        author.setActiveFlag(true);
         authorRepository.save(author);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());

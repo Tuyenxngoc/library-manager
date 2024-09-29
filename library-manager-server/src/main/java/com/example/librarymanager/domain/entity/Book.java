@@ -1,6 +1,7 @@
 package com.example.librarymanager.domain.entity;
 
 import com.example.librarymanager.constant.BookCondition;
+import com.example.librarymanager.domain.entity.common.UserDateAuditing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "books",
         uniqueConstraints = @UniqueConstraint(name = "UN_BOOK_BOOK_CODE", columnNames = "book_code"))
-public class Book {
+public class Book extends UserDateAuditing {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,6 +25,9 @@ public class Book {
 
     @Column(name = "book_code")
     private String bookCode; // Số đăng ký cá biệt sách
+
+    @Column(name = "active_flag", nullable = false)
+    private Boolean activeFlag = Boolean.TRUE;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "book_condition")

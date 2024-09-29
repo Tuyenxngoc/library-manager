@@ -1,6 +1,6 @@
 package com.example.librarymanager.domain.entity;
 
-import com.example.librarymanager.domain.entity.common.FlagUserDateAuditing;
+import com.example.librarymanager.domain.entity.common.UserDateAuditing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "category_groups")
-public class CategoryGroup extends FlagUserDateAuditing {//Nhóm danh mục
+public class CategoryGroup extends UserDateAuditing {//Nhóm danh mục
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +23,9 @@ public class CategoryGroup extends FlagUserDateAuditing {//Nhóm danh mục
 
     @Column(name = "group_name", nullable = false)
     private String groupName;
+
+    @Column(name = "active_flag", nullable = false)
+    private Boolean activeFlag = Boolean.TRUE;
 
     @OneToMany(mappedBy = "categoryGroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore

@@ -186,8 +186,12 @@ function BookSet() {
                 <Space>
                     <Button type="text" icon={<MdOutlineModeEdit />} onClick={() => showEditModal(record)} />
                     <Popconfirm
-                        title="Xóa bộ sách"
-                        description="Bạn có chắc muốn xóa bộ sách này không?"
+                        title="Thông báo"
+                        description={
+                            <div>
+                                Bạn có chắc muốn xóa <b>{record.name}</b> không?
+                            </div>
+                        }
                         onConfirm={() => handleDeleteEntity(record.id)}
                         okText="Xóa"
                         cancelText="Hủy"

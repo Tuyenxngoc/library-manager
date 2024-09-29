@@ -1,5 +1,6 @@
 package com.example.librarymanager.domain.entity;
 
+import com.example.librarymanager.domain.entity.common.UserDateAuditing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "book_definitions")
-public class BookDefinition {//Biên mục
+public class BookDefinition extends UserDateAuditing {//Biên mục
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -81,6 +82,9 @@ public class BookDefinition {//Biên mục
     @Column(name = "additional_info")
     private String additionalInfo; // Thông tin khác
 
+    @Column(name = "active_flag", nullable = false)
+    private Boolean activeFlag = Boolean.TRUE;
+
     @OneToMany(mappedBy = "bookDefinition", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Book> books = new ArrayList<>();
@@ -100,9 +104,13 @@ public class BookDefinition {//Biên mục
     @JsonIgnore
     private Publisher publisher;  // Nhà xuất bản
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "classification_symbol_id", foreignKey = @ForeignKey(name = "FK_BOOK_DEFINITION_CLASSIFICATION_SYMBOL_ID"), referencedColumnName = "classification_symbol_id")
+    @JsonIgnore
+    private ClassificationSymbol classificationSymbol;// Kí hiệu phân loại
+
     @OneToMany(mappedBy = "bookDefinition", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<BookAuthor> bookAuthors;  // Tác giả
+    private List<BookAuthor> bookAuthors = new ArrayList<>();  // Tác giả
 
-    //Kí hiệu phân loại, ..todo
 }

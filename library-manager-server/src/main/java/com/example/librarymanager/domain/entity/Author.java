@@ -1,7 +1,7 @@
 package com.example.librarymanager.domain.entity;
 
 import com.example.librarymanager.constant.Gender;
-import com.example.librarymanager.domain.entity.common.FlagUserDateAuditing;
+import com.example.librarymanager.domain.entity.common.UserDateAuditing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,7 +17,7 @@ import java.util.List;
 @Entity
 @Table(name = "authors",
         uniqueConstraints = @UniqueConstraint(name = "UN_AUTHOR_CODE", columnNames = "code"))
-public class Author extends FlagUserDateAuditing {
+public class Author extends UserDateAuditing {//Tác giả
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,6 +54,9 @@ public class Author extends FlagUserDateAuditing {
 
     @Column(name = "notes")
     private String notes; // Ghi chú
+
+    @Column(name = "active_flag", nullable = false)
+    private Boolean activeFlag = Boolean.TRUE;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore

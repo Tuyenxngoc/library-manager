@@ -1,6 +1,6 @@
 package com.example.librarymanager.domain.entity;
 
-import com.example.librarymanager.domain.entity.common.FlagUserDateAuditing;
+import com.example.librarymanager.domain.entity.common.UserDateAuditing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,7 +19,7 @@ import java.util.List;
                 @UniqueConstraint(name = "UN_CATEGORY_NAME", columnNames = "category_name"),
                 @UniqueConstraint(name = "UN_CATEGORY_CODE", columnNames = "category_code")
         })
-public class Category extends FlagUserDateAuditing {//Danh mục
+public class Category extends UserDateAuditing {//Danh mục
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +31,9 @@ public class Category extends FlagUserDateAuditing {//Danh mục
 
     @Column(name = "category_code", nullable = false)
     private String categoryCode;
+
+    @Column(name = "active_flag", nullable = false)
+    private Boolean activeFlag = Boolean.TRUE;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_group_id", foreignKey = @ForeignKey(name = "FK_CATEGORY_CATEGORY_GROUP_ID"), referencedColumnName = "category_group_id", nullable = false)

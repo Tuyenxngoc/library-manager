@@ -4,21 +4,20 @@ import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.request.BookDefinitionRequestDto;
 import com.example.librarymanager.domain.dto.response.CommonResponseDto;
-import com.example.librarymanager.domain.entity.BookDefinition;
-import jakarta.validation.Valid;
+import com.example.librarymanager.domain.dto.response.GetBookDefinitionResponseDto;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface BookDefinitionService {
 
-    CommonResponseDto save(@Valid BookDefinitionRequestDto requestDto, MultipartFile image);
+    CommonResponseDto save(BookDefinitionRequestDto requestDto, MultipartFile image);
 
-    CommonResponseDto update(Long id, @Valid BookDefinitionRequestDto requestDto);
+    CommonResponseDto update(Long id, BookDefinitionRequestDto requestDto, MultipartFile image);
 
     CommonResponseDto delete(Long id);
 
-    PaginationResponseDto<BookDefinition> findAll(PaginationFullRequestDto requestDto);
+    PaginationResponseDto<GetBookDefinitionResponseDto> findAll(PaginationFullRequestDto requestDto);
 
-    BookDefinition findById(Long id);
+    GetBookDefinitionResponseDto findById(Long id);
 
     CommonResponseDto toggleActiveStatus(Long id);
 }

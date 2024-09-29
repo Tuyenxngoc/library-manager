@@ -123,8 +123,13 @@ public class ErrorMessage {
     }
 
     public static class BookDefinition {
-        public static final String ERR_NOT_FOUND_ID = "exception.publisher.not.found.id";
-        public static final String ERR_DUPLICATE_CODE = "exception.publisher.duplicate.code";
-        public static final String ERR_HAS_LINKED_BOOKS = "exception.publisher.has.linked";
+        public static final String ERR_NOT_FOUND_ID = "exception.book.definition.not.found.id";
+        public static final String ERR_HAS_LINKED_BOOKS = "exception.book.definition.has.linked";
+    }
+
+    public static class ClassificationSymbol {
+        public static final String ERR_NOT_FOUND_ID = "exception.classification.symbol.not.found.id";
+        public static final String ERR_DUPLICATE_CODE = "exception.classification.symbol.duplicate.code";
+        public static final String ERR_HAS_LINKED_BOOKS = "exception.classification.symbol.has.linked";
     }
 }

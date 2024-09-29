@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import moment from 'moment';
 import queryString from 'query-string';
 import { Button, Image, Input, message, Select, Space, Upload } from 'antd';
 import images from '~/assets';
@@ -13,13 +12,15 @@ import { handleError } from '~/utils/errorHandler';
 import { checkIdIsNumber } from '~/utils/helper';
 import { createBookDefinition, getBookDefinitionById, updateBookDefinition } from '~/services/bookDefinitionService';
 import { getAuthors } from '~/services/authorService';
+import { getClassificationSymbols } from '~/services/classificationSymbolService';
 const { TextArea } = Input;
 const { Option } = Select;
 
 const defaultValue = {
     title: '',
     categoryId: null,
-    authorId: null,
+    authorIds: null,
+    classificationSymbolId: null,
     publisherId: null,
     publicationPlace: '',
     bookCode: '',
@@ -37,6 +38,7 @@ const defaultValue = {
     keywords: '',
     language: '',
     additionalInfo: '',
+    series: '',
     image: null,
 };
 
@@ -45,9 +47,15 @@ const validationSchema = yup.object({
 
     categoryId: yup.number().nullable().required('Danh mục là bắt buộc').typeError('Danh mục phải là số hợp lệ'),
 
-    authorId: yup.number().nullable().typeError('Tác giả phải là số hợp lệ'),
+    authorIds: yup
+        .array()
+        .of(yup.number().nullable().typeError('Tác giả phải là số hợp lệ'))
+        .nullable()
+        .typeError('Danh sách tác giả không hợp lệ'),
 
     publisherId: yup.number().nullable().typeError('Nhà xuất bản phải là số hợp lệ'),
+
+    classificationSymbolId: yup.number().nullable().typeError('Kí hiệu phân loại phải là số hợp lệ'),
 
     publicationPlace: yup.string(),
 
@@ -89,9 +97,13 @@ const validationSchema = yup.object({
     language: yup.string(),
 
     additionalInfo: yup.string(),
+
+    series: yup.string(),
 });
 
-function BookDefinitionForm() {
+const BookDefinitionForm = ({ mode }) => {
+    const isEditMode = mode === 'edit';
+    const isCopyMode = mode === 'copy';
     const { id } = useParams();
     const navigate = useNavigate();
     const [messageApi, contextHolder] = message.useMessage();
@@ -108,15 +120,15 @@ function BookDefinitionForm() {
     const [bookSets, setBookSets] = useState([]);
     const [isBookSetsLoading, setIsBookSetsLoading] = useState(true);
 
-    const [imageUrl, setImageUrl] = useState(''); // Lưu trữ URL hiển thị ảnh
+    const [classificationSymbols, setClassificationSymbols] = useState([]);
+    const [isClassificationSymbolsLoading, setIsClassificationSymbolsLoading] = useState(true);
 
-    // Xử lý sự kiện khi upload thay đổi
+    const [imageUrl, setImageUrl] = useState('');
+
     const handleUploadChange = (info) => {
         if (info.file.status === 'done' || info.file.status === 'uploading') {
-            // Cập nhật URL để hiển thị ảnh tạm thời
             const url = URL.createObjectURL(info.file.originFileObj);
             setImageUrl(url);
-            // Lưu trữ file ảnh trong state
             formik.setFieldValue('image', info.file.originFileObj);
         }
     };
@@ -212,9 +224,23 @@ function BookDefinitionForm() {
             const { items } = response.data.data;
             setBookSets(items);
         } catch (error) {
-            messageApi.error(error.message || 'Có lỗi xảy ra khi tải nhà xuất bản.');
+            messageApi.error(error.message || 'Có lỗi xảy ra khi tải bộ sách.');
         } finally {
             setIsBookSetsLoading(false);
+        }
+    };
+
+    const fetchClassificationSymbols = async (keyword = '') => {
+        setIsClassificationSymbolsLoading(true);
+        try {
+            const params = queryString.stringify({ keyword, searchBy: 'name' });
+            const response = await getClassificationSymbols(params);
+            const { items } = response.data.data;
+            setClassificationSymbols(items);
+        } catch (error) {
+            messageApi.error(error.message || 'Có lỗi xảy ra khi tải kí hiệu phân loại.');
+        } finally {
+            setIsClassificationSymbolsLoading(false);
         }
     };
 
@@ -223,6 +249,7 @@ function BookDefinitionForm() {
         fetchAuthors();
         fetchPublishers();
         fetchBookSets();
+        fetchClassificationSymbols();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -238,39 +265,40 @@ function BookDefinitionForm() {
                 .then((response) => {
                     const {
                         title,
-                        categoryId,
-                        authorId,
-                        publisherId,
-                        publicationPlace,
-                        bookCode,
+                        price,
+                        isbn,
                         publishingYear,
                         edition,
-                        pageCount,
-                        price,
                         referencePrice,
+                        publicationPlace,
+                        bookCode,
+                        pageCount,
                         bookSize,
                         parallelTitle,
+                        summary,
                         subtitle,
                         additionalMaterial,
-                        summary,
-                        isbn,
                         keywords,
                         language,
+                        imageUrl,
+                        series,
                         additionalInfo,
+                        authors,
+                        publisher,
+                        bookSet,
+                        classificationSymbol,
+                        category,
                     } = response.data.data;
-
+                    setImageUrl(imageUrl);
                     formik.setValues({
                         title,
-                        categoryId,
-                        authorId,
-                        publisherId,
+                        pageCount,
+                        price,
+                        referencePrice,
                         publicationPlace,
                         bookCode,
                         publishingYear,
                         edition,
-                        pageCount,
-                        price,
-                        referencePrice,
                         bookSize,
                         parallelTitle,
                         subtitle,
@@ -280,6 +308,12 @@ function BookDefinitionForm() {
                         keywords,
                         language,
                         additionalInfo,
+                        series,
+                        authorIds: authors ? authors.map((author) => author.id) : [],
+                        publisherId: publisher?.id,
+                        bookSetId: bookSet?.id,
+                        categoryId: category.id,
+                        classificationSymbolId: classificationSymbol?.id,
                     });
                 })
                 .catch((error) => {
@@ -292,7 +326,11 @@ function BookDefinitionForm() {
     return (
         <>
             {contextHolder}
-            <h2>{id ? 'Chỉnh sửa biên mục' : 'Thêm mới biên mục'}</h2>
+            <h2>
+                {isEditMode && <h1>Chỉnh sửa biên mục</h1>}
+                {isCopyMode && <h1>Nhân bản biên mục</h1>}
+                {mode === 'new' && <h1>Thêm mới biên mục</h1>}
+            </h2>
 
             <form onSubmit={formik.handleSubmit}>
                 <div className="row g-3">
@@ -344,18 +382,19 @@ function BookDefinitionForm() {
                             </div>
 
                             <div className="col-md-4">
-                                <label htmlFor="authorId">Tác giả:</label>
+                                <label htmlFor="authorIds">Tác giả:</label>
                                 <Select
+                                    mode="multiple"
                                     showSearch
                                     allowClear
                                     onSearch={fetchAuthors}
                                     filterOption={false}
-                                    id="authorId"
-                                    name="authorId"
-                                    value={formik.values.authorId}
-                                    onChange={(value) => formik.setFieldValue('authorId', value)}
-                                    onBlur={() => formik.setFieldTouched('authorId', true)}
-                                    status={formik.touched.authorId && formik.errors.authorId ? 'error' : undefined}
+                                    id="authorIds"
+                                    name="authorIds"
+                                    value={formik.values.authorIds}
+                                    onChange={(value) => formik.setFieldValue('authorIds', value)}
+                                    onBlur={() => formik.setFieldTouched('authorIds', true)}
+                                    status={formik.touched.authorIds && formik.errors.authorIds ? 'error' : undefined}
                                     loading={isAuthorsLoading}
                                     placeholder="Chọn tác giả"
                                     style={{ width: '100%' }}
@@ -366,7 +405,7 @@ function BookDefinitionForm() {
                                         </Option>
                                     ))}
                                 </Select>
-                                <div className="text-danger">{formik.touched.authorId && formik.errors.authorId}</div>
+                                <div className="text-danger">{formik.touched.authorIds && formik.errors.authorIds}</div>{' '}
                             </div>
 
                             <div className="col-md-4">
@@ -419,9 +458,35 @@ function BookDefinitionForm() {
                             </div>
 
                             <div className="col-md-4">
-                                <label htmlFor="penName">Kí hiệu phân loại:</label>
-                                <Input id="penName" name="penName" />
-                                <div className="text-danger">{formik.touched.penName && formik.errors.penName}</div>
+                                <label htmlFor="classificationSymbolId">Kí hiệu phân loại:</label>
+                                <Select
+                                    showSearch
+                                    allowClear
+                                    onSearch={fetchBookSets}
+                                    filterOption={false}
+                                    id="classificationSymbolId"
+                                    name="classificationSymbolId"
+                                    value={formik.values.classificationSymbolId}
+                                    onChange={(value) => formik.setFieldValue('classificationSymbolId', value)}
+                                    onBlur={() => formik.setFieldTouched('classificationSymbolId', true)}
+                                    status={
+                                        formik.touched.classificationSymbolId && formik.errors.classificationSymbolId
+                                            ? 'error'
+                                            : undefined
+                                    }
+                                    loading={isClassificationSymbolsLoading}
+                                    placeholder="Chọn kí hiệu phân loại"
+                                    style={{ width: '100%' }}
+                                >
+                                    {classificationSymbols.map((cs) => (
+                                        <Option key={cs.id} value={cs.id}>
+                                            {cs.name}
+                                        </Option>
+                                    ))}
+                                </Select>
+                                <div className="text-danger">
+                                    {formik.touched.classificationSymbolId && formik.errors.classificationSymbolId}
+                                </div>
                             </div>
 
                             <div className="col-md-4">
@@ -634,7 +699,7 @@ function BookDefinitionForm() {
                         <div className="text-danger">{formik.touched.language && formik.errors.language}</div>
                     </div>
 
-                    <div className="col-md-12">
+                    <div className="col-md-6">
                         <label htmlFor="additionalInfo">Thông tin khác:</label>
                         <Input
                             id="additionalInfo"
@@ -647,6 +712,19 @@ function BookDefinitionForm() {
                         <div className="text-danger">
                             {formik.touched.additionalInfo && formik.errors.additionalInfo}
                         </div>
+                    </div>
+
+                    <div className="col-md-6">
+                        <label htmlFor="series">Tùng thư:</label>
+                        <Input
+                            id="series"
+                            name="series"
+                            value={formik.values.series}
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            status={formik.touched.series && formik.errors.series ? 'error' : undefined}
+                        />
+                        <div className="text-danger">{formik.touched.series && formik.errors.series}</div>
                     </div>
 
                     <div className="col-md-6">
@@ -689,6 +767,6 @@ function BookDefinitionForm() {
             </form>
         </>
     );
-}
+};
 
 export default BookDefinitionForm;

@@ -42,6 +42,7 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
 
         CategoryGroup categoryGroup = categoryGroupMapper.toCategoryGroup(requestDto);
 
+        categoryGroup.setActiveFlag(true);
         categoryGroupRepository.save(categoryGroup);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());

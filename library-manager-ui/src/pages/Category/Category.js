@@ -18,7 +18,7 @@ function Category() {
         {
             key: '1',
             label: 'Loại sách',
-            children: <BookCategory />,
+            children: <BookCategory active={active} />,
         },
         {
             key: '2',

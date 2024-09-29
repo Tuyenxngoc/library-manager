@@ -37,6 +37,15 @@ public class UploadFileUtil {
         }
     }
 
+    public String copyImageFromUrl(String imageUrl) {
+        try {
+            Map<?, ?> result = cloudinary.uploader().upload(imageUrl, ObjectUtils.asMap("resource_type", "image"));
+            return result.get("secure_url").toString();
+        } catch (IOException e) {
+            throw new BadGatewayException("Copy image from URL failed!");
+        }
+    }
+
     public void destroyFileWithUrl(String url) {
         if (url == null || url.isEmpty()) {
             return;
