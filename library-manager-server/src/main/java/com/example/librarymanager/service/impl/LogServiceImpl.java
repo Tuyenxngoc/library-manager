@@ -1,36 +1,68 @@
 package com.example.librarymanager.service.impl;
 
+import com.example.librarymanager.constant.SortByDataConstant;
+import com.example.librarymanager.domain.dto.filter.LogFilter;
+import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
+import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
+import com.example.librarymanager.domain.dto.pagination.PagingMeta;
+import com.example.librarymanager.domain.dto.response.GetLogResponseDto;
 import com.example.librarymanager.domain.entity.Log;
+import com.example.librarymanager.domain.entity.User;
+import com.example.librarymanager.domain.specification.EntitySpecification;
 import com.example.librarymanager.repository.LogRepository;
 import com.example.librarymanager.service.LogService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.librarymanager.util.PaginationUtil;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class LogServiceImpl implements LogService {
 
-    @Autowired
-    private LogRepository logRepository;
+    private final LogRepository logRepository;
 
     @Override
-    public Log findById(Long id) {
-        return logRepository.findById(id).orElse(null);
+    public PaginationResponseDto<GetLogResponseDto> findAll(PaginationFullRequestDto requestDto, LogFilter logFilter) {
+        Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.LOG);
+
+        Page<Log> page = logRepository.findAll(
+                EntitySpecification.filterLogs(requestDto.getKeyword(), requestDto.getSearchBy(), logFilter),
+                pageable);
+
+        List<GetLogResponseDto> items = page.getContent().stream()
+                .map(GetLogResponseDto::new)
+                .toList();
+
+        PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.LOG, page);
+
+        PaginationResponseDto<GetLogResponseDto> responseDto = new PaginationResponseDto<>();
+        responseDto.setItems(items);
+        responseDto.setMeta(pagingMeta);
+
+        return responseDto;
     }
 
     @Override
-    public List<Log> findAll() {
-        return logRepository.findAll();
-    }
+    public void createLog(String feature, String event, String content, String userId) {
+        User user = new User(userId);
+        Log l = new Log();
+        l.setFeature(feature);
+        l.setEvent(event);
+        l.setContent(content);
+        l.setTimestamp(LocalDateTime.now());
+        l.setUser(user);
 
-    @Override
-    public Log save(Log log) {
-        return logRepository.save(log);
-    }
-
-    @Override
-    public void delete(Long id) {
-        logRepository.deleteById(id);
+        try {
+            logRepository.save(l);
+        } catch (Exception e) {
+            log.error("Error occurred while creating log: {}", e.getMessage());
+        }
     }
 }

@@ -54,4 +54,8 @@ public class User extends DateAuditing {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Log> logs = new ArrayList<>();
+
+    public User(String userId) {
+        this.id = userId;
+    }
 }

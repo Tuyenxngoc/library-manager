@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RestApiV1
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Tag(name = "ClassificationSymbol")
+@Tag(name = "Classification Symbol")
 public class ClassificationSymbolController {
 
     ClassificationSymbolService classificationSymbolService;

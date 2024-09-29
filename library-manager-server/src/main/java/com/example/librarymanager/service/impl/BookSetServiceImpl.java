@@ -17,6 +17,7 @@ import com.example.librarymanager.exception.ConflictException;
 import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.BookSetRepository;
 import com.example.librarymanager.service.BookSetService;
+import com.example.librarymanager.service.LogService;
 import com.example.librarymanager.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -31,14 +32,19 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class BookSetServiceImpl implements BookSetService {
+
+    private static final String TAG = "BookSet";
+
     private final BookSetRepository bookSetRepository;
 
     private final MessageSource messageSource;
 
     private final BookSetMapper bookSetMapper;
 
+    private final LogService logService;
+
     @Override
-    public CommonResponseDto save(BookSetRequestDto requestDto) {
+    public CommonResponseDto save(BookSetRequestDto requestDto, String userId) {
         if (bookSetRepository.existsByName(requestDto.getName())) {
             throw new ConflictException(ErrorMessage.BookSet.ERR_DUPLICATE_NAME);
         }
@@ -48,12 +54,14 @@ public class BookSetServiceImpl implements BookSetService {
         bookSet.setActiveFlag(true);
         bookSetRepository.save(bookSet);
 
+        logService.createLog(TAG, "Create", "Tạo bộ sách mới: " + bookSet.getName(), userId);
+
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, new GetBookSetResponseDto(bookSet));
     }
 
     @Override
-    public CommonResponseDto update(Long id, BookSetRequestDto requestDto) {
+    public CommonResponseDto update(Long id, BookSetRequestDto requestDto, String userId) {
         BookSet bookSet = findById(id);
 
         if (!Objects.equals(bookSet.getName(), requestDto.getName()) && bookSetRepository.existsByName(requestDto.getName())) {
@@ -64,12 +72,14 @@ public class BookSetServiceImpl implements BookSetService {
 
         bookSetRepository.save(bookSet);
 
+        logService.createLog(TAG, "Update", "Cập nhật bộ sách id: " + bookSet.getId() + ", tên mới: " + bookSet.getName(), userId);
+
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, new GetBookSetResponseDto(bookSet));
     }
 
     @Override
-    public CommonResponseDto delete(Long id) {
+    public CommonResponseDto delete(Long id, String userId) {
         BookSet bookSet = findById(id);
 
         if (!bookSet.getBookDefinitions().isEmpty()) {
@@ -77,6 +87,8 @@ public class BookSetServiceImpl implements BookSetService {
         }
 
         bookSetRepository.delete(bookSet);
+
+        logService.createLog(TAG, "Delete", "Xóa bộ sách: " + bookSet.getName(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.DELETE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message);
@@ -110,12 +122,14 @@ public class BookSetServiceImpl implements BookSetService {
     }
 
     @Override
-    public CommonResponseDto toggleActiveStatus(Long id) {
+    public CommonResponseDto toggleActiveStatus(Long id, String userId) {
         BookSet bookSet = findById(id);
 
         bookSet.setActiveFlag(!bookSet.getActiveFlag());
 
         bookSetRepository.save(bookSet);
+
+        logService.createLog(TAG, "Toggle Active Status", "Thay đổi trạng thái bộ sách: " + bookSet.getName(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, bookSet.getActiveFlag());

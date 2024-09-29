@@ -113,4 +113,10 @@ public class UrlConstant {
         public static final String DELETE = PRE_FIX + "/{id}";
         public static final String TOGGLE_ACTIVE = PRE_FIX + "/{id}/toggle-active";
     }
+
+    public static class Log {
+        private static final String PRE_FIX = "/logs";
+
+        public static final String GET_ALL = PRE_FIX;
+    }
 }

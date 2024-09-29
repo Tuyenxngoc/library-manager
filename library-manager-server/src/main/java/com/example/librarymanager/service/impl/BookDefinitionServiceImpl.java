@@ -85,7 +85,7 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
         }
 
         //Lưu danh mục phân loại
-        if(requestDto.getClassificationSymbolId() != null){
+        if (requestDto.getClassificationSymbolId() != null) {
             ClassificationSymbol classificationSymbol = classificationSymbolRepository.findById(requestDto.getClassificationSymbolId())
                     .orElseThrow(() -> new NotFoundException(ErrorMessage.ClassificationSymbol.ERR_NOT_FOUND_ID, requestDto.getClassificationSymbolId()));
             bookDefinition.setClassificationSymbol(classificationSymbol);

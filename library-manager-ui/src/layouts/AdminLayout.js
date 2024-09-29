@@ -57,7 +57,7 @@ const items = [
     ]),
     getItem('Thống kê báo cáo', '/admin/reports', <FaChartBar />, [getItem('Báo cáo', '/admin/reports/statistics')]),
     getItem('Quản lý tin tức', '/admin/news', <BsNewspaper />, [getItem('Tin tức', '/admin/news/articles')]),
-    getItem('Lịch sử truy cập', '/admin/history', <FaHistory />),
+    getItem('Lịch sử truy cập', '/admin/histories', <FaHistory />),
 ];
 
 function AdminLayout() {

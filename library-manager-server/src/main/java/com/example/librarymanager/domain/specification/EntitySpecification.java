@@ -1,7 +1,9 @@
 package com.example.librarymanager.domain.specification;
 
+import com.example.librarymanager.domain.dto.filter.LogFilter;
 import com.example.librarymanager.domain.entity.*;
 import com.example.librarymanager.util.SpecificationsUtil;
+import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
@@ -138,6 +140,50 @@ public class EntitySpecification {
                                     SpecificationsUtil.castToRequiredType(root.get(ClassificationSymbol_.level).getJavaType(), keyword)));
                 }
             }
+            return predicate;
+        };
+    }
+
+    public static Specification<Log> filterLogs(String keyword, String searchBy, LogFilter logFilter) {
+        return (root, query, builder) -> {
+            query.distinct(true);
+
+            Predicate predicate = builder.conjunction();
+
+            if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(searchBy)) {
+                switch (searchBy) {
+                    case Log_.CONTENT ->
+                            predicate = builder.and(predicate, builder.like(root.get(Log_.content), "%" + keyword + "%"));
+                }
+            }
+
+            // Apply LogFilter conditions
+            if (logFilter != null) {
+                // Filter by user
+                if (StringUtils.isNotBlank(logFilter.getUser())) {
+                    Join<Log, User> userJoin = root.join(Log_.user);
+                    predicate = builder.and(predicate, builder.equal(userJoin.get(User_.username), logFilter.getUser()));
+                }
+
+                // Filter by action (event)
+                if (StringUtils.isNotBlank(logFilter.getAction())) {
+                    predicate = builder.and(predicate, builder.equal(root.get(Log_.event), logFilter.getAction()));
+                }
+
+                // Filter by description (feature)
+                if (StringUtils.isNotBlank(logFilter.getDescription())) {
+                    predicate = builder.and(predicate, builder.like(root.get(Log_.feature), "%" + logFilter.getDescription() + "%"));
+                }
+
+                // Filter by startDate and endDate (timestamp)
+                if (logFilter.getStartDate() != null) {
+                    predicate = builder.and(predicate, builder.greaterThanOrEqualTo(root.get(Log_.timestamp), logFilter.getStartDate().atStartOfDay()));
+                }
+                if (logFilter.getEndDate() != null) {
+                    predicate = builder.and(predicate, builder.lessThanOrEqualTo(root.get(Log_.timestamp), logFilter.getEndDate().atTime(23, 59, 59)));
+                }
+            }
+
             return predicate;
         };
     }

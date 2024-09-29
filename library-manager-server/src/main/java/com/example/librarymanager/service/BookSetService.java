@@ -8,15 +8,15 @@ import com.example.librarymanager.domain.dto.response.GetBookSetResponseDto;
 import com.example.librarymanager.domain.entity.BookSet;
 
 public interface BookSetService {
-    CommonResponseDto save(BookSetRequestDto requestDto);
+    CommonResponseDto save(BookSetRequestDto requestDto, String userId);
 
-    CommonResponseDto update(Long id, BookSetRequestDto requestDto);
+    CommonResponseDto update(Long id, BookSetRequestDto requestDto, String userId);
 
-    CommonResponseDto delete(Long id);
+    CommonResponseDto delete(Long id, String userId);
 
     PaginationResponseDto<GetBookSetResponseDto> findAll(PaginationFullRequestDto requestDto);
 
     BookSet findById(Long id);
 
-    CommonResponseDto toggleActiveStatus(Long id);
+    CommonResponseDto toggleActiveStatus(Long id, String userId);
 }

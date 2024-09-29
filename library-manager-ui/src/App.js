@@ -29,6 +29,7 @@ import Publisher from './pages/Publisher/Publisher';
 import BookDefinition from './pages/BookDefinition/BookDefinition';
 import BookDefinitionForm from './pages/BookDefinition/BookDefinitionForm';
 import ClassificationSymbol from './pages/ClassificationSymbol/ClassificationSymbol';
+import History from './pages/History/History';
 
 function App() {
     return (
@@ -92,6 +93,11 @@ function App() {
                         {/* Kí hiệu phân loại */}
                         <Route path="classifications">
                             <Route index element={<ClassificationSymbol />} />
+                        </Route>
+
+                        {/* Lịch sử */}
+                        <Route path="histories">
+                            <Route index element={<History />} />
                         </Route>
                     </Route>
                 </Route>
