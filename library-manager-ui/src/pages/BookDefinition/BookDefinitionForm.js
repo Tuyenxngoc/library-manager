@@ -101,7 +101,7 @@ const validationSchema = yup.object({
 
     series: yup.string(),
 
-    imageUrl: yup.string().url(),
+    imageUrl: yup.string().nullable().url(),
 });
 
 const BookDefinitionForm = ({ mode }) => {
@@ -126,11 +126,13 @@ const BookDefinitionForm = ({ mode }) => {
     const [classificationSymbols, setClassificationSymbols] = useState([]);
     const [isClassificationSymbolsLoading, setIsClassificationSymbolsLoading] = useState(true);
 
+    const [previousImage, setPreviousImage] = useState(images.placeimg);
+
     const handleUploadChange = (info) => {
-        if (info.file.status === 'done' || info.file.status === 'uploading') {
+        if (info.file.originFileObj) {
             const url = URL.createObjectURL(info.file.originFileObj);
 
-            formik.setFieldValue('imageUrl', url);
+            setPreviousImage(url);
             formik.setFieldValue('image', info.file.originFileObj);
         }
     };
@@ -145,7 +147,11 @@ const BookDefinitionForm = ({ mode }) => {
             }
             return isImage;
         },
+        showUploadList: false,
         onChange: handleUploadChange,
+        customRequest: ({ file, onSuccess }) => {
+            onSuccess('ok');
+        },
     };
 
     const handleSubmit = async (values, { setSubmitting }) => {
@@ -317,6 +323,7 @@ const BookDefinitionForm = ({ mode }) => {
                         categoryId: category.id,
                         classificationSymbolId: classificationSymbol ? classificationSymbol.id : null,
                     });
+                    setPreviousImage(imageUrl);
                 })
                 .catch((error) => {
                     console.log(error);
@@ -328,11 +335,11 @@ const BookDefinitionForm = ({ mode }) => {
     return (
         <>
             {contextHolder}
-            <h2>
-                {isEditMode && <h1>Chỉnh sửa biên mục</h1>}
-                {isCopyMode && <h1>Nhân bản biên mục</h1>}
-                {mode === 'new' && <h1>Thêm mới biên mục</h1>}
-            </h2>
+            <>
+                {isEditMode && <h2>Chỉnh sửa biên mục</h2>}
+                {isCopyMode && <h2>Nhân bản biên mục</h2>}
+                {mode === 'new' && <h2>Thêm mới biên mục</h2>}
+            </>
 
             <form onSubmit={formik.handleSubmit}>
                 <div className="row g-3">
@@ -624,7 +631,7 @@ const BookDefinitionForm = ({ mode }) => {
                     </div>
 
                     <div className="col-md-2 text-center">
-                        <Image width={200} src={formik.values.imageUrl} fallback={images.placeimg} />
+                        <Image width={200} src={previousImage} />
 
                         <Upload {...uploadProps}>
                             <Button type="text">Chọn ảnh</Button>

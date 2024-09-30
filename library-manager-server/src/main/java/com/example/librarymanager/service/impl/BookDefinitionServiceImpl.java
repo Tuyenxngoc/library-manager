@@ -54,30 +54,22 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
 
     private final ClassificationSymbolRepository classificationSymbolRepository;
 
-    private String handleImageUpload(MultipartFile file) {
+    private void checkImageIsValid(MultipartFile file) {
         if (file != null && !file.isEmpty()) {
             String contentType = file.getContentType();
             if (contentType == null || !contentType.startsWith("image/")) {
                 throw new BadRequestException(ErrorMessage.INVALID_FILE_TYPE);
             }
-            // Upload và trả về URL của ảnh mới
-            return uploadFileUtil.uploadFile(file);
         }
-        return null;
     }
 
     @Override
     public CommonResponseDto save(BookDefinitionRequestDto requestDto, MultipartFile file) {
-        BookDefinition bookDefinition = bookDefinitionMapper.toBookDefinition(requestDto);
+        //Kiểm tra file tải lên có phải định dạng ảnh không
+        checkImageIsValid(file);
 
-        // Xử lý upload ảnh
-        String newImageUrl = handleImageUpload(file);
-        if (newImageUrl != null) {//Ưu tiên xử lý file upload
-            bookDefinition.setImageUrl(newImageUrl);
-        } else if(requestDto.getImageUrl() != null) {
-            newImageUrl = uploadFileUtil.copyImageFromUrl(requestDto.getImageUrl());
-            bookDefinition.setImageUrl(newImageUrl);
-        }
+        //Map dữ liệu
+        BookDefinition bookDefinition = bookDefinitionMapper.toBookDefinition(requestDto);
 
         //Lưu danh mục
         Category category = categoryRepository.findByIdAndActiveFlagIsTrue(requestDto.getCategoryId())
@@ -119,6 +111,15 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
             });
         }
 
+        // Xử lý upload ảnh, ưu tiên file upload, rồi đến image url
+        if (file != null && !file.isEmpty()) {
+            String newImageUrl = uploadFileUtil.uploadFile(file);
+            bookDefinition.setImageUrl(newImageUrl);
+        }else if(requestDto.getImageUrl() != null){
+            String newImageUrl = uploadFileUtil.copyImageFromUrl(requestDto.getImageUrl());
+            bookDefinition.setImageUrl(newImageUrl);
+        }
+
         bookDefinition.setActiveFlag(true);
         bookDefinitionRepository.save(bookDefinition);
 
@@ -128,13 +129,12 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
 
     @Override
     public CommonResponseDto update(Long id, BookDefinitionRequestDto requestDto, MultipartFile file) {
+        //Kiểm tra file tải lên có phải định dạng ảnh không
+        checkImageIsValid(file);
+
         // Tìm bookDefinition dựa trên id
         BookDefinition bookDefinition = bookDefinitionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.BookDefinition.ERR_NOT_FOUND_ID, id));
-
-        // Xử lý upload ảnh
-        String newImageUrl = handleImageUpload(file);
-        bookDefinition.setImageUrl(newImageUrl);
 
         // Cập nhật danh mục
         Category category = categoryRepository.findByIdAndActiveFlagIsTrue(requestDto.getCategoryId())
@@ -230,6 +230,16 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
         bookDefinition.setSeries(requestDto.getSeries());
         bookDefinition.setAdditionalInfo(requestDto.getAdditionalInfo());
 
+        // Xử lý upload ảnh, ưu tiên file upload, rồi đến image url
+        if (file != null && !file.isEmpty()) {
+            String newImageUrl = uploadFileUtil.uploadFile(file);
+
+            //Xóa ảnh cũ
+            uploadFileUtil.destroyFileWithUrl(bookDefinition.getImageUrl());
+
+            bookDefinition.setImageUrl(newImageUrl);
+        }
+
         // Lưu đối tượng bookDefinition đã cập nhật
         bookDefinitionRepository.save(bookDefinition);
 
@@ -246,6 +256,8 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
         if (!bookDefinition.getBooks().isEmpty()) {
             throw new BadRequestException(ErrorMessage.BookDefinition.ERR_HAS_LINKED_BOOKS);
         }
+
+        uploadFileUtil.destroyFileWithUrl(bookDefinition.getImageUrl());
 
         bookDefinitionRepository.delete(bookDefinition);
 
