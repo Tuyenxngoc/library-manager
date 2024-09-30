@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import queryString from 'query-string';
-import { Button, Image, Input, message, Select, Space, Upload } from 'antd';
+import { Alert, Button, Image, Input, message, Select, Space, Upload } from 'antd';
 import images from '~/assets';
 import { getCategories } from '~/services/categoryService';
 import { getPublishers } from '~/services/publisherService';
@@ -40,6 +40,7 @@ const defaultValue = {
     additionalInfo: '',
     series: '',
     image: null,
+    imageUrl: null,
 };
 
 const validationSchema = yup.object({
@@ -99,6 +100,8 @@ const validationSchema = yup.object({
     additionalInfo: yup.string(),
 
     series: yup.string(),
+
+    imageUrl: yup.string().url(),
 });
 
 const BookDefinitionForm = ({ mode }) => {
@@ -123,12 +126,11 @@ const BookDefinitionForm = ({ mode }) => {
     const [classificationSymbols, setClassificationSymbols] = useState([]);
     const [isClassificationSymbolsLoading, setIsClassificationSymbolsLoading] = useState(true);
 
-    const [imageUrl, setImageUrl] = useState('');
-
     const handleUploadChange = (info) => {
         if (info.file.status === 'done' || info.file.status === 'uploading') {
             const url = URL.createObjectURL(info.file.originFileObj);
-            setImageUrl(url);
+
+            formik.setFieldValue('imageUrl', url);
             formik.setFieldValue('image', info.file.originFileObj);
         }
     };
@@ -149,7 +151,7 @@ const BookDefinitionForm = ({ mode }) => {
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
             let response;
-            if (id) {
+            if (isEditMode) {
                 response = await updateBookDefinition(id, values);
             } else {
                 response = await createBookDefinition(values);
@@ -177,7 +179,7 @@ const BookDefinitionForm = ({ mode }) => {
     const fetchCategories = async (keyword = '') => {
         setIsCategoriesLoading(true);
         try {
-            const params = queryString.stringify({ keyword, searchBy: 'categoryName' });
+            const params = queryString.stringify({ keyword, searchBy: 'categoryName', activeFlag: true });
             const response = await getCategories(params);
             const { items } = response.data.data;
             setCategories(items);
@@ -191,7 +193,7 @@ const BookDefinitionForm = ({ mode }) => {
     const fetchAuthors = async (keyword = '') => {
         setIsAuthorsLoading(true);
         try {
-            const params = queryString.stringify({ keyword, searchBy: 'fullName' });
+            const params = queryString.stringify({ keyword, searchBy: 'fullName', activeFlag: true });
             const response = await getAuthors(params);
             const { items } = response.data.data;
             setAuthors(items);
@@ -205,7 +207,7 @@ const BookDefinitionForm = ({ mode }) => {
     const fetchPublishers = async (keyword = '') => {
         setIsPublishersLoading(true);
         try {
-            const params = queryString.stringify({ keyword, searchBy: 'name' });
+            const params = queryString.stringify({ keyword, searchBy: 'name', activeFlag: true });
             const response = await getPublishers(params);
             const { items } = response.data.data;
             setPublishers(items);
@@ -219,7 +221,7 @@ const BookDefinitionForm = ({ mode }) => {
     const fetchBookSets = async (keyword = '') => {
         setIsBookSetsLoading(true);
         try {
-            const params = queryString.stringify({ keyword, searchBy: 'name' });
+            const params = queryString.stringify({ keyword, searchBy: 'name', activeFlag: true });
             const response = await getBookSets(params);
             const { items } = response.data.data;
             setBookSets(items);
@@ -233,7 +235,7 @@ const BookDefinitionForm = ({ mode }) => {
     const fetchClassificationSymbols = async (keyword = '') => {
         setIsClassificationSymbolsLoading(true);
         try {
-            const params = queryString.stringify({ keyword, searchBy: 'name' });
+            const params = queryString.stringify({ keyword, searchBy: 'name', activeFlag: true });
             const response = await getClassificationSymbols(params);
             const { items } = response.data.data;
             setClassificationSymbols(items);
@@ -289,7 +291,6 @@ const BookDefinitionForm = ({ mode }) => {
                         classificationSymbol,
                         category,
                     } = response.data.data;
-                    setImageUrl(imageUrl);
                     formik.setValues({
                         title,
                         pageCount,
@@ -309,11 +310,12 @@ const BookDefinitionForm = ({ mode }) => {
                         language,
                         additionalInfo,
                         series,
+                        imageUrl,
                         authorIds: authors ? authors.map((author) => author.id) : [],
-                        publisherId: publisher?.id,
-                        bookSetId: bookSet?.id,
+                        publisherId: publisher ? publisher.id : null,
+                        bookSetId: bookSet ? bookSet.id : null,
                         categoryId: category.id,
-                        classificationSymbolId: classificationSymbol?.id,
+                        classificationSymbolId: classificationSymbol ? classificationSymbol.id : null,
                     });
                 })
                 .catch((error) => {
@@ -402,6 +404,7 @@ const BookDefinitionForm = ({ mode }) => {
                                     {authors.map((author) => (
                                         <Option key={author.id} value={author.id}>
                                             {author.fullName}
+                                            <span className="text-danger"> {!author.activeFlag && '(*)'}</span>
                                         </Option>
                                     ))}
                                 </Select>
@@ -621,7 +624,7 @@ const BookDefinitionForm = ({ mode }) => {
                     </div>
 
                     <div className="col-md-2 text-center">
-                        <Image width={200} src={imageUrl} fallback={images.placeimg} />
+                        <Image width={200} src={formik.values.imageUrl} fallback={images.placeimg} />
 
                         <Upload {...uploadProps}>
                             <Button type="text">Chọn ảnh</Button>

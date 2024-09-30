@@ -3,6 +3,8 @@ import { Parallax } from 'react-parallax';
 import { ImBooks, ImUserPlus } from 'react-icons/im';
 import { FiUsers } from 'react-icons/fi';
 import { BsShop } from 'react-icons/bs';
+import CountUp from 'react-countup';
+import { Button, Statistic } from 'antd';
 
 import { backgrounds } from '~/assets';
 import ProductList from '~/components/ProductList';
@@ -10,8 +12,6 @@ import Slider from '~/components/Slider';
 
 import classNames from 'classnames/bind';
 import styles from '~/styles/Home.module.scss';
-import { Button } from 'antd';
-import FormattedNumber from '~/components/FormattedNumber';
 import PostList from '~/components/PostList';
 
 const cx = classNames.bind(styles);
@@ -22,6 +22,8 @@ const COUNTERS = [
     { title: 'Số nhà xuất bản', count: 183, className: 'publishers' },
     { title: 'Số bạn đọc', count: 1119, className: 'readers' },
 ];
+
+const formatter = (value) => <CountUp end={value} duration={10} separator="," />;
 
 function Home() {
     return (
@@ -44,7 +46,7 @@ function Home() {
                                 <div className={cx('titlepluscounter')}>
                                     <h2>{item.title}</h2>
                                     <h3>
-                                        <FormattedNumber number={item.count} />
+                                        <Statistic title="Active Users" value={item.count} formatter={formatter} />
                                     </h3>
                                 </div>
                             </div>

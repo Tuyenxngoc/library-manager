@@ -10,7 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class EntitySpecification {
 
-    public static Specification<Author> filterAuthors(String keyword, String searchBy) {
+    public static Specification<Author> filterAuthors(String keyword, String searchBy, Boolean activeFlag) {
         return (root, query, builder) -> {
             query.distinct(true);
 
@@ -25,11 +25,16 @@ public class EntitySpecification {
                             predicate = builder.and(predicate, builder.like(root.get(Author_.fullName), "%" + keyword + "%"));
                 }
             }
+
+            if (activeFlag != null) {
+                predicate = builder.and(predicate, builder.equal(root.get(Author_.activeFlag), activeFlag));
+            }
+
             return predicate;
         };
     }
 
-    public static Specification<Category> filterCategories(String keyword, String searchBy) {
+    public static Specification<Category> filterCategories(String keyword, String searchBy, Boolean activeFlag) {
         return (root, query, builder) -> {
             query.distinct(true);
 
@@ -41,11 +46,16 @@ public class EntitySpecification {
                             predicate = builder.and(predicate, builder.like(root.get(Category_.categoryName), "%" + keyword + "%"));
                 }
             }
+
+            if (activeFlag != null) {
+                predicate = builder.and(predicate, builder.equal(root.get(Category_.activeFlag), activeFlag));
+            }
+
             return predicate;
         };
     }
 
-    public static Specification<CategoryGroup> filterCategoryGroups(String keyword, String searchBy) {
+    public static Specification<CategoryGroup> filterCategoryGroups(String keyword, String searchBy, Boolean activeFlag) {
         return (root, query, builder) -> {
             query.distinct(true);
 
@@ -57,11 +67,16 @@ public class EntitySpecification {
                             predicate = builder.and(predicate, builder.like(root.get(CategoryGroup_.groupName), "%" + keyword + "%"));
                 }
             }
+
+            if (activeFlag != null) {
+                predicate = builder.and(predicate, builder.equal(root.get(CategoryGroup_.activeFlag), activeFlag));
+            }
+
             return predicate;
         };
     }
 
-    public static Specification<BookSet> filterBookSets(String keyword, String searchBy) {
+    public static Specification<BookSet> filterBookSets(String keyword, String searchBy, Boolean activeFlag) {
         return (root, query, builder) -> {
             query.distinct(true);
 
@@ -73,11 +88,16 @@ public class EntitySpecification {
                             predicate = builder.and(predicate, builder.like(root.get(BookSet_.name), "%" + keyword + "%"));
                 }
             }
+
+            if (activeFlag != null) {
+                predicate = builder.and(predicate, builder.equal(root.get(BookSet_.activeFlag), activeFlag));
+            }
+
             return predicate;
         };
     }
 
-    public static Specification<Publisher> filterPublishers(String keyword, String searchBy) {
+    public static Specification<Publisher> filterPublishers(String keyword, String searchBy, Boolean activeFlag) {
         return (root, query, builder) -> {
             query.distinct(true);
 
@@ -98,11 +118,16 @@ public class EntitySpecification {
                             predicate = builder.and(predicate, builder.like(root.get(Publisher_.city), "%" + keyword + "%"));
                 }
             }
+
+            if (activeFlag != null) {
+                predicate = builder.and(predicate, builder.equal(root.get(Publisher_.activeFlag), activeFlag));
+            }
+
             return predicate;
         };
     }
 
-    public static Specification<BookDefinition> filterBookDefinitions(String keyword, String searchBy) {
+    public static Specification<BookDefinition> filterBookDefinitions(String keyword, String searchBy, Boolean activeFlag) {
         return (root, query, builder) -> {
             query.distinct(true);
 
@@ -117,11 +142,16 @@ public class EntitySpecification {
                             predicate = builder.and(predicate, builder.like(root.get(BookDefinition_.TITLE), "%" + keyword + "%"));
                 }
             }
+
+            if (activeFlag != null) {
+                predicate = builder.and(predicate, builder.equal(root.get(BookDefinition_.activeFlag), activeFlag));
+            }
+
             return predicate;
         };
     }
 
-    public static Specification<ClassificationSymbol> filterClassificationSymbols(String keyword, String searchBy) {
+    public static Specification<ClassificationSymbol> filterClassificationSymbols(String keyword, String searchBy, Boolean activeFlag) {
         return (root, query, builder) -> {
             query.distinct(true);
 

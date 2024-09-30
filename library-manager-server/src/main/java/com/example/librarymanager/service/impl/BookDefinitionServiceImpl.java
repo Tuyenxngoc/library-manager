@@ -27,6 +27,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,45 +50,57 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
 
     private final AuthorRepository authorRepository;
 
+    private final BookAuthorRepository bookAuthorRepository;
+
     private final ClassificationSymbolRepository classificationSymbolRepository;
 
-    @Override
-    public CommonResponseDto save(BookDefinitionRequestDto requestDto, MultipartFile file) {
-        BookDefinition bookDefinition = bookDefinitionMapper.toBookDefinition(requestDto);
-
-        //Upload ảnh
+    private String handleImageUpload(MultipartFile file) {
         if (file != null && !file.isEmpty()) {
             String contentType = file.getContentType();
             if (contentType == null || !contentType.startsWith("image/")) {
                 throw new BadRequestException(ErrorMessage.INVALID_FILE_TYPE);
             }
+            // Upload và trả về URL của ảnh mới
+            return uploadFileUtil.uploadFile(file);
+        }
+        return null;
+    }
 
-            String newUrl = uploadFileUtil.uploadFile(file);
-            bookDefinition.setImageUrl(newUrl);
+    @Override
+    public CommonResponseDto save(BookDefinitionRequestDto requestDto, MultipartFile file) {
+        BookDefinition bookDefinition = bookDefinitionMapper.toBookDefinition(requestDto);
+
+        // Xử lý upload ảnh
+        String newImageUrl = handleImageUpload(file);
+        if (newImageUrl != null) {//Ưu tiên xử lý file upload
+            bookDefinition.setImageUrl(newImageUrl);
+        } else if(requestDto.getImageUrl() != null) {
+            newImageUrl = uploadFileUtil.copyImageFromUrl(requestDto.getImageUrl());
+            bookDefinition.setImageUrl(newImageUrl);
         }
 
         //Lưu danh mục
-        Category category = categoryRepository.findById(requestDto.getCategoryId())
+        Category category = categoryRepository.findByIdAndActiveFlagIsTrue(requestDto.getCategoryId())
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.Category.ERR_NOT_FOUND_ID, requestDto.getCategoryId()));
         bookDefinition.setCategory(category);
 
         //Lưu vào bộ sách
         if (requestDto.getBookSetId() != null) {
-            BookSet bookSet = bookSetRepository.findById(requestDto.getBookSetId())
+            BookSet bookSet = bookSetRepository.findByIdAndActiveFlagIsTrue(requestDto.getBookSetId())
                     .orElseThrow(() -> new NotFoundException(ErrorMessage.BookSet.ERR_NOT_FOUND_ID, requestDto.getBookSetId()));
             bookDefinition.setBookSet(bookSet);
         }
 
         //Lưu nhà xuất bản
         if (requestDto.getPublisherId() != null) {
-            Publisher publisher = publisherRepository.findById(requestDto.getPublisherId())
+            Publisher publisher = publisherRepository.findByIdAndActiveFlagIsTrue(requestDto.getPublisherId())
                     .orElseThrow(() -> new NotFoundException(ErrorMessage.Publisher.ERR_NOT_FOUND_ID, requestDto.getPublisherId()));
             bookDefinition.setPublisher(publisher);
         }
 
         //Lưu danh mục phân loại
         if (requestDto.getClassificationSymbolId() != null) {
-            ClassificationSymbol classificationSymbol = classificationSymbolRepository.findById(requestDto.getClassificationSymbolId())
+            ClassificationSymbol classificationSymbol = classificationSymbolRepository.findByIdAndActiveFlagIsTrue(requestDto.getClassificationSymbolId())
                     .orElseThrow(() -> new NotFoundException(ErrorMessage.ClassificationSymbol.ERR_NOT_FOUND_ID, requestDto.getClassificationSymbolId()));
             bookDefinition.setClassificationSymbol(classificationSymbol);
         }
@@ -94,7 +108,7 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
         //Lưu danh sách tác giả
         if (requestDto.getAuthorIds() != null) {
             requestDto.getAuthorIds().forEach(authorId -> {
-                Author author = authorRepository.findById(authorId)
+                Author author = authorRepository.findByIdAndActiveFlagIsTrue(authorId)
                         .orElseThrow(() -> new NotFoundException(ErrorMessage.Author.ERR_NOT_FOUND_ID, authorId));
 
                 BookAuthor bookAuthor = new BookAuthor();
@@ -113,9 +127,117 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
     }
 
     @Override
-    public CommonResponseDto update(Long id, BookDefinitionRequestDto requestDto, MultipartFile image) {
-        return null;
+    public CommonResponseDto update(Long id, BookDefinitionRequestDto requestDto, MultipartFile file) {
+        // Tìm bookDefinition dựa trên id
+        BookDefinition bookDefinition = bookDefinitionRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.BookDefinition.ERR_NOT_FOUND_ID, id));
+
+        // Xử lý upload ảnh
+        String newImageUrl = handleImageUpload(file);
+        bookDefinition.setImageUrl(newImageUrl);
+
+        // Cập nhật danh mục
+        Category category = categoryRepository.findByIdAndActiveFlagIsTrue(requestDto.getCategoryId())
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.Category.ERR_NOT_FOUND_ID, requestDto.getCategoryId()));
+        bookDefinition.setCategory(category);
+
+        // Cập nhật bộ sách
+        if (requestDto.getBookSetId() != null) {
+            BookSet bookSet = bookSetRepository.findByIdAndActiveFlagIsTrue(requestDto.getBookSetId())
+                    .orElseThrow(() -> new NotFoundException(ErrorMessage.BookSet.ERR_NOT_FOUND_ID, requestDto.getBookSetId()));
+            bookDefinition.setBookSet(bookSet);
+        } else {
+            bookDefinition.setBookSet(null);
+        }
+
+        // Cập nhật nhà xuất bản
+        if (requestDto.getPublisherId() != null) {
+            Publisher publisher = publisherRepository.findByIdAndActiveFlagIsTrue(requestDto.getPublisherId())
+                    .orElseThrow(() -> new NotFoundException(ErrorMessage.Publisher.ERR_NOT_FOUND_ID, requestDto.getPublisherId()));
+            bookDefinition.setPublisher(publisher);
+        } else {
+            bookDefinition.setPublisher(null);
+        }
+
+        // Cập nhật biểu tượng phân loại
+        if (requestDto.getClassificationSymbolId() != null) {
+            ClassificationSymbol classificationSymbol = classificationSymbolRepository.findByIdAndActiveFlagIsTrue(requestDto.getClassificationSymbolId())
+                    .orElseThrow(() -> new NotFoundException(ErrorMessage.ClassificationSymbol.ERR_NOT_FOUND_ID, requestDto.getClassificationSymbolId()));
+            bookDefinition.setClassificationSymbol(classificationSymbol);
+        } else {
+            bookDefinition.setClassificationSymbol(null);
+        }
+
+        // Cập nhật danh sách tác giả
+        List<Long> newAuthorIds = requestDto.getAuthorIds(); // Mảng tác giả mới
+
+        // Xóa các tác giả không còn trong danh sách mới
+        if (newAuthorIds == null || newAuthorIds.isEmpty()) {
+            bookAuthorRepository.deleteAllByBookDefinitionId(bookDefinition.getId()); // Xóa các bản ghi trong cơ sở dữ liệu
+            bookDefinition.getBookAuthors().clear(); // Xóa các bản ghi trong bộ nhớ
+        } else {
+            // Tập hợp ID tác giả hiện tại
+            Set<Long> currentAuthorIds = bookDefinition.getBookAuthors().stream()
+                    .map(bookAuthor -> bookAuthor.getAuthor().getId())
+                    .collect(Collectors.toSet());
+
+            // Xóa các tác giả không có trong danh sách mới
+            for (Long currentAuthorId : currentAuthorIds) {
+                if (!newAuthorIds.contains(currentAuthorId)) {
+                    // Tìm BookAuthor để xóa
+                    BookAuthor bookAuthorToRemove = bookDefinition.getBookAuthors().stream()
+                            .filter(bookAuthor -> bookAuthor.getAuthor().getId().equals(currentAuthorId))
+                            .findFirst()
+                            .orElse(null);
+                    if (bookAuthorToRemove != null) {
+                        bookDefinition.getBookAuthors().remove(bookAuthorToRemove);
+                        bookAuthorRepository.delete(bookAuthorToRemove); // Xóa trong cơ sở dữ liệu
+                    }
+                }
+            }
+
+            // Thêm các tác giả mới
+            for (Long authorId : newAuthorIds) {
+                if (!currentAuthorIds.contains(authorId)) { // Nếu tác giả chưa tồn tại
+                    Author author = authorRepository.findByIdAndActiveFlagIsTrue(authorId)
+                            .orElseThrow(() -> new NotFoundException(ErrorMessage.Author.ERR_NOT_FOUND_ID, authorId));
+
+                    BookAuthor bookAuthor = new BookAuthor();
+                    bookAuthor.setAuthor(author);
+                    bookAuthor.setBookDefinition(bookDefinition);
+                    bookDefinition.getBookAuthors().add(bookAuthor);
+                }
+            }
+        }
+
+        // Cập nhật các thông tin khác
+        bookDefinition.setTitle(requestDto.getTitle());
+        bookDefinition.setPublishingYear(requestDto.getPublishingYear());
+        bookDefinition.setPrice(requestDto.getPrice());
+        bookDefinition.setEdition(requestDto.getEdition());
+        bookDefinition.setReferencePrice(requestDto.getReferencePrice());
+        bookDefinition.setPublicationPlace(requestDto.getPublicationPlace());
+        bookDefinition.setBookCode(requestDto.getBookCode());
+        bookDefinition.setPageCount(requestDto.getPageCount());
+        bookDefinition.setBookSize(requestDto.getBookSize());
+        bookDefinition.setParallelTitle(requestDto.getParallelTitle());
+        bookDefinition.setSummary(requestDto.getSummary());
+        bookDefinition.setSubtitle(requestDto.getSubtitle());
+        bookDefinition.setAdditionalMaterial(requestDto.getAdditionalMaterial());
+        bookDefinition.setKeywords(requestDto.getKeywords());
+        bookDefinition.setIsbn(requestDto.getIsbn());
+        bookDefinition.setLanguage(requestDto.getLanguage());
+        bookDefinition.setSeries(requestDto.getSeries());
+        bookDefinition.setAdditionalInfo(requestDto.getAdditionalInfo());
+
+        // Lưu đối tượng bookDefinition đã cập nhật
+        bookDefinitionRepository.save(bookDefinition);
+
+        // Trả về kết quả sau khi cập nhật thành công
+        String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
+        return new CommonResponseDto(message);
     }
+
 
     @Override
     public CommonResponseDto delete(Long id) {
@@ -136,7 +258,7 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BOOK_DEFINITION);
 
         Page<BookDefinition> page = bookDefinitionRepository.findAll(
-                EntitySpecification.filterBookDefinitions(requestDto.getKeyword(), requestDto.getSearchBy()),
+                EntitySpecification.filterBookDefinitions(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag()),
                 pageable);
 
         List<GetBookDefinitionResponseDto> items = page.getContent().stream()

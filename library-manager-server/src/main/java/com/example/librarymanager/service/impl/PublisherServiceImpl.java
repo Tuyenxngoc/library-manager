@@ -90,7 +90,7 @@ public class PublisherServiceImpl implements PublisherService {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.PUBLISHER);
 
         Page<Publisher> page = publisherRepository.findAll(
-                EntitySpecification.filterPublishers(requestDto.getKeyword(), requestDto.getSearchBy()),
+                EntitySpecification.filterPublishers(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag()),
                 pageable);
 
         PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.PUBLISHER, page);

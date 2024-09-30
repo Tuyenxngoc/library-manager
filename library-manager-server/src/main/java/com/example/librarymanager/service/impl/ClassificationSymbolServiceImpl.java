@@ -88,7 +88,7 @@ public class ClassificationSymbolServiceImpl implements ClassificationSymbolServ
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.CLASSIFICATION_SYMBOL);
 
         Page<ClassificationSymbol> page = classificationSymbolRepository.findAll(
-                EntitySpecification.filterClassificationSymbols(requestDto.getKeyword(), requestDto.getSearchBy()),
+                EntitySpecification.filterClassificationSymbols(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag()),
                 pageable);
 
         PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.CLASSIFICATION_SYMBOL, page);

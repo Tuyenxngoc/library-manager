@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Flex, Input, message, Popconfirm, Select, Space, Table, Tag } from 'antd';
+import { Button, Flex, Input, message, Popconfirm, Select, Space, Switch, Table, Tag } from 'antd';
 import { MdOutlineModeEdit } from 'react-icons/md';
 import { FaRegTrashAlt } from 'react-icons/fa';
-import { FaPrint } from 'react-icons/fa';
 
 import queryString from 'query-string';
 
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
-import { deleteAuthor, getAuthors } from '~/services/authorService';
+import { deleteAuthor, getAuthors, toggleActiveFlag } from '~/services/authorService';
 
 const genderTags = {
     MALE: <Tag color="green">Nam</Tag>,
@@ -81,6 +80,22 @@ function Author() {
         }
     };
 
+    const handleToggleActiveFlag = async (checked, record) => {
+        try {
+            const response = await toggleActiveFlag(record.id);
+            if (response.status === 200) {
+                const { data, message } = response.data.data;
+                setEntityData((prevData) =>
+                    prevData.map((item) => (item.id === record.id ? { ...item, activeFlag: data } : item)),
+                );
+                messageApi.success(message);
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi cập nhật.';
+            messageApi.error(errorMessage);
+        }
+    };
+
     useEffect(() => {
         const fetchEntities = async () => {
             setIsLoading(true);
@@ -146,6 +161,19 @@ function Author() {
             showSorterTooltip: false,
         },
         {
+            title: 'Trạng thái',
+            dataIndex: 'activeFlag',
+            key: 'activeFlag',
+            sorter: true,
+            showSorterTooltip: false,
+            render: (text, record) => (
+                <Space>
+                    {text ? 'Đang theo giõi' : 'Ngừng theo giõi'}
+                    <Switch checked={text} onChange={(checked) => handleToggleActiveFlag(checked, record)} />
+                </Space>
+            ),
+        },
+        {
             title: '',
             key: 'action',
             render: (_, record) => (
@@ -207,8 +235,6 @@ function Author() {
                     <Button type="primary" onClick={() => navigate('new')}>
                         Thêm mới
                     </Button>
-
-                    <Button icon={<FaPrint />} />
                 </Space>
             </Flex>
 

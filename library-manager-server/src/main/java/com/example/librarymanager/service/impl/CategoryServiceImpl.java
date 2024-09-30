@@ -53,7 +53,7 @@ public class CategoryServiceImpl implements CategoryService {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.CATEGORY);
 
         Page<Category> page = categoryRepository.findAll(
-                EntitySpecification.filterCategories(requestDto.getKeyword(), requestDto.getSearchBy()),
+                EntitySpecification.filterCategories(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag()),
                 pageable);
 
         List<GetCategoryResponseDto> items = page.getContent().stream()

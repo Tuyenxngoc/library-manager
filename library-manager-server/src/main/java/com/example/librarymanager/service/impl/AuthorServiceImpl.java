@@ -36,29 +36,6 @@ public class AuthorServiceImpl implements AuthorService {
     private final MessageSource messageSource;
 
     @Override
-    public Author findById(Long id) {
-        return authorRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.Author.ERR_NOT_FOUND_ID));
-    }
-
-    @Override
-    public PaginationResponseDto<Author> findAll(PaginationFullRequestDto requestDto) {
-        Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.AUTHOR);
-
-        Page<Author> page = authorRepository.findAll(
-                EntitySpecification.filterAuthors(requestDto.getKeyword(), requestDto.getSearchBy()),
-                pageable);
-
-        PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.AUTHOR, page);
-
-        PaginationResponseDto<Author> responseDto = new PaginationResponseDto<>();
-        responseDto.setItems(page.getContent());
-        responseDto.setMeta(pagingMeta);
-
-        return responseDto;
-    }
-
-    @Override
     public CommonResponseDto save(AuthorRequestDto requestDto) {
         Author author = authorMapper.toAuthor(requestDto);
 
@@ -71,20 +48,6 @@ public class AuthorServiceImpl implements AuthorService {
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, author);
-    }
-
-    @Override
-    public CommonResponseDto delete(Long id) {
-        Author author = findById(id);
-
-        if (!author.getBookAuthors().isEmpty()) {
-            throw new ConflictException(ErrorMessage.Author.ERR_HAS_LINKED_BOOKS);
-        }
-
-        authorRepository.delete(author);
-
-        String message = messageSource.getMessage(SuccessMessage.DELETE, null, LocaleContextHolder.getLocale());
-        return new CommonResponseDto(message);
     }
 
     @Override
@@ -112,4 +75,54 @@ public class AuthorServiceImpl implements AuthorService {
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, author);
     }
+
+    @Override
+    public CommonResponseDto delete(Long id) {
+        Author author = findById(id);
+
+        if (!author.getBookAuthors().isEmpty()) {
+            throw new ConflictException(ErrorMessage.Author.ERR_HAS_LINKED_BOOKS);
+        }
+
+        authorRepository.delete(author);
+
+        String message = messageSource.getMessage(SuccessMessage.DELETE, null, LocaleContextHolder.getLocale());
+        return new CommonResponseDto(message);
+    }
+
+    @Override
+    public PaginationResponseDto<Author> findAll(PaginationFullRequestDto requestDto) {
+        Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.AUTHOR);
+
+        Page<Author> page = authorRepository.findAll(
+                EntitySpecification.filterAuthors(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag()),
+                pageable);
+
+        PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.AUTHOR, page);
+
+        PaginationResponseDto<Author> responseDto = new PaginationResponseDto<>();
+        responseDto.setItems(page.getContent());
+        responseDto.setMeta(pagingMeta);
+
+        return responseDto;
+    }
+
+    @Override
+    public Author findById(Long id) {
+        return authorRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.Author.ERR_NOT_FOUND_ID));
+    }
+
+    @Override
+    public CommonResponseDto toggleActiveStatus(Long id) {
+        Author author = findById(id);
+
+        author.setActiveFlag(!author.getActiveFlag());
+
+        authorRepository.save(author);
+
+        String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
+        return new CommonResponseDto(message, author.getActiveFlag());
+    }
+
 }

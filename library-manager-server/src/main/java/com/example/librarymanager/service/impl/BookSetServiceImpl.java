@@ -99,7 +99,7 @@ public class BookSetServiceImpl implements BookSetService {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BOOK_SET);
 
         Page<BookSet> page = bookSetRepository.findAll(
-                EntitySpecification.filterBookSets(requestDto.getKeyword(), requestDto.getSearchBy()),
+                EntitySpecification.filterBookSets(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag()),
                 pageable);
 
         List<GetBookSetResponseDto> items = page.getContent().stream()

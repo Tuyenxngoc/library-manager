@@ -19,3 +19,7 @@ export const createAuthor = (values) => {
 export const deleteAuthor = (id) => {
     return axiosPrivate.delete(`authors/${id}`);
 };
+
+export const toggleActiveFlag = (id) => {
+    return axiosPrivate.patch(`authors/${id}/toggle-active`);
+};

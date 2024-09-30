@@ -57,4 +57,10 @@ public class AuthorController {
     public ResponseEntity<?> getAuthorById(@PathVariable Long id) {
         return VsResponseUtil.success(authorService.findById(id));
     }
+
+    @Operation(summary = "API Toggle Active Status of Author")
+    @PatchMapping(UrlConstant.Author.TOGGLE_ACTIVE)
+    public ResponseEntity<?> toggleActiveStatus(@PathVariable Long id) {
+        return VsResponseUtil.success(authorService.toggleActiveStatus(id));
+    }
 }

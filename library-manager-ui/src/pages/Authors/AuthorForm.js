@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { Button, DatePicker, Input, message, Radio } from 'antd';
+import { Button, DatePicker, Input, message, Radio, Space } from 'antd';
 import moment from 'moment';
 import { handleError } from '~/utils/errorHandler';
 import { checkIdIsNumber } from '~/utils/helper';
@@ -247,10 +247,13 @@ function AuthorForm() {
                         />
                         <div className="text-danger">{formik.touched.notes && formik.errors.notes}</div>
                     </div>
-                    <div className="col-12">
-                        <Button type="primary" htmlType="submit" loading={formik.isSubmitting}>
-                            Lưu
-                        </Button>
+                    <div className="col-md-12 text-end">
+                        <Space>
+                            <Button onClick={() => navigate('/admin/authors')}>Quay lại</Button>
+                            <Button type="primary" htmlType="submit" loading={formik.isSubmitting}>
+                                Lưu
+                            </Button>
+                        </Space>
                     </div>
                 </div>
             </form>

@@ -3,14 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button, Flex, Input, message, Popconfirm, Select, Space, Switch, Table } from 'antd';
 import { MdOutlineModeEdit } from 'react-icons/md';
 import { FaRegTrashAlt } from 'react-icons/fa';
-import { FaPrint } from 'react-icons/fa';
 import { RiFileCopyLine } from 'react-icons/ri';
 
 import queryString from 'query-string';
 
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
 import { deleteBookDefinition, getBookDefinitions, toggleActiveFlag } from '~/services/bookDefinitionService';
-import { render } from '@testing-library/react';
 
 const options = [
     { value: 'title', label: 'Nhan đề' },
@@ -230,8 +228,6 @@ function BookDefinition() {
                     <Button type="primary" onClick={() => navigate('new')}>
                         Thêm mới
                     </Button>
-
-                    <Button icon={<FaPrint />} />
                 </Space>
             </Flex>
 

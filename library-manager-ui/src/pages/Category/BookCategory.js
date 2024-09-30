@@ -150,7 +150,7 @@ function BookCategory({ active }) {
     const fetchParentCategories = async (keyword = '') => {
         setIsFetching(true);
         try {
-            const params = queryString.stringify({ keyword, searchBy: 'groupName' });
+            const params = queryString.stringify({ keyword, searchBy: 'groupName', activeFlag: true });
             const response = await getCategoryGroups(params);
             const { items } = response.data.data;
             setParentCategories(items);
@@ -288,13 +288,11 @@ function BookCategory({ active }) {
                             loading={isFetching}
                             filterOption={false}
                         >
-                            {parentCategories
-                                .filter((parent) => parent.activeFlag)
-                                .map((parent) => (
-                                    <Option key={parent.id} value={parent.id}>
-                                        {parent.groupName}
-                                    </Option>
-                                ))}
+                            {parentCategories.map((parent) => (
+                                <Option key={parent.id} value={parent.id}>
+                                    {parent.groupName}
+                                </Option>
+                            ))}
                         </Select>
                     </Form.Item>
                 </Form>
@@ -330,16 +328,11 @@ function BookCategory({ active }) {
                             loading={isFetching}
                             filterOption={false}
                         >
-                            {parentCategories
-                                .filter((parent) => {
-                                    const parentId = editForm.getFieldValue('parentId');
-                                    return parent.activeFlag || parent.id === parentId;
-                                })
-                                .map((parent) => (
-                                    <Option key={parent.id} value={parent.id}>
-                                        {parent.groupName}
-                                    </Option>
-                                ))}
+                            {parentCategories.map((parent) => (
+                                <Option key={parent.id} value={parent.id}>
+                                    {parent.groupName}
+                                </Option>
+                            ))}
                         </Select>
                     </Form.Item>
                 </Form>

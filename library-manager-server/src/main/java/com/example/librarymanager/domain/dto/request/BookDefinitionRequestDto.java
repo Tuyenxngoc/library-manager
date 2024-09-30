@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.validator.constraints.URL;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,5 +82,7 @@ public class BookDefinitionRequestDto {
     @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
     private String series; // Tùng thư
 
-    //Kí hiệu phân loại
+    @URL(message = ErrorMessage.INVALID_URL_FORMAT)
+    private String imageUrl; // Ảnh bìa
+
 }

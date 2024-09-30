@@ -9,7 +9,22 @@ export const getBookDefinitions = (params) => {
 };
 
 export const updateBookDefinition = (id, values) => {
-    return axiosPrivate.put(`book-definitions/${id}`, values);
+    const formData = new FormData();
+
+    for (const key in values) {
+        if (values.hasOwnProperty(key)) {
+            const value = values[key];
+            if (value !== null) {
+                formData.append(key, value);
+            }
+        }
+    }
+
+    return axiosPrivate.put(`book-definitions/${id}`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
 };
 
 export const createBookDefinition = (values) => {
