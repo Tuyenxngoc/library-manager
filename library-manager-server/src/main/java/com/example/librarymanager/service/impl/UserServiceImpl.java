@@ -3,6 +3,10 @@ package com.example.librarymanager.service.impl;
 import com.example.librarymanager.config.properties.AdminInfo;
 import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.RoleConstant;
+import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
+import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
+import com.example.librarymanager.domain.dto.request.UserRequestDto;
+import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.dto.response.auth.GetCurrentUserLoginResponseDto;
 import com.example.librarymanager.domain.entity.Reader;
 import com.example.librarymanager.domain.entity.User;
@@ -12,9 +16,7 @@ import com.example.librarymanager.repository.UserRepository;
 import com.example.librarymanager.security.CustomUserDetails;
 import com.example.librarymanager.service.RoleService;
 import com.example.librarymanager.service.UserService;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,18 +25,17 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserServiceImpl implements UserService {
 
-    final MessageSource messageSource;
+    private final MessageSource messageSource;
 
-    final UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    final RoleService roleService;
+    private final RoleService roleService;
 
-    final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    final ReaderRepository readerRepository;
+    private final ReaderRepository readerRepository;
 
     @Override
     public void initAdmin(AdminInfo adminInfo) {
@@ -58,12 +59,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserById(String userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.User.ERR_NOT_FOUND_ID, userId));
-    }
-
-    @Override
     public GetCurrentUserLoginResponseDto getCurrentUser(CustomUserDetails userDetails) {
         if (userDetails.getUserId() != null) {
             User user = userRepository.findById(userDetails.getUserId())
@@ -77,5 +72,31 @@ public class UserServiceImpl implements UserService {
             return GetCurrentUserLoginResponseDto.create(reader);
         }
         return null;
+    }
+
+    @Override
+    public CommonResponseDto save(UserRequestDto requestDto, String userId) {
+        return null;
+    }
+
+    @Override
+    public CommonResponseDto update(String id, UserRequestDto requestDto, String userId) {
+        return null;
+    }
+
+    @Override
+    public CommonResponseDto delete(String id, String userId) {
+        return null;
+    }
+
+    @Override
+    public PaginationResponseDto<User> findAll(PaginationFullRequestDto requestDto) {
+        return null;
+    }
+
+    @Override
+    public User findById(String id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.User.ERR_NOT_FOUND_ID, id));
     }
 }

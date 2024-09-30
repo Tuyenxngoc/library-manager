@@ -13,12 +13,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class LogFilter {
 
-    private String user;
-
-    private String action;
-
-    private String description;
-
     private LocalDate startDate;
 
     private LocalDate endDate;

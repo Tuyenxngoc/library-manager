@@ -48,7 +48,7 @@ public class Book extends UserDateAuditing {
     private ImportReceipt importReceipt;// Phiếu nhập
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "export_receipt_id", foreignKey = @ForeignKey(name = "FK_BOOK_EXPORT_RECEIPT_ID"), referencedColumnName = "export_receipt_id", nullable = false)
+    @JoinColumn(name = "export_receipt_id", foreignKey = @ForeignKey(name = "FK_BOOK_EXPORT_RECEIPT_ID"), referencedColumnName = "export_receipt_id")
     @JsonIgnore
     private ExportReceipt exportReceipt;// Phiếu xuất
 }

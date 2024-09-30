@@ -16,6 +16,7 @@ import com.example.librarymanager.exception.BadRequestException;
 import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.*;
 import com.example.librarymanager.service.BookDefinitionService;
+import com.example.librarymanager.service.LogService;
 import com.example.librarymanager.util.PaginationUtil;
 import com.example.librarymanager.util.UploadFileUtil;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class BookDefinitionServiceImpl implements BookDefinitionService {
+
+    private static final String TAG = "Quản lý biên mục";
 
     private final UploadFileUtil uploadFileUtil;
 
@@ -54,6 +57,8 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
 
     private final ClassificationSymbolRepository classificationSymbolRepository;
 
+    private final LogService logService;
+
     private void checkImageIsValid(MultipartFile file) {
         if (file != null && !file.isEmpty()) {
             String contentType = file.getContentType();
@@ -64,7 +69,7 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
     }
 
     @Override
-    public CommonResponseDto save(BookDefinitionRequestDto requestDto, MultipartFile file) {
+    public CommonResponseDto save(BookDefinitionRequestDto requestDto, MultipartFile file, String userId) {
         //Kiểm tra file tải lên có phải định dạng ảnh không
         checkImageIsValid(file);
 
@@ -115,7 +120,7 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
         if (file != null && !file.isEmpty()) {
             String newImageUrl = uploadFileUtil.uploadFile(file);
             bookDefinition.setImageUrl(newImageUrl);
-        }else if(requestDto.getImageUrl() != null){
+        } else if (requestDto.getImageUrl() != null) {
             String newImageUrl = uploadFileUtil.copyImageFromUrl(requestDto.getImageUrl());
             bookDefinition.setImageUrl(newImageUrl);
         }
@@ -123,12 +128,14 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
         bookDefinition.setActiveFlag(true);
         bookDefinitionRepository.save(bookDefinition);
 
+        logService.createLog(TAG, "Thêm", "Thêm biên mục mới mới: " + bookDefinition.getTitle(), userId);
+
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message);
     }
 
     @Override
-    public CommonResponseDto update(Long id, BookDefinitionRequestDto requestDto, MultipartFile file) {
+    public CommonResponseDto update(Long id, BookDefinitionRequestDto requestDto, MultipartFile file, String userId) {
         //Kiểm tra file tải lên có phải định dạng ảnh không
         checkImageIsValid(file);
 
@@ -169,7 +176,7 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
         }
 
         // Cập nhật danh sách tác giả
-        List<Long> newAuthorIds = requestDto.getAuthorIds(); // Mảng tác giả mới
+        Set<Long> newAuthorIds = requestDto.getAuthorIds(); // Mảng tác giả mới
 
         // Xóa các tác giả không còn trong danh sách mới
         if (newAuthorIds == null || newAuthorIds.isEmpty()) {
@@ -243,14 +250,16 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
         // Lưu đối tượng bookDefinition đã cập nhật
         bookDefinitionRepository.save(bookDefinition);
 
+        //Ghi log
+        logService.createLog(TAG, "Sửa", "Cập nhật biên mục id: " + bookDefinition.getId(), userId);
+
         // Trả về kết quả sau khi cập nhật thành công
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message);
     }
 
-
     @Override
-    public CommonResponseDto delete(Long id) {
+    public CommonResponseDto delete(Long id, String userId) {
         BookDefinition bookDefinition = findEntityById(id);
 
         if (!bookDefinition.getBooks().isEmpty()) {
@@ -260,6 +269,8 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
         uploadFileUtil.destroyFileWithUrl(bookDefinition.getImageUrl());
 
         bookDefinitionRepository.delete(bookDefinition);
+
+        logService.createLog(TAG, "Xóa", "Xóa biên mục: " + bookDefinition.getTitle(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.DELETE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message);
@@ -299,12 +310,14 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
     }
 
     @Override
-    public CommonResponseDto toggleActiveStatus(Long id) {
+    public CommonResponseDto toggleActiveStatus(Long id, String userId) {
         BookDefinition bookDefinition = findEntityById(id);
 
         bookDefinition.setActiveFlag(!bookDefinition.getActiveFlag());
 
         bookDefinitionRepository.save(bookDefinition);
+
+        logService.createLog(TAG, "Sửa", "Thay đổi trạng thái biên mục: " + bookDefinition.getActiveFlag(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, bookDefinition.getActiveFlag());

@@ -3,18 +3,19 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import queryString from 'query-string';
-import { Alert, Button, Image, Input, message, Select, Space, Upload } from 'antd';
+import { Button, Image, message, Space, Upload } from 'antd';
 import images from '~/assets';
+import { handleError } from '~/utils/errorHandler';
+import { checkIdIsNumber } from '~/utils/helper';
 import { getCategories } from '~/services/categoryService';
 import { getPublishers } from '~/services/publisherService';
 import { getBookSets } from '~/services/bookSetService';
-import { handleError } from '~/utils/errorHandler';
-import { checkIdIsNumber } from '~/utils/helper';
-import { createBookDefinition, getBookDefinitionById, updateBookDefinition } from '~/services/bookDefinitionService';
 import { getAuthors } from '~/services/authorService';
 import { getClassificationSymbols } from '~/services/classificationSymbolService';
-const { TextArea } = Input;
-const { Option } = Select;
+import { createBookDefinition, getBookDefinitionById, updateBookDefinition } from '~/services/bookDefinitionService';
+import FormInput from '~/components/FormInput';
+import FormTextArea from '~/components/FormTextArea';
+import FormSelect from '~/components/FormSelect';
 
 const defaultValue = {
     title: '',
@@ -60,7 +61,7 @@ const validationSchema = yup.object({
 
     publicationPlace: yup.string(),
 
-    bookCode: yup.string(),
+    bookCode: yup.string().required('Kí hiệu tên sách là bắt buộc'),
 
     publishingYear: yup
         .number()
@@ -106,7 +107,7 @@ const validationSchema = yup.object({
 
 const BookDefinitionForm = ({ mode }) => {
     const isEditMode = mode === 'edit';
-    const isCopyMode = mode === 'copy';
+
     const { id } = useParams();
     const navigate = useNavigate();
     const [messageApi, contextHolder] = message.useMessage();
@@ -264,7 +265,7 @@ const BookDefinitionForm = ({ mode }) => {
     useEffect(() => {
         if (id) {
             if (!checkIdIsNumber(id)) {
-                navigate('/admin/book-definition');
+                navigate('/admin/book-definitions');
                 return;
             }
 
@@ -337,7 +338,7 @@ const BookDefinitionForm = ({ mode }) => {
             {contextHolder}
             <>
                 {isEditMode && <h2>Chỉnh sửa biên mục</h2>}
-                {isCopyMode && <h2>Nhân bản biên mục</h2>}
+                {mode === 'copy' && <h2>Nhân bản biên mục</h2>}
                 {mode === 'new' && <h2>Thêm mới biên mục</h2>}
             </>
 
@@ -345,429 +346,123 @@ const BookDefinitionForm = ({ mode }) => {
                 <div className="row g-3">
                     <div className="col-md-10">
                         <div className="row g-3">
-                            <div className="col-md-8">
-                                <label htmlFor="title">
-                                    <span className="text-danger">*</span> Nhan đề:
-                                </label>
-                                <Input
-                                    id="title"
-                                    name="title"
-                                    value={formik.values.title}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    status={formik.touched.title && formik.errors.title ? 'error' : undefined}
-                                />
-                                <div className="text-danger">{formik.touched.title && formik.errors.title}</div>
-                            </div>
+                            <FormInput id="title" label="Nhan đề" className={'col-md-8'} formik={formik} required />
 
-                            <div className="col-md-4">
-                                <label htmlFor="categoryId">
-                                    <span className="text-danger">*</span> Danh mục:
-                                </label>
-                                <Select
-                                    showSearch
-                                    allowClear
-                                    onSearch={fetchCategories}
-                                    filterOption={false}
-                                    id="categoryId"
-                                    name="categoryId"
-                                    value={formik.values.categoryId}
-                                    onChange={(value) => formik.setFieldValue('categoryId', value)}
-                                    onBlur={() => formik.setFieldTouched('categoryId', true)}
-                                    status={formik.touched.categoryId && formik.errors.categoryId ? 'error' : undefined}
-                                    loading={isCategoriesLoading}
-                                    placeholder="Chọn danh mục"
-                                    style={{ width: '100%' }}
-                                >
-                                    {categories.map((category) => (
-                                        <Option key={category.id} value={category.id}>
-                                            {category.categoryName}
-                                        </Option>
-                                    ))}
-                                </Select>
-                                <div className="text-danger">
-                                    {formik.touched.categoryId && formik.errors.categoryId}
-                                </div>
-                            </div>
+                            <FormSelect
+                                required
+                                id="categoryId"
+                                label="Danh mục"
+                                className="col-md-4"
+                                formik={formik}
+                                options={categories}
+                                loading={isCategoriesLoading}
+                                onSearch={fetchCategories}
+                                fieldNames={{ label: 'categoryName', value: 'id' }}
+                            />
 
-                            <div className="col-md-4">
-                                <label htmlFor="authorIds">Tác giả:</label>
-                                <Select
-                                    mode="multiple"
-                                    showSearch
-                                    allowClear
-                                    onSearch={fetchAuthors}
-                                    filterOption={false}
-                                    id="authorIds"
-                                    name="authorIds"
-                                    value={formik.values.authorIds}
-                                    onChange={(value) => formik.setFieldValue('authorIds', value)}
-                                    onBlur={() => formik.setFieldTouched('authorIds', true)}
-                                    status={formik.touched.authorIds && formik.errors.authorIds ? 'error' : undefined}
-                                    loading={isAuthorsLoading}
-                                    placeholder="Chọn tác giả"
-                                    style={{ width: '100%' }}
-                                >
-                                    {authors.map((author) => (
-                                        <Option key={author.id} value={author.id}>
-                                            {author.fullName}
-                                            <span className="text-danger"> {!author.activeFlag && '(*)'}</span>
-                                        </Option>
-                                    ))}
-                                </Select>
-                                <div className="text-danger">{formik.touched.authorIds && formik.errors.authorIds}</div>{' '}
-                            </div>
+                            <FormSelect
+                                multiple
+                                id="authorIds"
+                                label="Tác giả"
+                                className="col-md-4"
+                                formik={formik}
+                                options={authors}
+                                loading={isAuthorsLoading}
+                                onSearch={fetchAuthors}
+                                fieldNames={{ label: 'fullName', value: 'id' }}
+                            />
 
-                            <div className="col-md-4">
-                                <label htmlFor="publisherId">Nhà xuất bản:</label>
-                                <Select
-                                    showSearch
-                                    allowClear
-                                    onSearch={fetchPublishers}
-                                    filterOption={false}
-                                    id="publisherId"
-                                    name="publisherId"
-                                    value={formik.values.publisherId}
-                                    onChange={(value) => formik.setFieldValue('publisherId', value)}
-                                    onBlur={() => formik.setFieldTouched('publisherId', true)}
-                                    status={
-                                        formik.touched.publisherId && formik.errors.publisherId ? 'error' : undefined
-                                    }
-                                    loading={isPublishersLoading}
-                                    placeholder="Chọn nhà xuất bản"
-                                    style={{ width: '100%' }}
-                                >
-                                    {publishers.map((publisher) => (
-                                        <Option key={publisher.id} value={publisher.id}>
-                                            {publisher.name}
-                                        </Option>
-                                    ))}
-                                </Select>
-                                <div className="text-danger">
-                                    {formik.touched.publisherId && formik.errors.publisherId}
-                                </div>
-                            </div>
+                            <FormSelect
+                                id="publisherId"
+                                label="Nhà xuất bản"
+                                className="col-md-4"
+                                formik={formik}
+                                options={publishers}
+                                loading={isPublishersLoading}
+                                onSearch={fetchPublishers}
+                                fieldNames={{ label: 'name', value: 'id' }}
+                            />
 
-                            <div className="col-md-4">
-                                <label htmlFor="publicationPlace">Nơi xuất bản:</label>
-                                <Input
-                                    id="publicationPlace"
-                                    name="publicationPlace"
-                                    value={formik.values.publicationPlace}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    status={
-                                        formik.touched.publicationPlace && formik.errors.publicationPlace
-                                            ? 'error'
-                                            : undefined
-                                    }
-                                />
-                                <div className="text-danger">
-                                    {formik.touched.publicationPlace && formik.errors.publicationPlace}
-                                </div>
-                            </div>
+                            <FormInput
+                                id="publicationPlace"
+                                label="Nơi xuất bản"
+                                formik={formik}
+                                className="col-md-4"
+                            />
 
-                            <div className="col-md-4">
-                                <label htmlFor="classificationSymbolId">Kí hiệu phân loại:</label>
-                                <Select
-                                    showSearch
-                                    allowClear
-                                    onSearch={fetchBookSets}
-                                    filterOption={false}
-                                    id="classificationSymbolId"
-                                    name="classificationSymbolId"
-                                    value={formik.values.classificationSymbolId}
-                                    onChange={(value) => formik.setFieldValue('classificationSymbolId', value)}
-                                    onBlur={() => formik.setFieldTouched('classificationSymbolId', true)}
-                                    status={
-                                        formik.touched.classificationSymbolId && formik.errors.classificationSymbolId
-                                            ? 'error'
-                                            : undefined
-                                    }
-                                    loading={isClassificationSymbolsLoading}
-                                    placeholder="Chọn kí hiệu phân loại"
-                                    style={{ width: '100%' }}
-                                >
-                                    {classificationSymbols.map((cs) => (
-                                        <Option key={cs.id} value={cs.id}>
-                                            {cs.name}
-                                        </Option>
-                                    ))}
-                                </Select>
-                                <div className="text-danger">
-                                    {formik.touched.classificationSymbolId && formik.errors.classificationSymbolId}
-                                </div>
-                            </div>
+                            <FormSelect
+                                id="classificationSymbolId"
+                                label="Kí hiệu phân loại"
+                                className="col-md-4"
+                                formik={formik}
+                                options={classificationSymbols}
+                                loading={isClassificationSymbolsLoading}
+                                onSearch={fetchClassificationSymbols}
+                                fieldNames={{ label: 'name', value: 'id' }}
+                            />
 
-                            <div className="col-md-4">
-                                <label htmlFor="bookCode">Kí hiệu tên sách:</label>
-                                <Input
-                                    id="bookCode"
-                                    name="bookCode"
-                                    value={formik.values.bookCode}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    status={formik.touched.bookCode && formik.errors.bookCode ? 'error' : undefined}
-                                />
-                                <div className="text-danger">{formik.touched.bookCode && formik.errors.bookCode}</div>
-                            </div>
+                            <FormInput
+                                id="bookCode"
+                                label="Kí hiệu tên sách"
+                                formik={formik}
+                                className="col-md-4"
+                                required
+                            />
 
-                            <div className="col-md-4">
-                                <label htmlFor="publishingYear">Năm xuất bản:</label>
-                                <Input
-                                    id="publishingYear"
-                                    name="publishingYear"
-                                    value={formik.values.publishingYear}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    status={
-                                        formik.touched.publishingYear && formik.errors.publishingYear
-                                            ? 'error'
-                                            : undefined
-                                    }
-                                />
-                                <div className="text-danger">
-                                    {formik.touched.publishingYear && formik.errors.publishingYear}
-                                </div>
-                            </div>
+                            <FormInput id="publishingYear" label="Năm xuất bản" formik={formik} className="col-md-4" />
 
-                            <div className="col-md-4">
-                                <label htmlFor="edition">Lần xuất bản:</label>
-                                <Input
-                                    id="edition"
-                                    name="edition"
-                                    value={formik.values.edition}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    status={formik.touched.edition && formik.errors.edition ? 'error' : undefined}
-                                />
-                                <div className="text-danger">{formik.touched.edition && formik.errors.edition}</div>
-                            </div>
+                            <FormInput id="edition" label="Lần xuất bản" formik={formik} className="col-md-4" />
 
-                            <div className="col-md-4">
-                                <label htmlFor="pageCount">Số trang:</label>
-                                <Input
-                                    id="pageCount"
-                                    name="pageCount"
-                                    value={formik.values.pageCount}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    status={formik.touched.pageCount && formik.errors.pageCount ? 'error' : undefined}
-                                />
-                                <div className="text-danger">{formik.touched.pageCount && formik.errors.pageCount}</div>
-                            </div>
+                            <FormInput id="pageCount" label="Số trang" formik={formik} className="col-md-4" />
 
-                            <div className="col-md-4">
-                                <label htmlFor="price">Giá bìa:</label>
-                                <Input
-                                    id="price"
-                                    name="price"
-                                    value={formik.values.price}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    status={formik.touched.price && formik.errors.price ? 'error' : undefined}
-                                />
-                                <div className="text-danger">{formik.touched.price && formik.errors.price}</div>
-                            </div>
+                            <FormInput id="price" label="Giá bìa" formik={formik} className="col-md-4" />
 
-                            <div className="col-md-4">
-                                <label htmlFor="referencePrice">Giá tham khảo:</label>
-                                <Input
-                                    id="referencePrice"
-                                    name="referencePrice"
-                                    value={formik.values.referencePrice}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    status={
-                                        formik.touched.referencePrice && formik.errors.referencePrice
-                                            ? 'error'
-                                            : undefined
-                                    }
-                                />
-                                <div className="text-danger">
-                                    {formik.touched.referencePrice && formik.errors.referencePrice}
-                                </div>
-                            </div>
+                            <FormInput id="referencePrice" label="Giá tham khảo" formik={formik} className="col-md-4" />
 
-                            <div className="col-md-4">
-                                <label htmlFor="bookSize">Khổ sách:</label>
-                                <Input
-                                    id="bookSize"
-                                    name="bookSize"
-                                    value={formik.values.bookSize}
-                                    onChange={formik.handleChange}
-                                    onBlur={formik.handleBlur}
-                                    status={formik.touched.bookSize && formik.errors.bookSize ? 'error' : undefined}
-                                />
-                                <div className="text-danger">{formik.touched.bookSize && formik.errors.bookSize}</div>
-                            </div>
+                            <FormInput id="bookSize" label="Khổ sách" formik={formik} className="col-md-4" />
 
-                            <div className="col-md-4">
-                                <label htmlFor="bookSetId">Bộ sách:</label>
-                                <Select
-                                    showSearch
-                                    allowClear
-                                    onSearch={fetchBookSets}
-                                    filterOption={false}
-                                    id="bookSetId"
-                                    name="bookSetId"
-                                    value={formik.values.bookSetId}
-                                    onChange={(value) => formik.setFieldValue('bookSetId', value)}
-                                    onBlur={() => formik.setFieldTouched('bookSetId', true)}
-                                    status={formik.touched.bookSetId && formik.errors.bookSetId ? 'error' : undefined}
-                                    loading={isBookSetsLoading}
-                                    placeholder="Chọn bộ sách"
-                                    style={{ width: '100%' }}
-                                >
-                                    {bookSets.map((bookset) => (
-                                        <Option key={bookset.id} value={bookset.id}>
-                                            {bookset.name}
-                                        </Option>
-                                    ))}
-                                </Select>
-                                <div className="text-danger">{formik.touched.bookSetId && formik.errors.bookSetId}</div>
-                            </div>
+                            <FormSelect
+                                id="bookSetId"
+                                label="Bộ sách"
+                                className="col-md-4"
+                                formik={formik}
+                                options={bookSets}
+                                loading={isBookSetsLoading}
+                                onSearch={fetchBookSets}
+                                fieldNames={{ label: 'name', value: 'id' }}
+                            />
                         </div>
                     </div>
 
                     <div className="col-md-2 text-center">
-                        <Image width={200} src={previousImage} />
+                        <Image width={200} src={previousImage} fallback={images.placeimg} />
 
                         <Upload {...uploadProps}>
                             <Button type="text">Chọn ảnh</Button>
                         </Upload>
                     </div>
 
-                    <div className="col-md-6">
-                        <label htmlFor="parallelTitle">Nhan đề song song:</label>
-                        <Input
-                            id="parallelTitle"
-                            name="parallelTitle"
-                            value={formik.values.parallelTitle}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            status={formik.touched.parallelTitle && formik.errors.parallelTitle ? 'error' : undefined}
-                        />
-                        <div className="text-danger">{formik.touched.parallelTitle && formik.errors.parallelTitle}</div>
-                    </div>
+                    <FormInput id="parallelTitle" label="Nhan đề song song" formik={formik} className="col-md-6" />
 
-                    <div className="col-md-6">
-                        <label htmlFor="subtitle">Phụ đề:</label>
-                        <Input
-                            id="subtitle"
-                            name="subtitle"
-                            value={formik.values.subtitle}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            status={formik.touched.subtitle && formik.errors.subtitle ? 'error' : undefined}
-                        />
-                        <div className="text-danger">{formik.touched.subtitle && formik.errors.subtitle}</div>
-                    </div>
+                    <FormInput id="subtitle" label="Phụ đề" formik={formik} className="col-md-6" />
 
-                    <div className="col-md-4">
-                        <label htmlFor="additionalMaterial">Tài liệu đi kèm:</label>
-                        <Input
-                            id="additionalMaterial"
-                            name="additionalMaterial"
-                            value={formik.values.additionalMaterial}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            status={
-                                formik.touched.additionalMaterial && formik.errors.additionalMaterial
-                                    ? 'error'
-                                    : undefined
-                            }
-                        />
-                        <div className="text-danger">
-                            {formik.touched.additionalMaterial && formik.errors.additionalMaterial}
-                        </div>
-                    </div>
+                    <FormInput id="additionalMaterial" label="Tài liệu đi kèm" formik={formik} className="col-md-4" />
 
-                    <div className="col-md-4">
-                        <label htmlFor="isbn">Mã ISBN:</label>
-                        <Input
-                            id="isbn"
-                            name="isbn"
-                            value={formik.values.isbn}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            status={formik.touched.isbn && formik.errors.isbn ? 'error' : undefined}
-                        />
-                        <div className="text-danger">{formik.touched.isbn && formik.errors.isbn}</div>
-                    </div>
+                    <FormInput id="isbn" label="Mã ISBN" formik={formik} className="col-md-4" />
 
-                    <div className="col-md-4">
-                        <label htmlFor="language">Ngôn ngữ:</label>
-                        <Input
-                            id="language"
-                            name="language"
-                            value={formik.values.language}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            status={formik.touched.language && formik.errors.language ? 'error' : undefined}
-                        />
-                        <div className="text-danger">{formik.touched.language && formik.errors.language}</div>
-                    </div>
+                    <FormInput id="language" label="Ngôn ngữ" formik={formik} className="col-md-4" />
 
-                    <div className="col-md-6">
-                        <label htmlFor="additionalInfo">Thông tin khác:</label>
-                        <Input
-                            id="additionalInfo"
-                            name="additionalInfo"
-                            value={formik.values.additionalInfo}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            status={formik.touched.additionalInfo && formik.errors.additionalInfo ? 'error' : undefined}
-                        />
-                        <div className="text-danger">
-                            {formik.touched.additionalInfo && formik.errors.additionalInfo}
-                        </div>
-                    </div>
+                    <FormInput id="additionalInfo" label="Thông tin khác" formik={formik} className="col-md-6" />
 
-                    <div className="col-md-6">
-                        <label htmlFor="series">Tùng thư:</label>
-                        <Input
-                            id="series"
-                            name="series"
-                            value={formik.values.series}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            status={formik.touched.series && formik.errors.series ? 'error' : undefined}
-                        />
-                        <div className="text-danger">{formik.touched.series && formik.errors.series}</div>
-                    </div>
+                    <FormInput id="series" label="Tùng thư" formik={formik} className="col-md-6" />
 
-                    <div className="col-md-6">
-                        <label htmlFor="summary">Tóm tắt:</label>
-                        <TextArea
-                            rows={4}
-                            id="summary"
-                            name="summary"
-                            value={formik.values.summary}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            status={formik.touched.summary && formik.errors.summary ? 'error' : undefined}
-                        />
-                        <div className="text-danger">{formik.touched.summary && formik.errors.summary}</div>
-                    </div>
+                    <FormTextArea id="summary" label="Tóm tắt" formik={formik} className="col-md-6" />
 
-                    <div className="col-md-6">
-                        <label htmlFor="keywords">Từ khóa tìm kiếm:</label>
-                        <TextArea
-                            rows={4}
-                            id="keywords"
-                            name="keywords"
-                            value={formik.values.keywords}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            status={formik.touched.keywords && formik.errors.keywords ? 'error' : undefined}
-                        />
-                        <div className="text-danger">{formik.touched.keywords && formik.errors.keywords}</div>
-                    </div>
+                    <FormTextArea id="keywords" label="Từ khóa tìm kiếm" formik={formik} className="col-md-6" />
 
                     <div className="col-md-12 text-end">
                         <Space>
-                            <Button onClick={() => navigate('/admin/book-definition')}>Quay lại</Button>
+                            <Button onClick={() => navigate('/admin/book-definitions')}>Quay lại</Button>
                             <Button type="primary" htmlType="submit" loading={formik.isSubmitting}>
                                 Lưu
                             </Button>

@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class GetLogResponseDto {
 
+    private final long id;
+
     private final String feature; // Chức năng được thao tác
 
     private final String event; // Sự kiện (Truy cập, Thêm, Xóa, v.v.)
@@ -24,6 +26,7 @@ public class GetLogResponseDto {
     private final LocalDateTime timestamp; // Thời gian hành động
 
     public GetLogResponseDto(Log log) {
+        this.id = log.getId();
         this.feature = log.getFeature();
         this.event = log.getEvent();
         this.content = log.getContent();

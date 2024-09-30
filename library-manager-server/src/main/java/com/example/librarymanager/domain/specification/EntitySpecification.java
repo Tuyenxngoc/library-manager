@@ -182,38 +182,61 @@ public class EntitySpecification {
 
             if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(searchBy)) {
                 switch (searchBy) {
+                    case Log_.USER -> {
+                        Join<Log, User> userJoin = root.join(Log_.user);
+                        predicate = builder.and(predicate, builder.like(userJoin.get(User_.username), "%" + keyword + "%"));
+                    }
+
+                    case Log_.FEATURE ->
+                            predicate = builder.and(predicate, builder.like(root.get(Log_.feature), "%" + keyword + "%"));
+
+                    case Log_.EVENT ->
+                            predicate = builder.and(predicate, builder.like(root.get(Log_.event), "%" + keyword + "%"));
+
                     case Log_.CONTENT ->
                             predicate = builder.and(predicate, builder.like(root.get(Log_.content), "%" + keyword + "%"));
                 }
             }
 
-            // Apply LogFilter conditions
             if (logFilter != null) {
-                // Filter by user
-                if (StringUtils.isNotBlank(logFilter.getUser())) {
-                    Join<Log, User> userJoin = root.join(Log_.user);
-                    predicate = builder.and(predicate, builder.equal(userJoin.get(User_.username), logFilter.getUser()));
-                }
-
-                // Filter by action (event)
-                if (StringUtils.isNotBlank(logFilter.getAction())) {
-                    predicate = builder.and(predicate, builder.equal(root.get(Log_.event), logFilter.getAction()));
-                }
-
-                // Filter by description (feature)
-                if (StringUtils.isNotBlank(logFilter.getDescription())) {
-                    predicate = builder.and(predicate, builder.like(root.get(Log_.feature), "%" + logFilter.getDescription() + "%"));
-                }
-
-                // Filter by startDate and endDate (timestamp)
                 if (logFilter.getStartDate() != null) {
                     predicate = builder.and(predicate, builder.greaterThanOrEqualTo(root.get(Log_.timestamp), logFilter.getStartDate().atStartOfDay()));
                 }
+
                 if (logFilter.getEndDate() != null) {
                     predicate = builder.and(predicate, builder.lessThanOrEqualTo(root.get(Log_.timestamp), logFilter.getEndDate().atTime(23, 59, 59)));
                 }
             }
 
+            return predicate;
+        };
+    }
+
+    public static Specification<ImportReceipt> filterImportReceipts(String keyword, String searchBy) {
+        return (root, query, builder) -> {
+            query.distinct(true);
+
+            Predicate predicate = builder.conjunction();
+
+            if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(searchBy)) {
+                switch (searchBy) {
+                    case ImportReceipt_.ID ->
+                            predicate = builder.and(predicate, builder.equal(root.get(ImportReceipt_.ID),
+                                    SpecificationsUtil.castToRequiredType(root.get(ImportReceipt_.id).getJavaType(), keyword)));
+
+                    case ImportReceipt_.RECEIPT_NUMBER ->
+                            predicate = builder.and(predicate, builder.like(root.get(ImportReceipt_.receiptNumber), "%" + keyword + "%"));
+
+                    case ImportReceipt_.FUNDING_SOURCE ->
+                            predicate = builder.and(predicate, builder.like(root.get(ImportReceipt_.fundingSource), "%" + keyword + "%"));
+
+                    case ImportReceipt_.IMPORT_REASON ->
+                            predicate = builder.and(predicate, builder.like(root.get(ImportReceipt_.importReason), "%" + keyword + "%"));
+
+                    case ImportReceipt_.GENERAL_RECORD_NUMBER ->
+                            predicate = builder.and(predicate, builder.like(root.get(ImportReceipt_.generalRecordNumber), "%" + keyword + "%"));
+                }
+            }
             return predicate;
         };
     }

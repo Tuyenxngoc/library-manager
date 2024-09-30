@@ -1,10 +1,12 @@
 package com.example.librarymanager.controller;
 
+import com.example.librarymanager.annotation.CurrentUser;
 import com.example.librarymanager.annotation.RestApiV1;
 import com.example.librarymanager.base.VsResponseUtil;
 import com.example.librarymanager.constant.UrlConstant;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.request.BookDefinitionRequestDto;
+import com.example.librarymanager.security.CustomUserDetails;
 import com.example.librarymanager.service.BookDefinitionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,8 +33,10 @@ public class BookDefinitionController {
     @PostMapping(value = UrlConstant.BookDefinition.CREATE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createBookDefinition(
             @Valid @ModelAttribute BookDefinitionRequestDto requestDto,
-            @RequestParam(value = "image", required = false) MultipartFile image) {
-        return VsResponseUtil.success(HttpStatus.CREATED, bookDefinitionService.save(requestDto, image));
+            @RequestParam(value = "image", required = false) MultipartFile image,
+            @CurrentUser CustomUserDetails userDetails
+    ) {
+        return VsResponseUtil.success(HttpStatus.CREATED, bookDefinitionService.save(requestDto, image, userDetails.getUserId()));
     }
 
     @Operation(summary = "API Update Book Definition")
@@ -40,15 +44,19 @@ public class BookDefinitionController {
     public ResponseEntity<?> updateBookDefinition(
             @PathVariable Long id,
             @Valid @ModelAttribute BookDefinitionRequestDto requestDto,
-            @RequestParam(value = "image", required = false) MultipartFile image
+            @RequestParam(value = "image", required = false) MultipartFile image,
+            @CurrentUser CustomUserDetails userDetails
     ) {
-        return VsResponseUtil.success(bookDefinitionService.update(id, requestDto, image));
+        return VsResponseUtil.success(bookDefinitionService.update(id, requestDto, image, userDetails.getUserId()));
     }
 
     @Operation(summary = "API Delete Book Definition")
     @DeleteMapping(UrlConstant.BookDefinition.DELETE)
-    public ResponseEntity<?> deleteBookDefinition(@PathVariable Long id) {
-        return VsResponseUtil.success(bookDefinitionService.delete(id));
+    public ResponseEntity<?> deleteBookDefinition(
+            @PathVariable Long id,
+            @CurrentUser CustomUserDetails userDetails
+    ) {
+        return VsResponseUtil.success(bookDefinitionService.delete(id, userDetails.getUserId()));
     }
 
     @Operation(summary = "API Get All Book Definitions")
@@ -65,7 +73,10 @@ public class BookDefinitionController {
 
     @Operation(summary = "API Toggle Active Status of Book Definition")
     @PatchMapping(UrlConstant.BookDefinition.TOGGLE_ACTIVE)
-    public ResponseEntity<?> toggleActiveStatus(@PathVariable Long id) {
-        return VsResponseUtil.success(bookDefinitionService.toggleActiveStatus(id));
+    public ResponseEntity<?> toggleActiveStatus(
+            @PathVariable Long id,
+            @CurrentUser CustomUserDetails userDetails
+    ) {
+        return VsResponseUtil.success(bookDefinitionService.toggleActiveStatus(id, userDetails.getUserId()));
     }
 }

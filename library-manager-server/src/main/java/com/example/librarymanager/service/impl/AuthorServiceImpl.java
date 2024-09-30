@@ -1,6 +1,7 @@
 package com.example.librarymanager.service.impl;
 
 import com.example.librarymanager.constant.ErrorMessage;
+import com.example.librarymanager.constant.Gender;
 import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.constant.SuccessMessage;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
@@ -17,23 +18,75 @@ import com.example.librarymanager.repository.AuthorRepository;
 import com.example.librarymanager.service.AuthorService;
 import com.example.librarymanager.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Objects;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthorServiceImpl implements AuthorService {
+
+    @Value("${data.authors.csv}")
+    private String authorsCsvPath;
 
     private final AuthorRepository authorRepository;
 
     private final AuthorMapper authorMapper;
 
     private final MessageSource messageSource;
+
+    @Override
+    @Transactional
+    public void initAuthorsFromCsv(String username) {
+        if (authorRepository.count() > 0) {
+            return;
+        }
+        try (BufferedReader br = new BufferedReader(new FileReader(authorsCsvPath))) {
+            String line;
+            br.readLine();
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(",");
+                if (values.length < 11) continue;
+
+                // Tạo một tác giả mới
+                Author author = new Author();
+                author.setFullName(values[1]);
+                author.setCode(values[2]);
+                author.setPenName(values[3].isEmpty() ? null : values[3]);
+                author.setGender(Gender.valueOf(values[4]));
+                author.setDateOfBirth(LocalDate.parse(values[5]));
+                if (!values[6].isEmpty()) {
+                    author.setDateOfDeath(LocalDate.parse(values[6]));
+                }
+                author.setTitle(values[7]);
+                author.setResidence(values[8]);
+                author.setAddress(values[9].isEmpty() ? null : values[9]);
+                author.setNotes(values[10].isEmpty() ? null : values[10]);
+                author.setActiveFlag(true);
+                author.setCreatedBy(username);
+                author.setLastModifiedBy(username);
+
+                // Kiểm tra xem tác giả đã tồn tại chưa
+                if (!authorRepository.existsByCode(author.getCode())) {
+                    authorRepository.save(author);
+                }
+            }
+        } catch (IOException e) {
+            log.error("Error while saving author: {}", e.getMessage(), e);
+        }
+    }
 
     @Override
     public CommonResponseDto save(AuthorRequestDto requestDto) {

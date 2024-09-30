@@ -20,7 +20,7 @@ import AdminLayout from './layouts/AdminLayout';
 import AdminLogin from './pages/Auth/AdminLogin';
 import AdminForgotPassword from './pages/Auth/AdminForgotPassword';
 import BookDetail from './pages/Books/BookDetail';
-import InwardBook from './pages/Misc/InwardBook';
+import InwardBook from './pages/Books/InwardBook';
 import Author from './pages/Authors/Author';
 import AuthorForm from './pages/Authors/AuthorForm';
 import BookSet from './pages/BookSet/BookSet';
@@ -30,6 +30,8 @@ import BookDefinition from './pages/BookDefinition/BookDefinition';
 import BookDefinitionForm from './pages/BookDefinition/BookDefinitionForm';
 import ClassificationSymbol from './pages/ClassificationSymbol/ClassificationSymbol';
 import History from './pages/History/History';
+import OutwardBook from './pages/Books/OutwardBook';
+import InwardBookForm from './pages/Books/InwardBookForm';
 
 function App() {
     return (
@@ -55,9 +57,18 @@ function App() {
                     <Route path="admin/" element={<AdminLayout />}>
                         {/* Đường dẫn yêu cầu quyền quản trị */}
 
-                        <Route path="Book/">
-                            <Route path="BookList" element={<h2>BookList</h2>} />
-                            <Route path="Inwardbook" element={<InwardBook />} />
+                        {/* Sách */}
+                        <Route path="books">
+                            <Route path="list" element={<h2>BookList</h2>} />
+                            <Route path="electronic" element={<h2>electronic</h2>} />
+
+                            <Route path="inward">
+                                <Route index element={<InwardBook />} />
+                                <Route path="new" element={<InwardBookForm />} />
+                                <Route path="edit/:id" element={<InwardBookForm />} />
+                            </Route>
+
+                            <Route path="outward" element={<OutwardBook />} />
                         </Route>
 
                         {/* Tác giả */}
@@ -83,7 +94,7 @@ function App() {
                         </Route>
 
                         {/* Biên mục */}
-                        <Route path="book-definition">
+                        <Route path="book-definitions">
                             <Route index element={<BookDefinition />} />
                             <Route path="new" element={<BookDefinitionForm mode="new" />} />
                             <Route path="edit/:id" element={<BookDefinitionForm mode="edit" />} />

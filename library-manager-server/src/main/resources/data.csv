@@ -1,0 +1,6 @@
+author_id,full_name,code,pen_name,gender,date_of_birth,date_of_death,title,residence,address,notes,active_flag
+1,Nguyễn Nhật Ánh,NA001,,FEMALE,1955-05-27,,Nhà văn,Hồ Chí Minh,,"Tác giả nổi tiếng với các tác phẩm dành cho tuổi teen như ""Kính vạn hoa"", ""Cho tôi xin một vé đi tuổi thơ""",TRUE
+2,Tô Hoài,TH002,,FEMALE,1920-09-27,2014-07-06,Nhà văn,Hà Nội,,"Tác giả của ""Dế Mèn phiêu lưu ký"" một tác phẩm kinh điển của văn học thiếu nhi Việt Nam.",TRUE
+3,Kim Lân,KL003,,FEMALE,1920-09-07,2007-10-27,Nhà văn,Hà Nội,,"Nổi tiếng với tác phẩm ""Vợ nhặt"" phản ánh cuộc sống nông thôn trong thời kỳ khó khăn.",TRUE
+4,Nam Cao,NCA004,,FEMALE,1915-11-01,1951-05-30,Nhà văn,Hà Nội,,"Tác giả của nhiều tác phẩm phê phán xã hội trong đó có ""Sống mòn"".",TRUE
+5,Lưu Quang Vũ,LQV005,,FEMALE,1948-01-15,1988-05-29,Nhà thơ Nhà viết kịch,Hà Nội,"","Nổi tiếng với các tác phẩm thơ và kịch như ""Hồn Trương Ba da hàng thịt"".",TRUE

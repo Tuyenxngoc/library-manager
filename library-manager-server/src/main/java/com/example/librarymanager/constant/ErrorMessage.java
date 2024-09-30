@@ -132,4 +132,10 @@ public class ErrorMessage {
         public static final String ERR_DUPLICATE_CODE = "exception.classification.symbol.duplicate.code";
         public static final String ERR_HAS_LINKED_BOOKS = "exception.classification.symbol.has.linked";
     }
+
+    public static class ImportReceipt {
+        public static final String ERR_NOT_FOUND_ID = "exception.import.receipt.not.found.id";
+        public static final String ERR_DUPLICATE_NUMBER = "exception.import.receipt.duplicate.code";
+        public static final String ERR_HAS_LINKED_BOOKS = "exception.import.receipt.has.linked";
+    }
 }

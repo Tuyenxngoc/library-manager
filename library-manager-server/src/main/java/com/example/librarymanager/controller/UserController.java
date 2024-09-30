@@ -4,15 +4,20 @@ import com.example.librarymanager.annotation.CurrentUser;
 import com.example.librarymanager.annotation.RestApiV1;
 import com.example.librarymanager.base.VsResponseUtil;
 import com.example.librarymanager.constant.UrlConstant;
+import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
+import com.example.librarymanager.domain.dto.request.UserRequestDto;
 import com.example.librarymanager.security.CustomUserDetails;
 import com.example.librarymanager.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 
 @RestApiV1
 @RequiredArgsConstructor
@@ -28,4 +33,43 @@ public class UserController {
         return VsResponseUtil.success(userService.getCurrentUser(userDetails));
     }
 
+    @Operation(summary = "API Create New User")
+    @PostMapping(UrlConstant.User.CREATE)
+    public ResponseEntity<?> createUser(
+            @Valid @RequestBody UserRequestDto requestDto,
+            @CurrentUser CustomUserDetails userDetails
+    ) {
+        return VsResponseUtil.success(HttpStatus.CREATED, userService.save(requestDto, userDetails.getUserId()));
+    }
+
+    @Operation(summary = "API Update User")
+    @PutMapping(UrlConstant.User.UPDATE)
+    public ResponseEntity<?> updateUser(
+            @PathVariable String id,
+            @Valid @RequestBody UserRequestDto requestDto,
+            @CurrentUser CustomUserDetails userDetails
+    ) {
+        return VsResponseUtil.success(userService.update(id, requestDto, userDetails.getUserId()));
+    }
+
+    @Operation(summary = "API Delete User")
+    @DeleteMapping(UrlConstant.User.DELETE)
+    public ResponseEntity<?> deleteUser(
+            @PathVariable String id,
+            @CurrentUser CustomUserDetails userDetails
+    ) {
+        return VsResponseUtil.success(userService.delete(id, userDetails.getUserId()));
+    }
+
+    @Operation(summary = "API Get All Users")
+    @GetMapping(UrlConstant.User.GET_ALL)
+    public ResponseEntity<?> getAllUsers(@ParameterObject PaginationFullRequestDto requestDto) {
+        return VsResponseUtil.success(userService.findAll(requestDto));
+    }
+
+    @Operation(summary = "API Get User By Id")
+    @GetMapping(UrlConstant.User.GET_BY_ID)
+    public ResponseEntity<?> getUserById(@PathVariable String id) {
+        return VsResponseUtil.success(userService.findById(id));
+    }
 }

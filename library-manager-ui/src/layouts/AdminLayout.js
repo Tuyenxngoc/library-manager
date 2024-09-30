@@ -37,7 +37,7 @@ const items = [
         getItem('Vào ra thư viện', '/admin/readers/access'),
     ]),
     getItem('Quản lý danh mục', '/admin', <BiCategory />, [
-        getItem('Biên mục', '/admin/book-definition'),
+        getItem('Biên mục', '/admin/book-definitions'),
         getItem('Loại sách', '/admin/categories'),
         getItem('Bộ sách', '/admin/collections'),
         getItem('Tác giả', '/admin/authors'),
@@ -86,7 +86,7 @@ function AdminLayout() {
         >
             {/* Sider */}
             <Sider collapsible width={220} collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
-                <div className="text-center">
+                <div className="text-center py-2">
                     <img src={images.logo} alt="logo" width={34} />
                 </div>
                 <Menu

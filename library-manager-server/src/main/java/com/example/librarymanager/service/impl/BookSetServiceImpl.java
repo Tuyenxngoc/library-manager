@@ -33,7 +33,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class BookSetServiceImpl implements BookSetService {
 
-    private static final String TAG = "BookSet";
+    private static final String TAG = "Quản lý bộ sách";
 
     private final BookSetRepository bookSetRepository;
 
@@ -54,7 +54,7 @@ public class BookSetServiceImpl implements BookSetService {
         bookSet.setActiveFlag(true);
         bookSetRepository.save(bookSet);
 
-        logService.createLog(TAG, "Create", "Tạo bộ sách mới: " + bookSet.getName(), userId);
+        logService.createLog(TAG, "Thêm", "Tạo bộ sách mới: " + bookSet.getName(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, new GetBookSetResponseDto(bookSet));
@@ -72,7 +72,7 @@ public class BookSetServiceImpl implements BookSetService {
 
         bookSetRepository.save(bookSet);
 
-        logService.createLog(TAG, "Update", "Cập nhật bộ sách id: " + bookSet.getId() + ", tên mới: " + bookSet.getName(), userId);
+        logService.createLog(TAG, "Sửa", "Cập nhật bộ sách id: " + bookSet.getId() + ", tên mới: " + bookSet.getName(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, new GetBookSetResponseDto(bookSet));
@@ -88,7 +88,7 @@ public class BookSetServiceImpl implements BookSetService {
 
         bookSetRepository.delete(bookSet);
 
-        logService.createLog(TAG, "Delete", "Xóa bộ sách: " + bookSet.getName(), userId);
+        logService.createLog(TAG, "Xóa", "Xóa bộ sách: " + bookSet.getName(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.DELETE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message);
@@ -129,7 +129,7 @@ public class BookSetServiceImpl implements BookSetService {
 
         bookSetRepository.save(bookSet);
 
-        logService.createLog(TAG, "Toggle Active Status", "Thay đổi trạng thái bộ sách: " + bookSet.getName(), userId);
+        logService.createLog(TAG, "Sửa", "Thay đổi trạng thái bộ sách: " + bookSet.getName(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, bookSet.getActiveFlag());

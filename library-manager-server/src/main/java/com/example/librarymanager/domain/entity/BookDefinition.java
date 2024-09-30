@@ -16,7 +16,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "book_definitions")
+@Table(name = "book_definitions",
+        uniqueConstraints = @UniqueConstraint(name = "UN_BOOK_DEFINITIONS_BOOK_CODE", columnNames = "book_code"))
 public class BookDefinition extends UserDateAuditing {//Biên mục
 
     @Id
@@ -26,6 +27,9 @@ public class BookDefinition extends UserDateAuditing {//Biên mục
 
     @Column(name = "title", nullable = false)
     private String title;  // Nhan đề của biên mục
+
+    @Column(name = "book_code", nullable = false)
+    private String bookCode; // Kí hiệu tên sách
 
     @Column(name = "publishing_year")
     private String publishingYear; // Năm xuất bản
@@ -41,9 +45,6 @@ public class BookDefinition extends UserDateAuditing {//Biên mục
 
     @Column(name = "publication_place")
     private String publicationPlace; // Nơi xuất bản Hà Nội, vv
-
-    @Column(name = "book_code")
-    private String bookCode; // Kí hiệu tên sách
 
     @Column(name = "page_count")
     private Integer pageCount; // Số trang

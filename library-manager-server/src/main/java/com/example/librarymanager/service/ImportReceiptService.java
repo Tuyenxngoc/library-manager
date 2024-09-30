@@ -1,15 +1,19 @@
 package com.example.librarymanager.service;
 
-import com.example.librarymanager.domain.entity.ImportReceipt;
-
-import java.util.List;
+import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
+import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
+import com.example.librarymanager.domain.dto.request.ImportReceiptRequestDto;
+import com.example.librarymanager.domain.dto.response.CommonResponseDto;
+import com.example.librarymanager.domain.dto.response.GetImportReceiptResponseDto;
 
 public interface ImportReceiptService {
-    ImportReceipt findById(Long id);
+    CommonResponseDto save(ImportReceiptRequestDto requestDto, String userId);
 
-    List<ImportReceipt> findAll();
+    CommonResponseDto update(Long id, ImportReceiptRequestDto requestDto, String userId);
 
-    ImportReceipt save(ImportReceipt importReceipt);
+    CommonResponseDto delete(Long id, String userId);
 
-    void delete(Long id);
+    PaginationResponseDto<GetImportReceiptResponseDto> findAll(PaginationFullRequestDto requestDto);
+
+    GetImportReceiptResponseDto findById(Long id);
 }

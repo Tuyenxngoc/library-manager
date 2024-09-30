@@ -8,6 +8,8 @@ import com.example.librarymanager.domain.entity.Author;
 
 public interface AuthorService {
 
+    void initAuthorsFromCsv(String username);
+
     CommonResponseDto save(AuthorRequestDto requestDto);
 
     CommonResponseDto update(Long id, AuthorRequestDto requestDto);

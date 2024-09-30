@@ -1,5 +1,6 @@
 package com.example.librarymanager.domain.entity;
 
+import com.example.librarymanager.domain.entity.common.UserDateAuditing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,13 +15,14 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "import_receipts")
-public class ImportReceipt {
+@Table(name = "import_receipts",
+        uniqueConstraints = @UniqueConstraint(name = "UN_IMPORT_RECEIPTS_RECEIPT_NUMBER", columnNames = "receipt_number"))
+public class ImportReceipt extends UserDateAuditing {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "import_receipt_id")
-    private Long id;  // Số phiếu nhập
+    private Long id;
 
     @Column(name = "receipt_number", nullable = false)
     private String receiptNumber;  // Số phiếu nhập

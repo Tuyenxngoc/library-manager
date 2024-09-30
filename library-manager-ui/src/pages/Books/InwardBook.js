@@ -1,6 +1,14 @@
-import { Button, Space, Table, Tag } from 'antd';
+import { useNavigate } from 'react-router-dom';
+import { MdOutlineModeEdit } from 'react-icons/md';
+import { FaRegTrashAlt } from 'react-icons/fa';
+
+import { Button, Flex, Popconfirm, Space, Table, Tag } from 'antd';
 
 function InwardBook() {
+    const navigate = useNavigate();
+
+    const handleDeleteEntity = async (id) => {};
+
     const columns = [
         {
             title: 'Số phiếu nhập',
@@ -47,40 +55,34 @@ function InwardBook() {
             title: '',
             key: 'action',
             render: (_, record) => (
-                <Space size="middle">
-                    <a>Invite {record.name}</a>
-                    <a>Delete</a>
+                <Space>
+                    <Button type="text" icon={<MdOutlineModeEdit />} onClick={() => navigate(`edit/${record.id}`)} />
+                    <Popconfirm
+                        title="Thông báo"
+                        description={
+                            <div>
+                                Bạn có chắc muốn xóa <b>{record.fullName}</b> không?
+                            </div>
+                        }
+                        onConfirm={() => handleDeleteEntity(record.id)}
+                        okText="Xóa"
+                        cancelText="Hủy"
+                    >
+                        <Button type="text" danger icon={<FaRegTrashAlt />} />
+                    </Popconfirm>
                 </Space>
             ),
         },
     ];
-    const data = [
-        {
-            key: '1',
-            name: 'John Brown',
-            age: 32,
-            address: 'New York No. 1 Lake Park',
-            tags: ['nice', 'developer'],
-        },
-        {
-            key: '2',
-            name: 'Jim Green',
-            age: 42,
-            address: 'London No. 1 Lake Park',
-            tags: ['loser'],
-        },
-        {
-            key: '3',
-            name: 'Joe Black',
-            age: 32,
-            address: 'Sydney No. 1 Lake Park',
-            tags: ['cool', 'teacher'],
-        },
-    ];
+
     return (
         <div>
-            <Button>Lập phiếu nhập</Button>
-            <Table columns={columns} dataSource={data} />
+            <Flex className="py-2" wrap justify="space-between" align="center">
+                <h2>Danh sách phiếu nhập</h2>
+                <Button type="primary" onClick={() => navigate('new')}>
+                    Lập phiếu nhập
+                </Button>
+            </Flex>
         </div>
     );
 }

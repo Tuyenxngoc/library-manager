@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.URL;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -21,6 +21,10 @@ public class BookDefinitionRequestDto {
     @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)
     @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
     private String title;  // Nhan đề
+
+    @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)
+    @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
+    private String bookCode; // Kí hiệu tên sách
 
     @NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
     private Long categoryId; // Danh mục
@@ -38,13 +42,10 @@ public class BookDefinitionRequestDto {
     private Double referencePrice; // Giá tham khảo
 
     @NotNull(message = ErrorMessage.INVALID_ARRAY_IS_REQUIRED)
-    private List<@NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED) Long> authorIds = new ArrayList<>();// Tác giả
+    private Set<@NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED) Long> authorIds = new HashSet<>();// Tác giả
 
     @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
     private String publicationPlace; // Nơi xuất bản
-
-    @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
-    private String bookCode; // Kí hiệu tên sách
 
     @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
     private String publishingYear; // Năm xuất bản
