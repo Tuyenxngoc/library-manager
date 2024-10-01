@@ -1,15 +1,15 @@
 package com.example.librarymanager.service;
 
-import com.example.librarymanager.domain.entity.Book;
-
-import java.util.List;
+import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
+import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
+import com.example.librarymanager.domain.dto.request.BookRequestDto;
+import com.example.librarymanager.domain.dto.response.CommonResponseDto;
+import com.example.librarymanager.domain.dto.response.GetBookResponseDto;
 
 public interface BookService {
-    Book findById(Long id);
+    CommonResponseDto update(Long id, BookRequestDto requestDto, String userId);
 
-    List<Book> findAll();
+    PaginationResponseDto<GetBookResponseDto> findAll(PaginationFullRequestDto requestDto);
 
-    Book save(Book book);
-
-    void delete(Long id);
+    GetBookResponseDto findById(Long id);
 }

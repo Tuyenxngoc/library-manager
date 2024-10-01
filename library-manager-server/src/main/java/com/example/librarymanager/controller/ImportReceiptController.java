@@ -46,15 +46,6 @@ public class ImportReceiptController {
         return VsResponseUtil.success(importReceiptService.update(id, requestDto, userDetails.getUserId()));
     }
 
-    @Operation(summary = "API Delete Import Receipt")
-    @DeleteMapping(UrlConstant.ImportReceipt.DELETE)
-    public ResponseEntity<?> deleteImportReceipt(
-            @PathVariable Long id,
-            @CurrentUser CustomUserDetails userDetails
-    ) {
-        return VsResponseUtil.success(importReceiptService.delete(id, userDetails.getUserId()));
-    }
-
     @Operation(summary = "API Get All Import Receipts")
     @GetMapping(UrlConstant.ImportReceipt.GET_ALL)
     public ResponseEntity<?> getAllImportReceipts(@ParameterObject PaginationFullRequestDto requestDto) {

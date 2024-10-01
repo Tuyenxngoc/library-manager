@@ -125,6 +125,7 @@ public class ErrorMessage {
     public static class BookDefinition {
         public static final String ERR_NOT_FOUND_ID = "exception.book.definition.not.found.id";
         public static final String ERR_HAS_LINKED_BOOKS = "exception.book.definition.has.linked";
+        public static final String ERR_DUPLICATE_CODE = "exception.book.definition.duplicate.code";
     }
 
     public static class ClassificationSymbol {

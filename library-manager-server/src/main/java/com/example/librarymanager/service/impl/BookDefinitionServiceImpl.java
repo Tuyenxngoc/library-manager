@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -72,6 +73,11 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
     public CommonResponseDto save(BookDefinitionRequestDto requestDto, MultipartFile file, String userId) {
         //Kiểm tra file tải lên có phải định dạng ảnh không
         checkImageIsValid(file);
+
+        //Kiểm tra kí hiệu tên sách
+        if (bookDefinitionRepository.existsByBookCode(requestDto.getBookCode())) {
+            throw new BadRequestException(ErrorMessage.BookDefinition.ERR_DUPLICATE_CODE, requestDto.getBookCode());
+        }
 
         //Map dữ liệu
         BookDefinition bookDefinition = bookDefinitionMapper.toBookDefinition(requestDto);
@@ -142,6 +148,11 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
         // Tìm bookDefinition dựa trên id
         BookDefinition bookDefinition = bookDefinitionRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.BookDefinition.ERR_NOT_FOUND_ID, id));
+
+        //Kiểm tra kí hiệu tên sách
+        if (!Objects.equals(bookDefinition.getBookCode(), requestDto.getBookCode()) && bookDefinitionRepository.existsByBookCode(requestDto.getBookCode())) {
+            throw new BadRequestException(ErrorMessage.BookDefinition.ERR_DUPLICATE_CODE, requestDto.getBookCode());
+        }
 
         // Cập nhật danh mục
         Category category = categoryRepository.findByIdAndActiveFlagIsTrue(requestDto.getCategoryId())

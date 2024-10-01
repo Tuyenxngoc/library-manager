@@ -1,18 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Flex, Input, message, Select, Space, Table } from 'antd';
-import { MdOutlineModeEdit } from 'react-icons/md';
+import { Button, Flex, Input, Select, Space, Table } from 'antd';
+import { FaPrint } from 'react-icons/fa';
 import queryString from 'query-string';
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
-import { getImportReceipts } from '~/services/importReceiptService';
+import { getBooks } from '~/services/bookService';
 
-const options = [
-    { value: 'receiptNumber', label: 'Số phiếu nhập' },
-    { label: 'Số vào tổng quát', value: 'generalRecordNumber' },
-    { value: 'fundingSource', label: 'Nguồn cấp phát' },
-];
+const options = [{ value: 'bookCode', label: 'Số ĐKCB' }];
 
-function InwardBook() {
+function BookList() {
     const navigate = useNavigate();
 
     const [meta, setMeta] = useState(INITIAL_META);
@@ -25,8 +21,6 @@ function InwardBook() {
 
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState(null);
-
-    const [messageApi, contextHolder] = message.useMessage();
 
     const handleChangePage = (newPage) => {
         setFilters((prev) => ({ ...prev, pageNum: newPage }));
@@ -64,7 +58,7 @@ function InwardBook() {
             setErrorMessage(null);
             try {
                 const params = queryString.stringify(filters);
-                const response = await getImportReceipts(params);
+                const response = await getBooks(params);
                 const { meta, items } = response.data.data;
                 setEntityData(items);
                 setMeta(meta);
@@ -80,42 +74,68 @@ function InwardBook() {
 
     const columns = [
         {
-            title: 'Số phiếu nhập',
-            dataIndex: 'receiptNumber',
-            key: 'receiptNumber',
+            title: 'Số ĐKCB',
+            dataIndex: 'bookCode',
+            key: 'bookCode',
             sorter: true,
             showSorterTooltip: false,
         },
         {
-            title: 'Số vào tổng quát',
-            dataIndex: 'generalRecordNumber',
-            key: 'generalRecordNumber',
-        },
-        {
-            title: 'Ngày nhập',
-            dataIndex: 'importDate',
-            key: 'importDate',
+            title: 'Nhan đề',
+            dataIndex: 'bookDefinition',
+            key: 'bookDefinition',
             sorter: true,
             showSorterTooltip: false,
+            render: (text, record) => <span>{text.title}</span>,
         },
         {
-            title: 'Nguồn cấp phát',
-            key: 'fundingSource',
-            dataIndex: 'fundingSource',
+            title: 'KHPL',
+            dataIndex: 'bookDefinition',
+            key: 'bookDefinition',
             sorter: true,
             showSorterTooltip: false,
+            render: (text, record) => <span>{text.bookCode}</span>,
         },
         {
-            title: 'Lý do nhập',
-            dataIndex: 'importReason',
-            key: 'importReason',
-        },
-        {
-            title: '',
-            key: 'action',
-            render: (_, record) => (
-                <Button type="text" icon={<MdOutlineModeEdit />} onClick={() => navigate(`edit/${record.id}`)} />
+            title: 'Tác giả',
+            dataIndex: 'bookDefinition',
+            key: 'bookDefinition',
+            sorter: true,
+            showSorterTooltip: false,
+            render: (text, record) => (
+                <span>
+                    {text.authors.map((author, index) => (
+                        <span key={author.id}>
+                            {author.name}
+                            {index < text.authors.length - 1 ? ', ' : ''}
+                        </span>
+                    ))}
+                </span>
             ),
+        },
+        {
+            title: 'Nhà xuất bản',
+            dataIndex: 'bookDefinition',
+            key: 'bookDefinition',
+            sorter: true,
+            showSorterTooltip: false,
+            render: (text, record) => <span>{text.publisher ? text.publisher.name : 'Không có'}</span>,
+        },
+        {
+            title: 'Năm xuất bản',
+            dataIndex: 'bookDefinition',
+            key: 'bookDefinition',
+            sorter: true,
+            showSorterTooltip: false,
+            render: (text, record) => text.publishingYear,
+        },
+        {
+            title: 'Tình trạng',
+            dataIndex: 'bookCondition',
+            key: 'bookCondition',
+            sorter: true,
+            showSorterTooltip: false,
+            render: (text, record) => text || '',
         },
     ];
 
@@ -129,10 +149,8 @@ function InwardBook() {
 
     return (
         <div>
-            {contextHolder}
-
             <Flex wrap justify="space-between" align="center">
-                <h2>Danh sách phiếu nhập</h2>
+                <h2>Danh sách sách</h2>
                 <Space>
                     <Space.Compact className="my-2">
                         <Select
@@ -154,8 +172,8 @@ function InwardBook() {
                         </Button>
                     </Space.Compact>
 
-                    <Button type="primary" onClick={() => navigate('new')}>
-                        Lập phiếu nhập
+                    <Button type="primary" icon={<FaPrint />}>
+                        In
                     </Button>
                 </Space>
             </Flex>
@@ -180,4 +198,4 @@ function InwardBook() {
     );
 }
 
-export default InwardBook;
+export default BookList;

@@ -18,6 +18,7 @@ import com.example.librarymanager.domain.specification.EntitySpecification;
 import com.example.librarymanager.exception.ConflictException;
 import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.BookDefinitionRepository;
+import com.example.librarymanager.repository.BookRepository;
 import com.example.librarymanager.repository.ImportReceiptRepository;
 import com.example.librarymanager.service.ImportReceiptService;
 import com.example.librarymanager.service.LogService;
@@ -49,6 +50,12 @@ public class ImportReceiptServiceImpl implements ImportReceiptService {
     private final MessageSource messageSource;
 
     private final LogService logService;
+    private final BookRepository bookRepository;
+
+    private ImportReceipt getEntity(Long id) {
+        return importReceiptRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.ImportReceipt.ERR_NOT_FOUND_ID, id));
+    }
 
     @Override
     public CommonResponseDto save(ImportReceiptRequestDto requestDto, String userId) {
@@ -71,16 +78,16 @@ public class ImportReceiptServiceImpl implements ImportReceiptService {
             Integer quantity = entry.getKey();
             BookDefinition bookDefinition = entry.getValue();
 
-            for (int i = 0; i < quantity; i++) {
-                long count = bookDefinitionRepository.countByBookCode(bookDefinition.getBookCode());
-                String bookCode = String.format("%s.%05d", bookDefinition.getBookCode(), (int) (Math.random() * 1000));
+            long currentCount = bookRepository.countByBookDefinitionId(bookDefinition.getId());
 
-                //Tạo sách dựa theo biên mục
+            for (int i = 0; i < quantity; i++) {
+                String bookCode = String.format("%s.%05d", bookDefinition.getBookCode(), currentCount + i + 1);
+
+                // Tạo sách dựa theo biên mục
                 Book book = new Book();
                 book.setBookCode(bookCode);
                 book.setBookDefinition(bookDefinition);
                 book.setImportReceipt(importReceipt);
-                book.setActiveFlag(true);
 
                 importReceipt.getBook().add(book);
             }
@@ -100,13 +107,8 @@ public class ImportReceiptServiceImpl implements ImportReceiptService {
     }
 
     @Override
-    public CommonResponseDto delete(Long id, String userId) {
-        return null;
-    }
-
-    @Override
     public PaginationResponseDto<GetImportReceiptResponseDto> findAll(PaginationFullRequestDto requestDto) {
-        Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BOOK_SET);
+        Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.IMPORT_RECEIPT);
 
         Page<ImportReceipt> page = importReceiptRepository.findAll(
                 EntitySpecification.filterImportReceipts(requestDto.getKeyword(), requestDto.getSearchBy()),
@@ -116,7 +118,7 @@ public class ImportReceiptServiceImpl implements ImportReceiptService {
                 .map(GetImportReceiptResponseDto::new)
                 .toList();
 
-        PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.BOOK_SET, page);
+        PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.IMPORT_RECEIPT, page);
 
         PaginationResponseDto<GetImportReceiptResponseDto> responseDto = new PaginationResponseDto<>();
         responseDto.setItems(items);

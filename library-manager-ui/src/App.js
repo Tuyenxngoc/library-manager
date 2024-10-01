@@ -32,6 +32,7 @@ import ClassificationSymbol from './pages/ClassificationSymbol/ClassificationSym
 import History from './pages/History/History';
 import OutwardBook from './pages/Books/OutwardBook';
 import InwardBookForm from './pages/Books/InwardBookForm';
+import BookList from './pages/Books/BookList';
 
 function App() {
     return (
@@ -59,7 +60,7 @@ function App() {
 
                         {/* Sách */}
                         <Route path="books">
-                            <Route path="list" element={<h2>BookList</h2>} />
+                            <Route path="list" element={<BookList />} />
                             <Route path="electronic" element={<h2>electronic</h2>} />
 
                             <Route path="inward">

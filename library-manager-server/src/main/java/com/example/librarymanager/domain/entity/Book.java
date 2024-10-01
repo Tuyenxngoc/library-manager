@@ -26,9 +26,6 @@ public class Book extends UserDateAuditing {
     @Column(name = "book_code")
     private String bookCode; // Số đăng ký cá biệt sách
 
-    @Column(name = "active_flag", nullable = false)
-    private Boolean activeFlag = Boolean.TRUE;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "book_condition")
     private BookCondition bookCondition; // Tình trạng sách
