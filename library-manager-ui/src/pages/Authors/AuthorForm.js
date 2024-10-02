@@ -111,7 +111,7 @@ function AuthorForm() {
             <h2>{id ? 'Chỉnh sửa tác giả' : 'Thêm mới tác giả'}</h2>
 
             <form onSubmit={formik.handleSubmit}>
-                <div className="row g-2">
+                <div className="row g-3">
                     <div className="col-md-6">
                         <label htmlFor="fullName">
                             <span className="text-danger">*</span> Họ tên:

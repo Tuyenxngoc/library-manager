@@ -60,19 +60,10 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
 
     private final LogService logService;
 
-    private void checkImageIsValid(MultipartFile file) {
-        if (file != null && !file.isEmpty()) {
-            String contentType = file.getContentType();
-            if (contentType == null || !contentType.startsWith("image/")) {
-                throw new BadRequestException(ErrorMessage.INVALID_FILE_TYPE);
-            }
-        }
-    }
-
     @Override
     public CommonResponseDto save(BookDefinitionRequestDto requestDto, MultipartFile file, String userId) {
         //Kiểm tra file tải lên có phải định dạng ảnh không
-        checkImageIsValid(file);
+        uploadFileUtil.checkImageIsValid(file);
 
         //Kiểm tra kí hiệu tên sách
         if (bookDefinitionRepository.existsByBookCode(requestDto.getBookCode())) {
@@ -143,7 +134,7 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
     @Override
     public CommonResponseDto update(Long id, BookDefinitionRequestDto requestDto, MultipartFile file, String userId) {
         //Kiểm tra file tải lên có phải định dạng ảnh không
-        checkImageIsValid(file);
+        uploadFileUtil.checkImageIsValid(file);
 
         // Tìm bookDefinition dựa trên id
         BookDefinition bookDefinition = bookDefinitionRepository.findById(id)

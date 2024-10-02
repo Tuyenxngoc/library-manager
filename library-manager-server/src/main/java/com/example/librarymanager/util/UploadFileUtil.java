@@ -2,7 +2,9 @@ package com.example.librarymanager.util;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.exception.BadGatewayException;
+import com.example.librarymanager.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -58,6 +60,15 @@ public class UploadFileUtil {
             log.info(String.format("Destroy image public id %s %s", publicId, result.toString()));
         } catch (IOException e) {
             throw new BadGatewayException("Remove file failed!");
+        }
+    }
+
+    public void checkImageIsValid(MultipartFile file) {
+        if (file != null && !file.isEmpty()) {
+            String contentType = file.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                throw new BadRequestException(ErrorMessage.INVALID_FILE_TYPE);
+            }
         }
     }
 

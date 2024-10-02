@@ -33,6 +33,8 @@ import History from './pages/History/History';
 import OutwardBook from './pages/Books/OutwardBook';
 import InwardBookForm from './pages/Books/InwardBookForm';
 import BookList from './pages/Books/BookList';
+import NewsArticles from './pages/NewsArticles/NewsArticles';
+import NewsArticlesForm from './pages/NewsArticles/NewsArticlesForm';
 
 function App() {
     return (
@@ -105,6 +107,13 @@ function App() {
                         {/* Kí hiệu phân loại */}
                         <Route path="classifications">
                             <Route index element={<ClassificationSymbol />} />
+                        </Route>
+
+                        {/* Tin tức */}
+                        <Route path="news-articles">
+                            <Route index element={<NewsArticles />} />
+                            <Route path="new" element={<NewsArticlesForm />} />
+                            <Route path="edit/:id" element={<NewsArticlesForm />} />
                         </Route>
 
                         {/* Lịch sử */}

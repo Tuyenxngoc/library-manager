@@ -134,4 +134,15 @@ public enum SortByDataConstant implements SortByInterface {
         }
     },
 
+    NEWS_ARTICLE {
+        @Override
+        public String getSortBy(String sortBy) {
+            return switch (sortBy) {
+                case "id" -> "id";
+                case "title" -> "title";
+                default -> "createdDate";
+            };
+        }
+    },
+
 }

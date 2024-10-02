@@ -56,7 +56,7 @@ const items = [
         getItem('Trả-Gia hạn sách', '/admin/circulation/return-renew'),
     ]),
     getItem('Thống kê báo cáo', '/admin/reports', <FaChartBar />, [getItem('Báo cáo', '/admin/reports/statistics')]),
-    getItem('Quản lý tin tức', '/admin/news', <BsNewspaper />, [getItem('Tin tức', '/admin/news/articles')]),
+    getItem('Quản lý tin tức', '/admin/news-articles', <BsNewspaper />),
     getItem('Lịch sử truy cập', '/admin/histories', <FaHistory />),
 ];
 

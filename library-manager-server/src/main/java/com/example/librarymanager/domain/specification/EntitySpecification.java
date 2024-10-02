@@ -257,4 +257,28 @@ public class EntitySpecification {
             return predicate;
         };
     }
+
+    public static Specification<NewsArticle> filterNewsArticles(String keyword, String searchBy, Boolean activeFlag) {
+        return (root, query, builder) -> {
+            query.distinct(true);
+
+            Predicate predicate = builder.conjunction();
+
+            if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(searchBy)) {
+                switch (searchBy) {
+                    case NewsArticle_.TITLE ->
+                            predicate = builder.and(predicate, builder.like(root.get(NewsArticle_.title), "%" + keyword + "%"));
+
+                    case NewsArticle_.DESCRIPTION ->
+                            predicate = builder.and(predicate, builder.like(root.get(NewsArticle_.description), "%" + keyword + "%"));
+                }
+            }
+
+            if (activeFlag != null) {
+                predicate = builder.and(predicate, builder.equal(root.get(NewsArticle_.activeFlag), activeFlag));
+            }
+
+            return predicate;
+        };
+    }
 }

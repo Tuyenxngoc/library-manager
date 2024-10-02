@@ -40,7 +40,7 @@ public class BookDefinitionController {
     }
 
     @Operation(summary = "API Update Book Definition")
-    @PutMapping(UrlConstant.BookDefinition.UPDATE)
+    @PutMapping(value = UrlConstant.BookDefinition.UPDATE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateBookDefinition(
             @PathVariable Long id,
             @Valid @ModelAttribute BookDefinitionRequestDto requestDto,
