@@ -26,7 +26,13 @@ function getItem(label, key, icon, children) {
 
 const items = [
     getItem('Trang chủ', '/admin/home', <AiFillDashboard />),
-    getItem('Thiết lập hệ thống', '/admin/settings', <IoMdSettings />),
+    getItem('Thiết lập hệ thống', '/admin/settings', <IoMdSettings />, [
+        getItem('Thông tin thư viện', '/admin/settings/library-info'),
+        getItem('Nội quy thư viện', '/admin/settings/library-rules'),
+        getItem('Kì nghỉ ngày lễ', '/admin/settings/holidays'),
+        getItem('Cấu hình chung', '/admin/settings/general-config'),
+        getItem('Thiết lập Slide', '/admin/settings/slide-config'),
+    ]),
     getItem('Quản lý người dùng', '/admin/users', <FaUsers />, [
         getItem('Quản lý nhóm', '/admin/users/groups'),
         getItem('Quản lý người dùng', '/admin/users/manage'),
@@ -46,7 +52,6 @@ const items = [
     ]),
     getItem('Quản lý sách', '/admin/books', <FaBook />, [
         getItem('Danh sách sách', '/admin/books/list'),
-        getItem('Danh sách sách điện tử', '/admin/books/electronic'),
         getItem('Nhập sách', '/admin/books/inward'),
         getItem('Kiểm kê sách', '/admin/books/inventory'),
         getItem('Xuất sách', '/admin/books/outward'),
@@ -105,6 +110,7 @@ function AdminLayout() {
                         padding: 0,
                         background: colorBgContainer,
                     }}
+                    className="shadow-sm"
                 />
 
                 {/* Content */}

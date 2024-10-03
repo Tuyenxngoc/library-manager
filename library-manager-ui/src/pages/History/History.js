@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import queryString from 'query-string';
-import { Button, DatePicker, Flex, Input, Select, Space, Table } from 'antd';
+import { Button, DatePicker, Flex, Input, Select, Space, Table, Tag } from 'antd';
 import { getLogs } from '~/services/logService';
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
 
@@ -10,6 +10,19 @@ const options = [
     { value: 'event', label: 'Sự kiện' },
     { value: 'content', label: 'Nội dung' },
 ];
+
+const getTagByEvent = (event) => {
+    switch (event) {
+        case 'Thêm':
+            return <Tag color="green">Thêm</Tag>;
+        case 'Sửa':
+            return <Tag color="yellow">Sửa</Tag>;
+        case 'Xóa':
+            return <Tag color="red">Xóa</Tag>;
+        default:
+            return <Tag color="default">{event}</Tag>;
+    }
+};
 
 function History() {
     const [meta, setMeta] = useState(INITIAL_META);
@@ -103,6 +116,7 @@ function History() {
             key: 'event',
             sorter: true,
             showSorterTooltip: false,
+            render: (text) => getTagByEvent(text),
         },
         {
             title: 'Nội dung',

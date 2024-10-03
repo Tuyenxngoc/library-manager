@@ -153,10 +153,9 @@ function AuthorForm() {
                         <div className="text-danger">{formik.touched.penName && formik.errors.penName}</div>
                     </div>
                     <div className="col-md-6">
-                        <label htmlFor="gender">Giới tính:</label>
+                        <span>Giới tính:</span>
                         <div>
                             <Radio.Group
-                                id="gender"
                                 name="gender"
                                 value={formik.values.gender}
                                 onChange={(e) => formik.setFieldValue('gender', e.target.value)}
@@ -176,6 +175,7 @@ function AuthorForm() {
                         <label htmlFor="dateOfBirth">Ngày sinh:</label>
                         <div>
                             <DatePicker
+                                className="w-100"
                                 id="dateOfBirth"
                                 name="dateOfBirth"
                                 value={formik.values.dateOfBirth}
@@ -189,6 +189,7 @@ function AuthorForm() {
                         <label htmlFor="dateOfDeath">Ngày mất:</label>
                         <div>
                             <DatePicker
+                                className="w-100"
                                 id="dateOfDeath"
                                 name="dateOfDeath"
                                 value={formik.values.dateOfDeath}
@@ -225,6 +226,7 @@ function AuthorForm() {
                     <div className="col-md-6">
                         <label htmlFor="address">Địa chỉ:</label>
                         <Input
+                            autoComplete="off"
                             id="address"
                             name="address"
                             value={formik.values.address}

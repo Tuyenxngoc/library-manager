@@ -146,7 +146,7 @@ function NewsArticlesForm() {
 
                     <div className="col-md-12">
                         <span>
-                            <span className="text-danger">*</span>Nội dung
+                            <span className="text-danger">*</span>Nội dung:
                         </span>
                         <ReactQuill
                             className="custom-quill"

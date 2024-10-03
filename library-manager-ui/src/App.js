@@ -35,6 +35,13 @@ import InwardBookForm from './pages/Books/InwardBookForm';
 import BookList from './pages/Books/BookList';
 import NewsArticles from './pages/NewsArticles/NewsArticles';
 import NewsArticlesForm from './pages/NewsArticles/NewsArticlesForm';
+import InventoryBook from './pages/Books/InventoryBook';
+import Dashboard from './pages/Dashboard/Dashboard';
+import LibraryInfo from './pages/settings/LibraryInfo';
+import LibraryRules from './pages/settings/LibraryRules';
+import Holidays from './pages/settings/Holidays';
+import GeneralConfig from './pages/settings/GeneralConfig';
+import SlideConfig from './pages/settings/SlideConfig';
 
 function App() {
     return (
@@ -60,15 +67,30 @@ function App() {
                     <Route path="admin/" element={<AdminLayout />}>
                         {/* Đường dẫn yêu cầu quyền quản trị */}
 
+                        {/* Trang chủ */}
+                        <Route path="home" element={<Dashboard />} />
+
+                        {/* Thiết lập hệ thống */}
+                        <Route path="settings">
+                            <Route path="library-info" element={<LibraryInfo />} />
+                            <Route path="library-rules" element={<LibraryRules />} />
+                            <Route path="holidays" element={<Holidays />} />
+                            <Route path="general-config" element={<GeneralConfig />} />
+                            <Route path="slide-config" element={<SlideConfig />} />
+                        </Route>
+
                         {/* Sách */}
                         <Route path="books">
                             <Route path="list" element={<BookList />} />
-                            <Route path="electronic" element={<h2>electronic</h2>} />
 
                             <Route path="inward">
                                 <Route index element={<InwardBook />} />
                                 <Route path="new" element={<InwardBookForm />} />
                                 <Route path="edit/:id" element={<InwardBookForm />} />
+                            </Route>
+
+                            <Route path="inventory">
+                                <Route index element={<InventoryBook />} />
                             </Route>
 
                             <Route path="outward" element={<OutwardBook />} />

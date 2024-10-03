@@ -135,11 +135,11 @@ public class EntitySpecification {
 
             if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(searchBy)) {
                 switch (searchBy) {
+                    case BookDefinition_.TITLE ->
+                            predicate = builder.and(predicate, builder.like(root.get(BookDefinition_.title), "%" + keyword + "%"));
+
                     case BookDefinition_.BOOK_CODE ->
                             predicate = builder.and(predicate, builder.like(root.get(BookDefinition_.bookCode), "%" + keyword + "%"));
-
-                    case BookDefinition_.TITLE ->
-                            predicate = builder.and(predicate, builder.like(root.get(BookDefinition_.TITLE), "%" + keyword + "%"));
                 }
             }
 

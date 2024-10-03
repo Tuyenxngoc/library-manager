@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Flex, Input, message, Popconfirm, Select, Space, Switch, Table, Tag } from 'antd';
+import { Button, Flex, Input, message, Popconfirm, Select, Space, Switch, Table } from 'antd';
 import { MdOutlineModeEdit } from 'react-icons/md';
 import { FaRegTrashAlt } from 'react-icons/fa';
 
