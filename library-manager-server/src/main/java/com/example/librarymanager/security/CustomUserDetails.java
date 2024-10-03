@@ -3,6 +3,7 @@ package com.example.librarymanager.security;
 import com.example.librarymanager.constant.RoleConstant;
 import com.example.librarymanager.domain.entity.Reader;
 import com.example.librarymanager.domain.entity.User;
+import com.example.librarymanager.domain.entity.UserGroupRole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public class CustomUserDetails implements UserDetails {
 
@@ -39,7 +41,12 @@ public class CustomUserDetails implements UserDetails {
 
     public static CustomUserDetails create(User user) {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(user.getRole().getName()));
+
+        Set<UserGroupRole> roles = user.getUserGroup().getUserGroupRoles();
+        for (UserGroupRole role : roles) {
+            authorities.add(new SimpleGrantedAuthority(role.getRole().getName()));
+        }
+
         return new CustomUserDetails(user.getId(), null, user.getUsername(), user.getPassword(), authorities);
     }
 

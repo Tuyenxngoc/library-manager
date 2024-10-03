@@ -1,9 +1,7 @@
 package com.example.librarymanager.service.impl;
 
-import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.RoleConstant;
 import com.example.librarymanager.domain.entity.Role;
-import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.RoleRepository;
 import com.example.librarymanager.service.RoleService;
 import lombok.AccessLevel;
@@ -23,25 +21,24 @@ public class RoleServiceImpl implements RoleService {
     RoleRepository roleRepository;
 
     @Override
-    public Role getRole(byte roleId) {
-        return roleRepository.findById(roleId)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.Role.ERR_NOT_FOUND_ID, roleId));
-    }
-
-    @Override
-    public Role getRole(String name) {
-        return roleRepository.findByName(name)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.Role.ERR_NOT_FOUND_NAME, name));
-    }
-
-    @Override
     public void initRoles() {
         if (roleRepository.count() == 0) {
-            roleRepository.save(new Role(RoleConstant.ROLE_SUPER_ADMIN.name()));
-            roleRepository.save(new Role(RoleConstant.ROLE_ADMIN.name()));
-            roleRepository.save(new Role(RoleConstant.ROLE_USER.name()));
+            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_AUTHOR.name()));
+            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_BOOK.name()));
+            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_BOOK_DEFINITION.name()));
+            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_BOOK_SET.name()));
+            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_CATEGORY.name()));
+            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_CATEGORY_GROUP.name()));
+            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_CLASSIFICATION_SYMBOL.name()));
+            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_IMPORT_RECEIPT.name()));
+            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_LOG.name()));
+            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_NEWS_ARTICLE.name()));
+            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_PUBLISHER.name()));
+            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_ROLE.name()));
+            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_USER.name()));
+            roleRepository.save(new Role(RoleConstant.ROLE_READER.name()));
 
-            log.info("Initializing roles: SUPER ADMIN, ADMIN, USER");
+            log.info("Initializing roles");
         }
     }
 

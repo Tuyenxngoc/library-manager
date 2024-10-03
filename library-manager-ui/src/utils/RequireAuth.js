@@ -9,7 +9,7 @@ function RequireAuth({ allowedRoles }) {
 
     if (isAuthenticated) {
         if (allowedRoles && allowedRoles.length > 0) {
-            const hasRequiredRole = allowedRoles.some((role) => user.roleName === role);
+            const hasRequiredRole = allowedRoles.some((role) => user.roleNames.includes(role));
 
             if (!hasRequiredRole) {
                 return <Navigate to="/access-denied" />;

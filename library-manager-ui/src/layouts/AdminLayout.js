@@ -13,6 +13,9 @@ import { FaRecycle } from 'react-icons/fa';
 import { BiCategory } from 'react-icons/bi';
 import { FaBook } from 'react-icons/fa';
 import images from '~/assets';
+import { checkUserHasRequiredRole } from '~/utils/helper';
+import { ROLES } from '~/common/roleConstants';
+import useAuth from '~/hooks/useAuth';
 
 const { Header, Content, Footer, Sider } = Layout;
 function getItem(label, key, icon, children) {
@@ -24,54 +27,18 @@ function getItem(label, key, icon, children) {
     };
 }
 
-const items = [
-    getItem('Trang chủ', '/admin/home', <AiFillDashboard />),
-    getItem('Thiết lập hệ thống', '/admin/settings', <IoMdSettings />, [
-        getItem('Thông tin thư viện', '/admin/settings/library-info'),
-        getItem('Nội quy thư viện', '/admin/settings/library-rules'),
-        getItem('Kì nghỉ ngày lễ', '/admin/settings/holidays'),
-        getItem('Cấu hình chung', '/admin/settings/general-config'),
-        getItem('Thiết lập Slide', '/admin/settings/slide-config'),
-    ]),
-    getItem('Quản lý người dùng', '/admin/users', <FaUsers />, [
-        getItem('Quản lý nhóm', '/admin/users/groups'),
-        getItem('Quản lý người dùng', '/admin/users/manage'),
-    ]),
-    getItem('Quản lý bạn đọc', '/admin/readers', <FaUser />, [
-        getItem('Thẻ bạn đọc', '/admin/readers/cards'),
-        getItem('Xử lý vi phạm', '/admin/readers/violations'),
-        getItem('Vào ra thư viện', '/admin/readers/access'),
-    ]),
-    getItem('Quản lý danh mục', '/admin', <BiCategory />, [
-        getItem('Biên mục', '/admin/book-definitions'),
-        getItem('Loại sách', '/admin/categories'),
-        getItem('Bộ sách', '/admin/collections'),
-        getItem('Tác giả', '/admin/authors'),
-        getItem('Ký hiệu phân loại', '/admin/classifications'),
-        getItem('Nhà xuất bản', '/admin/publishers'),
-    ]),
-    getItem('Quản lý sách', '/admin/books', <FaBook />, [
-        getItem('Danh sách sách', '/admin/books/list'),
-        getItem('Nhập sách', '/admin/books/inward'),
-        getItem('Kiểm kê sách', '/admin/books/inventory'),
-        getItem('Xuất sách', '/admin/books/outward'),
-    ]),
-    getItem('Quản lý lưu thông', '/admin/circulation', <FaRecycle />, [
-        getItem('Mượn sách', '/admin/circulation/borrow'),
-        getItem('Trả-Gia hạn sách', '/admin/circulation/return-renew'),
-    ]),
-    getItem('Thống kê báo cáo', '/admin/reports', <FaChartBar />, [getItem('Báo cáo', '/admin/reports/statistics')]),
-    getItem('Quản lý tin tức', '/admin/news-articles', <BsNewspaper />),
-    getItem('Lịch sử truy cập', '/admin/histories', <FaHistory />),
-];
-
 function AdminLayout() {
     const {
         token: { colorBgContainer, borderRadiusLG },
     } = theme.useToken();
 
+    const {
+        user: { roleNames },
+    } = useAuth();
+
     const navigate = useNavigate();
     const location = useLocation();
+
     const [collapsed, setCollapsed] = useState(false);
     const [selectedKey, setSelectedKey] = useState(location.pathname);
 
@@ -82,6 +49,50 @@ function AdminLayout() {
     useEffect(() => {
         setSelectedKey(location.pathname);
     }, [location.pathname]);
+
+    const items = [
+        getItem('Trang chủ', '/admin/home', <AiFillDashboard />),
+        getItem('Thiết lập hệ thống', '/admin/settings', <IoMdSettings />, [
+            getItem('Thông tin thư viện', '/admin/settings/library-info'),
+            getItem('Nội quy thư viện', '/admin/settings/library-rules'),
+            getItem('Kì nghỉ ngày lễ', '/admin/settings/holidays'),
+            getItem('Cấu hình chung', '/admin/settings/general-config'),
+            getItem('Thiết lập Slide', '/admin/settings/slide-config'),
+        ]),
+        checkUserHasRequiredRole(roleNames, ROLES.ManageUser) &&
+            getItem('Quản lý người dùng', '/admin/user', <FaUsers />, [
+                getItem('Quản lý nhóm', '/admin/user-groups'),
+                getItem('Quản lý người dùng', '/admin/users'),
+            ]),
+        getItem('Quản lý bạn đọc', '/admin/readers', <FaUser />, [
+            getItem('Thẻ bạn đọc', '/admin/readers/cards'),
+            getItem('Xử lý vi phạm', '/admin/readers/violations'),
+            getItem('Vào ra thư viện', '/admin/readers/access'),
+        ]),
+        getItem('Quản lý danh mục', '/admin', <BiCategory />, [
+            getItem('Biên mục', '/admin/book-definitions'),
+            getItem('Loại sách', '/admin/categories'),
+            getItem('Bộ sách', '/admin/collections'),
+            checkUserHasRequiredRole(roleNames, ROLES.ManageAuthor) && getItem('Tác giả', '/admin/authors'),
+            getItem('Ký hiệu phân loại', '/admin/classifications'),
+            getItem('Nhà xuất bản', '/admin/publishers'),
+        ]),
+        getItem('Quản lý sách', '/admin/books', <FaBook />, [
+            getItem('Danh sách sách', '/admin/books/list'),
+            getItem('Nhập sách', '/admin/books/inward'),
+            getItem('Kiểm kê sách', '/admin/books/inventory'),
+            getItem('Xuất sách', '/admin/books/outward'),
+        ]),
+        getItem('Quản lý lưu thông', '/admin/circulation', <FaRecycle />, [
+            getItem('Mượn sách', '/admin/circulation/borrow'),
+            getItem('Trả-Gia hạn sách', '/admin/circulation/return-renew'),
+        ]),
+        getItem('Thống kê báo cáo', '/admin/reports', <FaChartBar />, [
+            getItem('Báo cáo', '/admin/reports/statistics'),
+        ]),
+        getItem('Quản lý tin tức', '/admin/news-articles', <BsNewspaper />),
+        getItem('Lịch sử truy cập', '/admin/histories', <FaHistory />),
+    ];
 
     return (
         <Layout

@@ -91,8 +91,7 @@ public class AuthServiceImpl implements AuthService {
 
             return new LoginResponseDto(
                     accessToken,
-                    refreshToken,
-                    customUserDetails.getAuthorities()
+                    refreshToken
             );
         } catch (AuthenticationException | UnauthorizedException e) {
             throw new UnauthorizedException(ErrorMessage.Auth.ERR_INCORRECT_USERNAME_PASSWORD);
@@ -123,8 +122,7 @@ public class AuthServiceImpl implements AuthService {
 
             return new LoginResponseDto(
                     accessToken,
-                    refreshToken,
-                    customUserDetails.getAuthorities()
+                    refreshToken
             );
         } catch (AuthenticationException | UnauthorizedException e) {
             throw new UnauthorizedException(ErrorMessage.Auth.ERR_INCORRECT_USERNAME_PASSWORD);

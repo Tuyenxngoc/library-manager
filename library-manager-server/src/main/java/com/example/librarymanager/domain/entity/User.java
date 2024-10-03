@@ -47,9 +47,9 @@ public class User extends DateAuditing {
     private Boolean isEnabled = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id", foreignKey = @ForeignKey(name = "FK_USER_ROLE_ID"), referencedColumnName = "role_id", nullable = false)
+    @JoinColumn(name = "user_group_id", foreignKey = @ForeignKey(name = "FK_USER_USER_GROUP_ID"), referencedColumnName = "user_group_id", nullable = false)
     @JsonIgnore
-    private Role role;
+    private UserGroup userGroup;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore

@@ -30,7 +30,7 @@ public class Role extends DateAuditing {
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<User> users = new ArrayList<>();
+    private List<UserGroupRole> userGroupRoles = new ArrayList<>();
 
     public Role(String name) {
         this.name = name;

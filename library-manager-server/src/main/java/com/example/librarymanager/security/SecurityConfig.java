@@ -30,6 +30,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.example.librarymanager.constant.RoleConstant.ROLE_MANAGE_AUTHOR;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -88,6 +90,7 @@ public class SecurityConfig {
                                 "/api/v1/posts",
                                 "/api/v1/posts/*",
                                 "/api/v1/posts/*/comments").permitAll()
+                        .requestMatchers("/api/v1/authors/**").hasAuthority(ROLE_MANAGE_AUTHOR.name())
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -146,4 +146,10 @@ public class ErrorMessage {
         public static final String ERR_HAS_LINKED_BOOKS = "exception.import.receipt.has.linked";
     }
 
+    public static class UserGroup {
+        public static final String ERR_NOT_FOUND_ID = "exception.user.group.not.found.id";
+        public static final String ERR_DUPLICATE_CODE = "exception.user.group.duplicate.code";
+        public static final String ERR_HAS_LINKED_USERS = "exception.user.group.has.linked";
+    }
+
 }

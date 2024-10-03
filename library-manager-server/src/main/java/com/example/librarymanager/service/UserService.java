@@ -7,11 +7,12 @@ import com.example.librarymanager.domain.dto.request.UserRequestDto;
 import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.dto.response.auth.GetCurrentUserLoginResponseDto;
 import com.example.librarymanager.domain.entity.User;
+import com.example.librarymanager.domain.entity.UserGroup;
 import com.example.librarymanager.security.CustomUserDetails;
 
 public interface UserService {
 
-    void initAdmin(AdminInfo adminInfo);
+    void initAdmin(AdminInfo adminInfo, UserGroup userGroup);
 
     GetCurrentUserLoginResponseDto getCurrentUser(CustomUserDetails userDetails);
 

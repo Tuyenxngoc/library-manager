@@ -43,7 +43,7 @@ const options = [
 
 function Header() {
     const { isAuthenticated, user, logout } = useAuth();
-    const hasRequiredRole = isAuthenticated && user.roleName === ROLES.Reader;
+    const hasRequiredRole = isAuthenticated && user.roleNames[0] === ROLES.Reader;
 
     const items = hasRequiredRole
         ? [

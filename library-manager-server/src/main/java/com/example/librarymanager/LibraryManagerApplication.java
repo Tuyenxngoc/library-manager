@@ -3,10 +3,8 @@ package com.example.librarymanager;
 import com.example.librarymanager.config.CloudinaryConfig;
 import com.example.librarymanager.config.MailConfig;
 import com.example.librarymanager.config.properties.AdminInfo;
-import com.example.librarymanager.service.AuthorService;
-import com.example.librarymanager.service.ReaderService;
-import com.example.librarymanager.service.RoleService;
-import com.example.librarymanager.service.UserService;
+import com.example.librarymanager.domain.entity.UserGroup;
+import com.example.librarymanager.service.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -33,6 +31,8 @@ public class LibraryManagerApplication {
 
     RoleService roleService;
 
+    UserGroupService userGroupService;
+
     UserService userService;
 
     ReaderService readerService;
@@ -56,7 +56,8 @@ public class LibraryManagerApplication {
     CommandLineRunner init(AdminInfo adminInfo) {
         return args -> {
             roleService.initRoles();
-            userService.initAdmin(adminInfo);
+            UserGroup userGroup = userGroupService.initUserGroup(adminInfo);
+            userService.initAdmin(adminInfo, userGroup);
             readerService.initReaders();
             authorService.initAuthorsFromCsv(adminInfo.getUsername());
         };

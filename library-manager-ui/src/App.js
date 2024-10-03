@@ -42,6 +42,10 @@ import LibraryRules from './pages/settings/LibraryRules';
 import Holidays from './pages/settings/Holidays';
 import GeneralConfig from './pages/settings/GeneralConfig';
 import SlideConfig from './pages/settings/SlideConfig';
+import UserManagement from './pages/UserManagement/UserManagement';
+import UserManagementForm from './pages/UserManagement/UserManagementForm';
+import UserGroupManagement from './pages/UserGroupManagement/UserGroupManagement';
+import UserGroupForm from './pages/UserGroupManagement/UserGroupForm';
 
 function App() {
     return (
@@ -63,7 +67,27 @@ function App() {
                     <Route element={<RequireAuth />}>{/* Đường dẫn yêu cầu đăng nhập */}</Route>
                 </Route>
 
-                <Route element={<RequireAuth allowedRoles={[ROLES.SuperAdmin, ROLES.Admin]} />}>
+                <Route
+                    element={
+                        <RequireAuth
+                            allowedRoles={[
+                                ROLES.ManageAuthor,
+                                ROLES.ManageNewsArticle,
+                                ROLES.ManageUser,
+                                ROLES.ManageClassificationSymbol,
+                                ROLES.ManageCategory,
+                                ROLES.ManageBookSet,
+                                ROLES.ManageLog,
+                                ROLES.ManageRole,
+                                ROLES.ManageBook,
+                                ROLES.ManageImportReceipt,
+                                ROLES.ManageBookDefinition,
+                                ROLES.ManageCategoryGroup,
+                                ROLES.ManagePublisher,
+                            ]}
+                        />
+                    }
+                >
                     <Route path="admin/" element={<AdminLayout />}>
                         {/* Đường dẫn yêu cầu quyền quản trị */}
 
@@ -77,6 +101,20 @@ function App() {
                             <Route path="holidays" element={<Holidays />} />
                             <Route path="general-config" element={<GeneralConfig />} />
                             <Route path="slide-config" element={<SlideConfig />} />
+                        </Route>
+
+                        {/* Quản lý người dùng */}
+                        <Route path="users">
+                            <Route index element={<UserManagement />} />
+                            <Route path="new" element={<UserManagementForm />} />
+                            <Route path="edit/:id" element={<UserManagementForm />} />
+                        </Route>
+
+                        {/* Quản lý nhóm người dùng */}
+                        <Route path="user-groups">
+                            <Route index element={<UserGroupManagement />} />
+                            <Route path="new" element={<UserGroupForm />} />
+                            <Route path="edit/:id" element={<UserGroupForm />} />
                         </Route>
 
                         {/* Sách */}

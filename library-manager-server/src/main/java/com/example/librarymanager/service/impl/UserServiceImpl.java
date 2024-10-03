@@ -2,7 +2,6 @@ package com.example.librarymanager.service.impl;
 
 import com.example.librarymanager.config.properties.AdminInfo;
 import com.example.librarymanager.constant.ErrorMessage;
-import com.example.librarymanager.constant.RoleConstant;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.request.UserRequestDto;
@@ -10,8 +9,10 @@ import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.dto.response.auth.GetCurrentUserLoginResponseDto;
 import com.example.librarymanager.domain.entity.Reader;
 import com.example.librarymanager.domain.entity.User;
+import com.example.librarymanager.domain.entity.UserGroup;
 import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.ReaderRepository;
+import com.example.librarymanager.repository.UserGroupRepository;
 import com.example.librarymanager.repository.UserRepository;
 import com.example.librarymanager.security.CustomUserDetails;
 import com.example.librarymanager.service.RoleService;
@@ -33,12 +34,14 @@ public class UserServiceImpl implements UserService {
 
     private final RoleService roleService;
 
+    private final UserGroupRepository userGroupRepository;
+
     private final PasswordEncoder passwordEncoder;
 
     private final ReaderRepository readerRepository;
 
     @Override
-    public void initAdmin(AdminInfo adminInfo) {
+    public void initAdmin(AdminInfo adminInfo, UserGroup userGroup) {
         if (userRepository.count() == 0) {
             try {
                 User user = new User();
@@ -47,7 +50,7 @@ public class UserServiceImpl implements UserService {
                 user.setPhoneNumber(adminInfo.getPhoneNumber());
                 user.setFullName(adminInfo.getName());
                 user.setPassword(passwordEncoder.encode(adminInfo.getPassword()));
-                user.setRole(roleService.getRole(RoleConstant.ROLE_ADMIN.name()));
+                user.setUserGroup(userGroup);
                 user.setIsEnabled(true);
                 userRepository.save(user);
 

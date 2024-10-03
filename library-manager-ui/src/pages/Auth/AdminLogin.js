@@ -88,6 +88,7 @@ function AdminLogin() {
                                         size="large"
                                         id="username"
                                         name="username"
+                                        autoComplete="on"
                                         value={formik.values.username}
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
@@ -114,7 +115,9 @@ function AdminLogin() {
                                     </div>
                                 </div>
                                 <div className="mb-3">
-                                    <Checkbox checked>Nhớ mật khẩu</Checkbox>
+                                    <Checkbox name="rememberMe" checked>
+                                        Nhớ mật khẩu
+                                    </Checkbox>
                                 </div>
 
                                 <Button

@@ -13,7 +13,7 @@ const defaultAuth = {
     isAuthenticated: false,
     user: {
         name: '',
-        roleName: '',
+        roleNames: [],
     },
 };
 
@@ -36,12 +36,12 @@ const AuthProvider = ({ children }) => {
             }
             const response = await getCurrentUserLogin();
             if (response.status === 200) {
-                const { name, roleName } = response.data.data;
+                const { name, roleNames } = response.data.data;
                 setAuthData({
                     isAuthenticated: true,
                     user: {
                         name,
-                        roleName,
+                        roleNames,
                     },
                 });
             } else {
