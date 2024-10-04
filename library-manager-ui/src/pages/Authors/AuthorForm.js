@@ -183,7 +183,7 @@ function AuthorForm() {
                                 status={formik.touched.dateOfBirth && formik.errors.dateOfBirth ? 'error' : undefined}
                             />
                         </div>
-                        <div className="text-danger">{formik.touched.dateOfBirth && formik.errors.birthDate}</div>
+                        <div className="text-danger">{formik.touched.dateOfBirth && formik.errors.dateOfBirth}</div>
                     </div>
                     <div className="col-md-3">
                         <label htmlFor="dateOfDeath">Ngày mất:</label>

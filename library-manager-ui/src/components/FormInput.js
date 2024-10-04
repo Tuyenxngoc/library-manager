@@ -1,11 +1,12 @@
 import { Input } from 'antd';
 
-const FormInput = ({ id, label, className, formik, required = false }) => (
+const FormInput = ({ id, label, className, formik, required = false, ...rest }) => (
     <div className={className}>
         <label htmlFor={id}>
             {required && <span className="text-danger">*</span>} {label}:
         </label>
         <Input
+            {...rest}
             id={id}
             name={id}
             value={formik.values[id]}

@@ -45,7 +45,6 @@ import SlideConfig from './pages/settings/SlideConfig';
 import UserManagement from './pages/UserManagement/UserManagement';
 import UserManagementForm from './pages/UserManagement/UserManagementForm';
 import UserGroupManagement from './pages/UserGroupManagement/UserGroupManagement';
-import UserGroupForm from './pages/UserGroupManagement/UserGroupForm';
 
 function App() {
     return (
@@ -113,8 +112,6 @@ function App() {
                         {/* Quản lý nhóm người dùng */}
                         <Route path="user-groups">
                             <Route index element={<UserGroupManagement />} />
-                            <Route path="new" element={<UserGroupForm />} />
-                            <Route path="edit/:id" element={<UserGroupForm />} />
                         </Route>
 
                         {/* Sách */}

@@ -5,8 +5,8 @@ import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.request.UserRequestDto;
 import com.example.librarymanager.domain.dto.response.CommonResponseDto;
+import com.example.librarymanager.domain.dto.response.GetUserResponseDto;
 import com.example.librarymanager.domain.dto.response.auth.GetCurrentUserLoginResponseDto;
-import com.example.librarymanager.domain.entity.User;
 import com.example.librarymanager.domain.entity.UserGroup;
 import com.example.librarymanager.security.CustomUserDetails;
 
@@ -22,7 +22,7 @@ public interface UserService {
 
     CommonResponseDto delete(String id, String userId);
 
-    PaginationResponseDto<User> findAll(PaginationFullRequestDto requestDto);
+    PaginationResponseDto<GetUserResponseDto> findAll(PaginationFullRequestDto requestDto);
 
-    User findById(String id);
+    GetUserResponseDto findById(String id);
 }

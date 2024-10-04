@@ -82,7 +82,7 @@ public class UserGroupServiceImpl implements UserGroupService {
     @Override
     public CommonResponseDto save(UserGroupRequestDto requestDto, String userId) {
         if (userGroupRepository.existsByCode(requestDto.getCode())) {
-            throw new ConflictException(ErrorMessage.UserGroup.ERR_DUPLICATE_CODE);
+            throw new ConflictException(ErrorMessage.UserGroup.ERR_DUPLICATE_CODE, requestDto.getCode());
         }
 
         UserGroup userGroup = userGroupMapper.toUserGroup(requestDto);
@@ -109,7 +109,7 @@ public class UserGroupServiceImpl implements UserGroupService {
         UserGroup userGroup = getEntity(id);
 
         if (!Objects.equals(userGroup.getCode(), requestDto.getCode()) && userGroupRepository.existsByCode(requestDto.getCode())) {
-            throw new ConflictException(ErrorMessage.UserGroup.ERR_DUPLICATE_CODE);
+            throw new ConflictException(ErrorMessage.UserGroup.ERR_DUPLICATE_CODE, requestDto.getCode());
         }
 
         userGroup.setCode(requestDto.getCode());
