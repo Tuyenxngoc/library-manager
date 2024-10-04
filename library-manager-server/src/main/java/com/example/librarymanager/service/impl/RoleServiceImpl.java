@@ -1,6 +1,5 @@
 package com.example.librarymanager.service.impl;
 
-import com.example.librarymanager.constant.RoleConstant;
 import com.example.librarymanager.domain.entity.Role;
 import com.example.librarymanager.repository.RoleRepository;
 import com.example.librarymanager.service.RoleService;
@@ -11,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static com.example.librarymanager.constant.RoleConstant.*;
 
 @Slf4j
 @Service
@@ -23,20 +24,20 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public void initRoles() {
         if (roleRepository.count() == 0) {
-            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_AUTHOR.name()));
-            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_BOOK.name()));
-            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_BOOK_DEFINITION.name()));
-            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_BOOK_SET.name()));
-            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_CATEGORY.name()));
-            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_CATEGORY_GROUP.name()));
-            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_CLASSIFICATION_SYMBOL.name()));
-            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_IMPORT_RECEIPT.name()));
-            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_LOG.name()));
-            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_NEWS_ARTICLE.name()));
-            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_PUBLISHER.name()));
-            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_ROLE.name()));
-            roleRepository.save(new Role(RoleConstant.ROLE_MANAGE_USER.name()));
-            roleRepository.save(new Role(RoleConstant.ROLE_READER.name()));
+            roleRepository.save(new Role(ROLE_MANAGE_AUTHOR));
+            roleRepository.save(new Role(ROLE_MANAGE_BOOK));
+            roleRepository.save(new Role(ROLE_MANAGE_BOOK_DEFINITION));
+            roleRepository.save(new Role(ROLE_MANAGE_BOOK_SET));
+            roleRepository.save(new Role(ROLE_MANAGE_CATEGORY));
+            roleRepository.save(new Role(ROLE_MANAGE_CATEGORY_GROUP));
+            roleRepository.save(new Role(ROLE_MANAGE_CLASSIFICATION_SYMBOL));
+            roleRepository.save(new Role(ROLE_MANAGE_IMPORT_RECEIPT));
+            roleRepository.save(new Role(ROLE_MANAGE_LOG));
+            roleRepository.save(new Role(ROLE_MANAGE_NEWS_ARTICLE));
+            roleRepository.save(new Role(ROLE_MANAGE_PUBLISHER));
+            roleRepository.save(new Role(ROLE_MANAGE_USER));
+            roleRepository.save(new Role(ROLE_MANAGE_USER_GROUP));
+            roleRepository.save(new Role(ROLE_READER));
 
             log.info("Initializing roles");
         }

@@ -18,6 +18,7 @@ import com.example.librarymanager.domain.entity.UserGroup;
 import com.example.librarymanager.domain.mapper.UserMapper;
 import com.example.librarymanager.domain.specification.EntitySpecification;
 import com.example.librarymanager.exception.ConflictException;
+import com.example.librarymanager.exception.ForbiddenException;
 import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.ReaderRepository;
 import com.example.librarymanager.repository.UserGroupRepository;
@@ -179,6 +180,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public CommonResponseDto delete(String id, String userId) {
         User user = getEntity(id);
+        User currentUser = getEntity(userId);
+
+        if (id.equals(userId)) {
+            throw new ForbiddenException(ErrorMessage.ERR_FORBIDDEN_UPDATE_DELETE);
+        }
+
+        if (user.getUserGroup().getId().equals(currentUser.getUserGroup().getId())) {
+            throw new ForbiddenException(ErrorMessage.ERR_FORBIDDEN_UPDATE_DELETE);
+        }
 
         // Xóa người dùng
         userRepository.delete(user);

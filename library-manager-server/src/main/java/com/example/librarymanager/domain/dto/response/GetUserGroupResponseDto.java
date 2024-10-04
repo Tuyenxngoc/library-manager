@@ -23,7 +23,7 @@ public class GetUserGroupResponseDto {
 
     private final long userCount;
 
-    private final Set<BaseEntityDto> roles = new HashSet<>();
+    private final Set<GetRoleResponseDto> roles = new HashSet<>();
 
     public GetUserGroupResponseDto(UserGroup userGroup) {
         this.id = userGroup.getId();
@@ -34,7 +34,7 @@ public class GetUserGroupResponseDto {
         this.userCount = userGroup.getUsers().size();
         this.roles.addAll(userGroup.getUserGroupRoles().stream().map(userGroupRole -> {
             Role role = userGroupRole.getRole();
-            return new BaseEntityDto(role.getId(), role.getName());
+            return new GetRoleResponseDto(role);
         }).collect(Collectors.toSet()));
     }
 }

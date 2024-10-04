@@ -44,7 +44,7 @@ public class CustomUserDetails implements UserDetails {
 
         Set<UserGroupRole> roles = user.getUserGroup().getUserGroupRoles();
         for (UserGroupRole role : roles) {
-            authorities.add(new SimpleGrantedAuthority(role.getRole().getName()));
+            authorities.add(new SimpleGrantedAuthority(role.getRole().getCode().name()));
         }
 
         return new CustomUserDetails(user.getId(), null, user.getUsername(), user.getPassword(), authorities);

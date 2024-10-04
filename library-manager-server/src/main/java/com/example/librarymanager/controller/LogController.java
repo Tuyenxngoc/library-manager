@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @RestApiV1
@@ -24,6 +25,7 @@ public class LogController {
     LogService logService;
 
     @Operation(summary = "API Get All Logs")
+    @PreAuthorize("hasRole('ROLE_MANAGE_LOG')")
     @GetMapping(UrlConstant.Log.GET_ALL)
     public ResponseEntity<?> getAllLogs(
             @ParameterObject PaginationFullRequestDto requestDto,

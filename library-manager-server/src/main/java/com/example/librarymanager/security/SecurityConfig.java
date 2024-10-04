@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -29,8 +28,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 import java.util.List;
-
-import static com.example.librarymanager.constant.RoleConstant.ROLE_MANAGE_AUTHOR;
 
 @Configuration
 @EnableWebSecurity
@@ -84,13 +81,6 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(registry -> registry
                         .requestMatchers(WHITE_LIST_URL).permitAll()
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/v1/categories",
-                                "/api/v1/notifications",
-                                "/api/v1/posts",
-                                "/api/v1/posts/*",
-                                "/api/v1/posts/*/comments").permitAll()
-                        .requestMatchers("/api/v1/authors/**").hasAuthority(ROLE_MANAGE_AUTHOR.name())
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

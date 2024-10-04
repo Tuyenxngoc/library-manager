@@ -1,31 +1,115 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 
 import { AiFillDashboard } from 'react-icons/ai';
 import { IoMdSettings } from 'react-icons/io';
-import { FaUsers } from 'react-icons/fa';
-import { FaUser } from 'react-icons/fa';
-import { FaHistory } from 'react-icons/fa';
+import { FaUsers, FaUser, FaHistory, FaChartBar, FaRecycle, FaBook } from 'react-icons/fa';
 import { BsNewspaper } from 'react-icons/bs';
-import { FaChartBar } from 'react-icons/fa';
-import { FaRecycle } from 'react-icons/fa';
 import { BiCategory } from 'react-icons/bi';
-import { FaBook } from 'react-icons/fa';
 import images from '~/assets';
 import { checkUserHasRequiredRole } from '~/utils/helper';
 import { ROLES } from '~/common/roleConstants';
 import useAuth from '~/hooks/useAuth';
 
 const { Header, Content, Footer, Sider } = Layout;
-function getItem(label, key, icon, children) {
-    return {
-        key,
-        icon,
-        children,
-        label,
-    };
-}
+
+const menuConfig = [
+    {
+        label: 'Trang chủ',
+        key: '/admin/home',
+        icon: <AiFillDashboard />,
+    },
+    {
+        label: 'Thiết lập hệ thống',
+        key: '/admin/settings',
+        icon: <IoMdSettings />,
+        children: [
+            { label: 'Thông tin thư viện', key: '/admin/settings/library-info' },
+            { label: 'Nội quy thư viện', key: '/admin/settings/library-rules' },
+            { label: 'Kì nghỉ ngày lễ', key: '/admin/settings/holidays' },
+            { label: 'Cấu hình chung', key: '/admin/settings/general-config' },
+            { label: 'Thiết lập Slide', key: '/admin/settings/slide-config' },
+        ],
+    },
+    {
+        label: 'Quản lý người dùng',
+        key: '/admin/user',
+        icon: <FaUsers />,
+        roles: [ROLES.ManageUser],
+        children: [
+            { label: 'Quản lý nhóm', key: '/admin/user-groups' },
+            { label: 'Quản lý người dùng', key: '/admin/users' },
+        ],
+    },
+    {
+        label: 'Quản lý bạn đọc',
+        key: '/admin/readers',
+        icon: <FaUser />,
+        children: [
+            { label: 'Thẻ bạn đọc', key: '/admin/readers/cards' },
+            { label: 'Xử lý vi phạm', key: '/admin/readers/violations' },
+            { label: 'Vào ra thư viện', key: '/admin/readers/access' },
+        ],
+    },
+    {
+        label: 'Quản lý danh mục',
+        key: '/admin',
+        icon: <BiCategory />,
+        roles: [
+            ROLES.ManageBookDefinition,
+            ROLES.ManageCategory,
+            ROLES.ManageBookSet,
+            ROLES.ManageAuthor,
+            ROLES.ManageClassificationSymbol,
+            ROLES.ManagePublisher,
+        ],
+        children: [
+            { label: 'Biên mục', key: '/admin/book-definitions', roles: [ROLES.ManageBookDefinition] },
+            { label: 'Loại sách', key: '/admin/categories', roles: [ROLES.ManageCategory, ROLES.ManageCategoryGroup] },
+            { label: 'Bộ sách', key: '/admin/collections', roles: [ROLES.ManageBookSet] },
+            { label: 'Tác giả', key: '/admin/authors', roles: [ROLES.ManageAuthor] },
+            { label: 'Ký hiệu phân loại', key: '/admin/classifications', roles: [ROLES.ManageClassificationSymbol] },
+            { label: 'Nhà xuất bản', key: '/admin/publishers', roles: [ROLES.ManagePublisher] },
+        ],
+    },
+    {
+        label: 'Quản lý sách',
+        key: '/admin/books',
+        icon: <FaBook />,
+        children: [
+            { label: 'Danh sách sách', key: '/admin/books/list' },
+            { label: 'Nhập sách', key: '/admin/books/inward' },
+            { label: 'Kiểm kê sách', key: '/admin/books/inventory' },
+            { label: 'Xuất sách', key: '/admin/books/outward' },
+        ],
+    },
+    {
+        label: 'Quản lý lưu thông',
+        key: '/admin/circulation',
+        icon: <FaRecycle />,
+        children: [
+            { label: 'Mượn sách', key: '/admin/circulation/borrow' },
+            { label: 'Trả-Gia hạn sách', key: '/admin/circulation/return-renew' },
+        ],
+    },
+    {
+        label: 'Thống kê báo cáo',
+        key: '/admin/reports',
+        icon: <FaChartBar />,
+        children: [{ label: 'Báo cáo', key: '/admin/reports/statistics' }],
+    },
+    {
+        label: 'Quản lý tin tức',
+        key: '/admin/news-articles',
+        icon: <BsNewspaper />,
+    },
+    {
+        label: 'Lịch sử truy cập',
+        key: '/admin/histories',
+        icon: <FaHistory />,
+    },
+];
 
 function AdminLayout() {
     const {
@@ -42,66 +126,35 @@ function AdminLayout() {
     const [collapsed, setCollapsed] = useState(false);
     const [selectedKey, setSelectedKey] = useState(location.pathname);
 
-    const handleMenuItemClick = ({ key }) => {
-        navigate(key);
-    };
-
     useEffect(() => {
         setSelectedKey(location.pathname);
     }, [location.pathname]);
 
-    const items = [
-        getItem('Trang chủ', '/admin/home', <AiFillDashboard />),
-        getItem('Thiết lập hệ thống', '/admin/settings', <IoMdSettings />, [
-            getItem('Thông tin thư viện', '/admin/settings/library-info'),
-            getItem('Nội quy thư viện', '/admin/settings/library-rules'),
-            getItem('Kì nghỉ ngày lễ', '/admin/settings/holidays'),
-            getItem('Cấu hình chung', '/admin/settings/general-config'),
-            getItem('Thiết lập Slide', '/admin/settings/slide-config'),
-        ]),
-        checkUserHasRequiredRole(roleNames, ROLES.ManageUser) &&
-            getItem('Quản lý người dùng', '/admin/user', <FaUsers />, [
-                getItem('Quản lý nhóm', '/admin/user-groups'),
-                getItem('Quản lý người dùng', '/admin/users'),
-            ]),
-        getItem('Quản lý bạn đọc', '/admin/readers', <FaUser />, [
-            getItem('Thẻ bạn đọc', '/admin/readers/cards'),
-            getItem('Xử lý vi phạm', '/admin/readers/violations'),
-            getItem('Vào ra thư viện', '/admin/readers/access'),
-        ]),
-        getItem('Quản lý danh mục', '/admin', <BiCategory />, [
-            getItem('Biên mục', '/admin/book-definitions'),
-            getItem('Loại sách', '/admin/categories'),
-            getItem('Bộ sách', '/admin/collections'),
-            checkUserHasRequiredRole(roleNames, ROLES.ManageAuthor) && getItem('Tác giả', '/admin/authors'),
-            getItem('Ký hiệu phân loại', '/admin/classifications'),
-            getItem('Nhà xuất bản', '/admin/publishers'),
-        ]),
-        getItem('Quản lý sách', '/admin/books', <FaBook />, [
-            getItem('Danh sách sách', '/admin/books/list'),
-            getItem('Nhập sách', '/admin/books/inward'),
-            getItem('Kiểm kê sách', '/admin/books/inventory'),
-            getItem('Xuất sách', '/admin/books/outward'),
-        ]),
-        getItem('Quản lý lưu thông', '/admin/circulation', <FaRecycle />, [
-            getItem('Mượn sách', '/admin/circulation/borrow'),
-            getItem('Trả-Gia hạn sách', '/admin/circulation/return-renew'),
-        ]),
-        getItem('Thống kê báo cáo', '/admin/reports', <FaChartBar />, [
-            getItem('Báo cáo', '/admin/reports/statistics'),
-        ]),
-        getItem('Quản lý tin tức', '/admin/news-articles', <BsNewspaper />),
-        getItem('Lịch sử truy cập', '/admin/histories', <FaHistory />),
-    ];
+    const filterMenuItems = (items) => {
+        return items.reduce((acc, item) => {
+            const hasRole = item.roles ? item.roles.some((role) => checkUserHasRequiredRole(roleNames, role)) : true;
+            if (hasRole) {
+                const newItem = { ...item };
+                if (newItem.children) {
+                    newItem.children = filterMenuItems(newItem.children);
+                }
+                acc.push(newItem);
+            }
+            return acc;
+        }, []);
+    };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const items = useMemo(() => filterMenuItems(menuConfig), [roleNames]);
+
+    const handleMenuItemClick = ({ key }) => {
+        navigate(key);
+    };
 
     return (
-        <Layout
-            style={{
-                minHeight: '100vh',
-            }}
-        >
+        <Layout style={{ minHeight: '100vh' }}>
             {/* Sider */}
-            <Sider collapsible width={220} collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
+            <Sider collapsible width={220} collapsed={collapsed} onCollapse={setCollapsed}>
                 <div className="text-center py-2">
                     <img src={images.logo} alt="logo" width={34} />
                 </div>
@@ -109,7 +162,15 @@ function AdminLayout() {
                     theme="dark"
                     selectedKeys={[selectedKey]}
                     mode="inline"
-                    items={items}
+                    items={items.map((item) => ({
+                        key: item.key,
+                        icon: item.icon,
+                        label: item.label,
+                        children: item.children?.map((child) => ({
+                            key: child.key,
+                            label: child.label,
+                        })),
+                    }))}
                     onClick={handleMenuItemClick}
                 />
             </Sider>
@@ -123,7 +184,6 @@ function AdminLayout() {
                     }}
                     className="shadow-sm"
                 />
-
                 {/* Content */}
                 <Content
                     style={{
@@ -135,21 +195,12 @@ function AdminLayout() {
                             margin: '16px 0',
                         }}
                         items={[
-                            {
-                                title: 'Home',
-                            },
-                            {
-                                title: <Link to="">Application Center</Link>,
-                            },
-                            {
-                                title: <Link to="">Application List</Link>,
-                            },
-                            {
-                                title: 'An Application',
-                            },
+                            { title: 'Home' },
+                            { title: <Link to="">Application Center</Link> },
+                            { title: <Link to="">Application List</Link> },
+                            { title: 'An Application' },
                         ]}
                     />
-
                     <div
                         style={{
                             padding: 24,
@@ -161,17 +212,13 @@ function AdminLayout() {
                         <Outlet />
                     </div>
                 </Content>
-
                 {/* Footer */}
-                <Footer
-                    style={{
-                        textAlign: 'center',
-                    }}
-                >
+                <Footer style={{ textAlign: 'center' }}>
                     {new Date().getFullYear()} All Rights Reserved By © NHÓM 16
                 </Footer>
             </Layout>
         </Layout>
     );
 }
+
 export default AdminLayout;

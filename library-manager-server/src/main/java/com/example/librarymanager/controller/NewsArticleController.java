@@ -18,6 +18,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,6 +31,7 @@ public class NewsArticleController {
     NewsArticleService newsArticleService;
 
     @Operation(summary = "API Create News Article")
+    @PreAuthorize("hasRole('ROLE_MANAGE_NEWS_ARTICLE')")
     @PostMapping(value = UrlConstant.NewsArticle.CREATE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createNewsArticle(
             @Valid @ModelAttribute NewsArticleRequestDto requestDto,
@@ -40,6 +42,7 @@ public class NewsArticleController {
     }
 
     @Operation(summary = "API Update News Article")
+    @PreAuthorize("hasRole('ROLE_MANAGE_NEWS_ARTICLE')")
     @PutMapping(value = UrlConstant.NewsArticle.UPDATE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateNewsArticle(
             @PathVariable Long id,
@@ -51,6 +54,7 @@ public class NewsArticleController {
     }
 
     @Operation(summary = "API Delete News Article")
+    @PreAuthorize("hasRole('ROLE_MANAGE_NEWS_ARTICLE')")
     @DeleteMapping(UrlConstant.NewsArticle.DELETE)
     public ResponseEntity<?> deleteNewsArticle(
             @PathVariable Long id,
@@ -60,18 +64,21 @@ public class NewsArticleController {
     }
 
     @Operation(summary = "API Get All News Articles")
+    @PreAuthorize("hasRole('ROLE_MANAGE_NEWS_ARTICLE')")
     @GetMapping(UrlConstant.NewsArticle.GET_ALL)
     public ResponseEntity<?> getAllNewsArticles(@ParameterObject PaginationFullRequestDto requestDto) {
         return VsResponseUtil.success(newsArticleService.findAll(requestDto));
     }
 
     @Operation(summary = "API Get News Article By Id")
+    @PreAuthorize("hasRole('ROLE_MANAGE_NEWS_ARTICLE')")
     @GetMapping(UrlConstant.NewsArticle.GET_BY_ID)
     public ResponseEntity<?> getNewsArticleById(@PathVariable Long id) {
         return VsResponseUtil.success(newsArticleService.findById(id));
     }
 
     @Operation(summary = "API Toggle Active Status of News Article")
+    @PreAuthorize("hasRole('ROLE_MANAGE_NEWS_ARTICLE')")
     @PatchMapping(UrlConstant.NewsArticle.TOGGLE_ACTIVE)
     public ResponseEntity<?> toggleActiveStatus(
             @PathVariable Long id,

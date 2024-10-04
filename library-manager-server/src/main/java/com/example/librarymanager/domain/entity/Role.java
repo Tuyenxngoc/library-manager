@@ -1,5 +1,6 @@
 package com.example.librarymanager.domain.entity;
 
+import com.example.librarymanager.constant.RoleConstant;
 import com.example.librarymanager.domain.entity.common.DateAuditing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -17,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "roles",
-        uniqueConstraints = @UniqueConstraint(name = "UN_ROLE_NAME", columnNames = "name"))
+        uniqueConstraints = @UniqueConstraint(name = "UN_ROLE_CODE", columnNames = "code"))
 public class Role extends DateAuditing {
 
     @Id
@@ -28,11 +29,16 @@ public class Role extends DateAuditing {
     @Column(nullable = false)
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "code", nullable = false)
+    private RoleConstant code;
+
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<UserGroupRole> userGroupRoles = new ArrayList<>();
 
-    public Role(String name) {
-        this.name = name;
+    public Role(RoleConstant roleConstant) {
+        this.name = roleConstant.getRoleName();
+        this.code = roleConstant;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.librarymanager.service.impl;
 
+import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.domain.entity.Reader;
 import com.example.librarymanager.domain.entity.User;
 import com.example.librarymanager.repository.ReaderRepository;
@@ -10,6 +11,8 @@ import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,6 +27,8 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService, CustomU
 
     ReaderRepository readerRepository;
 
+    MessageSource messageSource;
+
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String usernameOrCardNumber) throws UsernameNotFoundException {
@@ -32,7 +37,7 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService, CustomU
             return CustomUserDetails.create(user);
         } else {
             Reader reader = readerRepository.findByCardNumber(usernameOrCardNumber)
-                    .orElseThrow(() -> new UsernameNotFoundException("Reader not found"));
+                    .orElseThrow(() -> new UsernameNotFoundException(messageSource.getMessage(ErrorMessage.Reader.ERR_NOT_FOUND_CARD_NUMBER, new String[]{usernameOrCardNumber}, LocaleContextHolder.getLocale())));
 
             return CustomUserDetails.create(reader);
         }
@@ -42,7 +47,7 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService, CustomU
     @Transactional
     public UserDetails loadUserByUserId(String userId) throws UsernameNotFoundException {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UsernameNotFoundException(messageSource.getMessage(ErrorMessage.User.ERR_NOT_FOUND_ID, new String[]{userId}, LocaleContextHolder.getLocale())));
 
         return CustomUserDetails.create(user);
     }
@@ -50,7 +55,7 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService, CustomU
     @Override
     public UserDetails loadUserByCardNumber(String cardNumber) throws UsernameNotFoundException {
         Reader reader = readerRepository.findByCardNumber(cardNumber)
-                .orElseThrow(() -> new UsernameNotFoundException("Reader not found"));
+                .orElseThrow(() -> new UsernameNotFoundException(messageSource.getMessage(ErrorMessage.Reader.ERR_NOT_FOUND_CARD_NUMBER, new String[]{cardNumber}, LocaleContextHolder.getLocale())));
 
         return CustomUserDetails.create(reader);
     }

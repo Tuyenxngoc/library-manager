@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -30,6 +31,7 @@ public class BookController {
     BookService bookService;
 
     @Operation(summary = "API Update Book")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BOOK')")
     @PutMapping(UrlConstant.Book.UPDATE)
     public ResponseEntity<?> updateBook(
             @PathVariable Long id,
@@ -40,12 +42,14 @@ public class BookController {
     }
 
     @Operation(summary = "API Get All Books")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BOOK')")
     @GetMapping(UrlConstant.Book.GET_ALL)
     public ResponseEntity<?> getAllBooks(@ParameterObject PaginationFullRequestDto requestDto) {
         return VsResponseUtil.success(bookService.findAll(requestDto));
     }
 
     @Operation(summary = "API Get Book By Id")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BOOK')")
     @GetMapping(UrlConstant.Book.GET_BY_ID)
     public ResponseEntity<?> getBookById(@PathVariable Long id) {
         return VsResponseUtil.success(bookService.findById(id));

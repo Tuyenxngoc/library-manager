@@ -21,6 +21,7 @@ import com.example.librarymanager.exception.ConflictException;
 import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.RoleRepository;
 import com.example.librarymanager.repository.UserGroupRepository;
+import com.example.librarymanager.repository.UserGroupRoleRepository;
 import com.example.librarymanager.service.LogService;
 import com.example.librarymanager.service.UserGroupService;
 import com.example.librarymanager.util.PaginationUtil;
@@ -31,8 +32,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,6 +45,8 @@ public class UserGroupServiceImpl implements UserGroupService {
     private final UserGroupRepository userGroupRepository;
 
     private final RoleRepository roleRepository;
+
+    private final UserGroupRoleRepository userGroupRoleRepository;
 
     private final MessageSource messageSource;
 
@@ -66,7 +69,7 @@ public class UserGroupServiceImpl implements UserGroupService {
             userGroup.setLastModifiedBy(adminInfo.getUsername());
             userGroup.getUserGroupRoles().addAll(
                     roleRepository.findAll().stream()
-                            .filter(role -> !role.getName().equals(RoleConstant.ROLE_READER.name()))
+                            .filter(role -> !role.getCode().equals(RoleConstant.ROLE_READER))
                             .map(role -> new UserGroupRole(role, userGroup))
                             .collect(Collectors.toSet())
             );
@@ -108,8 +111,42 @@ public class UserGroupServiceImpl implements UserGroupService {
     public CommonResponseDto update(Long id, UserGroupRequestDto requestDto, String userId) {
         UserGroup userGroup = getEntity(id);
 
+        // Check for duplicate code
         if (!Objects.equals(userGroup.getCode(), requestDto.getCode()) && userGroupRepository.existsByCode(requestDto.getCode())) {
             throw new ConflictException(ErrorMessage.UserGroup.ERR_DUPLICATE_CODE, requestDto.getCode());
+        }
+
+        // Get current roles as a Set of Byte
+        Set<Byte> currentRoles = userGroup.getUserGroupRoles().stream()
+                .map(userGroupRole -> userGroupRole.getRole().getId())
+                .collect(Collectors.toSet());
+
+        // Prepare new role set
+        Set<Byte> newRoles = requestDto.getRoleIds();
+
+        // Determine roles to add and remove
+        Set<Byte> rolesToAdd = new HashSet<>(newRoles);
+        rolesToAdd.removeAll(currentRoles); // Roles that need to be added
+
+        Set<Byte> rolesToRemove = new HashSet<>(currentRoles);
+        rolesToRemove.removeAll(newRoles); // Roles that need to be removed
+
+        // If there are roles to add or remove, proceed with updating
+        if (!rolesToAdd.isEmpty() || !rolesToRemove.isEmpty()) {
+            // Batch fetch roles for the new roles to add
+            Map<Byte, Role> roleMap = roleRepository.findAllById(rolesToAdd).stream()
+                    .collect(Collectors.toMap(Role::getId, Function.identity()));
+
+            // Add new roles
+            for (byte roleId : rolesToAdd) {
+                Role role = roleMap.get(roleId);
+                if (role != null) {
+                    userGroup.getUserGroupRoles().add(new UserGroupRole(role, userGroup));
+                }
+            }
+
+            // Remove old roles
+            userGroup.getUserGroupRoles().removeIf(userGroupRole -> rolesToRemove.contains(userGroupRole.getRole().getId()));
         }
 
         userGroup.setCode(requestDto.getCode());

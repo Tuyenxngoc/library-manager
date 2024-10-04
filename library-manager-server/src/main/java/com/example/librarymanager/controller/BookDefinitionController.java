@@ -18,6 +18,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,6 +31,7 @@ public class BookDefinitionController {
     BookDefinitionService bookDefinitionService;
 
     @Operation(summary = "API Create Book Definition")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BOOK_DEFINITION')")
     @PostMapping(value = UrlConstant.BookDefinition.CREATE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createBookDefinition(
             @Valid @ModelAttribute BookDefinitionRequestDto requestDto,
@@ -40,6 +42,7 @@ public class BookDefinitionController {
     }
 
     @Operation(summary = "API Update Book Definition")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BOOK_DEFINITION')")
     @PutMapping(value = UrlConstant.BookDefinition.UPDATE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateBookDefinition(
             @PathVariable Long id,
@@ -51,6 +54,7 @@ public class BookDefinitionController {
     }
 
     @Operation(summary = "API Delete Book Definition")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BOOK_DEFINITION')")
     @DeleteMapping(UrlConstant.BookDefinition.DELETE)
     public ResponseEntity<?> deleteBookDefinition(
             @PathVariable Long id,
@@ -60,18 +64,21 @@ public class BookDefinitionController {
     }
 
     @Operation(summary = "API Get All Book Definitions")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BOOK_DEFINITION')")
     @GetMapping(UrlConstant.BookDefinition.GET_ALL)
     public ResponseEntity<?> getAllBookDefinitions(@ParameterObject PaginationFullRequestDto requestDto) {
         return VsResponseUtil.success(bookDefinitionService.findAll(requestDto));
     }
 
     @Operation(summary = "API Get Book Definition By Id")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BOOK_DEFINITION')")
     @GetMapping(UrlConstant.BookDefinition.GET_BY_ID)
     public ResponseEntity<?> getBookDefinitionById(@PathVariable Long id) {
         return VsResponseUtil.success(bookDefinitionService.findById(id));
     }
 
     @Operation(summary = "API Toggle Active Status of Book Definition")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BOOK_DEFINITION')")
     @PatchMapping(UrlConstant.BookDefinition.TOGGLE_ACTIVE)
     public ResponseEntity<?> toggleActiveStatus(
             @PathVariable Long id,

@@ -17,6 +17,7 @@ import lombok.experimental.FieldDefaults;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestApiV1
@@ -34,6 +35,7 @@ public class UserController {
     }
 
     @Operation(summary = "API Create New User")
+    @PreAuthorize("hasRole('ROLE_MANAGE_USER')")
     @PostMapping(UrlConstant.User.CREATE)
     public ResponseEntity<?> createUser(
             @Valid @RequestBody UserRequestDto requestDto,
@@ -43,6 +45,7 @@ public class UserController {
     }
 
     @Operation(summary = "API Update User")
+    @PreAuthorize("hasRole('ROLE_MANAGE_USER')")
     @PutMapping(UrlConstant.User.UPDATE)
     public ResponseEntity<?> updateUser(
             @PathVariable String id,
@@ -53,6 +56,7 @@ public class UserController {
     }
 
     @Operation(summary = "API Delete User")
+    @PreAuthorize("hasRole('ROLE_MANAGE_USER')")
     @DeleteMapping(UrlConstant.User.DELETE)
     public ResponseEntity<?> deleteUser(
             @PathVariable String id,
@@ -62,12 +66,14 @@ public class UserController {
     }
 
     @Operation(summary = "API Get All Users")
+    @PreAuthorize("hasRole('ROLE_MANAGE_USER')")
     @GetMapping(UrlConstant.User.GET_ALL)
     public ResponseEntity<?> getAllUsers(@ParameterObject PaginationFullRequestDto requestDto) {
         return VsResponseUtil.success(userService.findAll(requestDto));
     }
 
     @Operation(summary = "API Get User By Id")
+    @PreAuthorize("hasRole('ROLE_MANAGE_USER')")
     @GetMapping(UrlConstant.User.GET_BY_ID)
     public ResponseEntity<?> getUserById(@PathVariable String id) {
         return VsResponseUtil.success(userService.findById(id));

@@ -15,6 +15,7 @@ import lombok.experimental.FieldDefaults;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestApiV1
@@ -26,12 +27,14 @@ public class AuthorController {
     AuthorService authorService;
 
     @Operation(summary = "API Create Author")
+    @PreAuthorize("hasRole('ROLE_MANAGE_AUTHOR')")
     @PostMapping(UrlConstant.Author.CREATE)
     public ResponseEntity<?> createAuthor(@Valid @RequestBody AuthorRequestDto requestDto) {
         return VsResponseUtil.success(HttpStatus.CREATED, authorService.save(requestDto));
     }
 
     @Operation(summary = "API Update Author")
+    @PreAuthorize("hasRole('ROLE_MANAGE_AUTHOR')")
     @PutMapping(UrlConstant.Author.UPDATE)
     public ResponseEntity<?> updateAuthor(
             @PathVariable Long id,
@@ -41,24 +44,28 @@ public class AuthorController {
     }
 
     @Operation(summary = "API Delete Author")
+    @PreAuthorize("hasRole('ROLE_MANAGE_AUTHOR')")
     @DeleteMapping(UrlConstant.Author.DELETE)
     public ResponseEntity<?> deleteAuthor(@PathVariable Long id) {
         return VsResponseUtil.success(authorService.delete(id));
     }
 
     @Operation(summary = "API Get Authors")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGE_AUTHOR')")
     @GetMapping(UrlConstant.Author.GET_ALL)
     public ResponseEntity<?> getAuthors(@ParameterObject PaginationFullRequestDto requestDto) {
         return VsResponseUtil.success(authorService.findAll(requestDto));
     }
 
     @Operation(summary = "API Get Author By Id")
+    @PreAuthorize("hasRole('ROLE_MANAGE_AUTHOR')")
     @GetMapping(UrlConstant.Author.GET_BY_ID)
     public ResponseEntity<?> getAuthorById(@PathVariable Long id) {
         return VsResponseUtil.success(authorService.findById(id));
     }
 
     @Operation(summary = "API Toggle Active Status of Author")
+    @PreAuthorize("hasRole('ROLE_MANAGE_AUTHOR')")
     @PatchMapping(UrlConstant.Author.TOGGLE_ACTIVE)
     public ResponseEntity<?> toggleActiveStatus(@PathVariable Long id) {
         return VsResponseUtil.success(authorService.toggleActiveStatus(id));

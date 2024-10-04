@@ -18,7 +18,7 @@ public class GetCurrentUserLoginResponseDto {
 
     private String name;
 
-    private Set<String> roleNames;
+    private Set<RoleConstant> roleNames;
 
     public static GetCurrentUserLoginResponseDto create(User user) {
         GetCurrentUserLoginResponseDto responseDto = GetCurrentUserLoginResponseDto.builder()
@@ -28,7 +28,7 @@ public class GetCurrentUserLoginResponseDto {
 
         Set<UserGroupRole> roles = user.getUserGroup().getUserGroupRoles();
         for (UserGroupRole role : roles) {
-            responseDto.getRoleNames().add(role.getRole().getName());
+            responseDto.getRoleNames().add(role.getRole().getCode());
         }
 
         return responseDto;
@@ -39,7 +39,7 @@ public class GetCurrentUserLoginResponseDto {
                 .name(reader.getFullName())
                 .roleNames(new HashSet<>())
                 .build();
-        responseDto.getRoleNames().add(RoleConstant.ROLE_READER.name());
+        responseDto.getRoleNames().add(RoleConstant.ROLE_READER);
 
         return responseDto;
     }

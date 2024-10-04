@@ -17,6 +17,7 @@ import lombok.experimental.FieldDefaults;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestApiV1
@@ -28,6 +29,7 @@ public class UserGroupController {
     UserGroupService userGroupService;
 
     @Operation(summary = "API Create User Group")
+    @PreAuthorize("hasRole('ROLE_MANAGE_USER_GROUP')")
     @PostMapping(UrlConstant.UserGroup.CREATE)
     public ResponseEntity<?> createUserGroup(
             @Valid @RequestBody UserGroupRequestDto requestDto,
@@ -37,6 +39,7 @@ public class UserGroupController {
     }
 
     @Operation(summary = "API Update User Group")
+    @PreAuthorize("hasRole('ROLE_MANAGE_USER_GROUP')")
     @PutMapping(UrlConstant.UserGroup.UPDATE)
     public ResponseEntity<?> updateUserGroup(
             @PathVariable Long id,
@@ -47,6 +50,7 @@ public class UserGroupController {
     }
 
     @Operation(summary = "API Delete User Group")
+    @PreAuthorize("hasRole('ROLE_MANAGE_USER_GROUP')")
     @DeleteMapping(UrlConstant.UserGroup.DELETE)
     public ResponseEntity<?> deleteUserGroup(
             @PathVariable Long id,
@@ -56,18 +60,21 @@ public class UserGroupController {
     }
 
     @Operation(summary = "API Get All User Groups")
+    @PreAuthorize("hasRole('ROLE_MANAGE_USER_GROUP')")
     @GetMapping(UrlConstant.UserGroup.GET_ALL)
     public ResponseEntity<?> getAllUserGroups(@ParameterObject PaginationFullRequestDto requestDto) {
         return VsResponseUtil.success(userGroupService.findAll(requestDto));
     }
 
     @Operation(summary = "API Get User Group By Id")
+    @PreAuthorize("hasRole('ROLE_MANAGE_USER_GROUP')")
     @GetMapping(UrlConstant.UserGroup.GET_BY_ID)
     public ResponseEntity<?> getUserGroupById(@PathVariable Long id) {
         return VsResponseUtil.success(userGroupService.findById(id));
     }
 
     @Operation(summary = "API Toggle Active Status of User Group")
+    @PreAuthorize("hasRole('ROLE_MANAGE_USER_GROUP')")
     @PatchMapping(UrlConstant.UserGroup.TOGGLE_ACTIVE)
     public ResponseEntity<?> toggleActiveStatus(
             @PathVariable Long id,

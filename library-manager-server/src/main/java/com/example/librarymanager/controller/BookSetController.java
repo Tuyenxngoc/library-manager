@@ -17,6 +17,7 @@ import lombok.experimental.FieldDefaults;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestApiV1
@@ -28,6 +29,7 @@ public class BookSetController {
     BookSetService bookSetService;
 
     @Operation(summary = "API Create Book Set")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BOOK_SET')")
     @PostMapping(UrlConstant.BookSet.CREATE)
     public ResponseEntity<?> createBookSet(
             @Valid @RequestBody BookSetRequestDto requestDto,
@@ -37,6 +39,7 @@ public class BookSetController {
     }
 
     @Operation(summary = "API Update Book Set")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BOOK_SET')")
     @PutMapping(UrlConstant.BookSet.UPDATE)
     public ResponseEntity<?> updateBookSet(
             @PathVariable Long id,
@@ -47,6 +50,7 @@ public class BookSetController {
     }
 
     @Operation(summary = "API Delete Book Set")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BOOK_SET')")
     @DeleteMapping(UrlConstant.BookSet.DELETE)
     public ResponseEntity<?> deleteBookSet(
             @PathVariable Long id,
@@ -56,18 +60,21 @@ public class BookSetController {
     }
 
     @Operation(summary = "API Get All Book Sets")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BOOK_SET')")
     @GetMapping(UrlConstant.BookSet.GET_ALL)
     public ResponseEntity<?> getAllBookSets(@ParameterObject PaginationFullRequestDto requestDto) {
         return VsResponseUtil.success(bookSetService.findAll(requestDto));
     }
 
     @Operation(summary = "API Get Book Set By Id")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BOOK_SET')")
     @GetMapping(UrlConstant.BookSet.GET_BY_ID)
     public ResponseEntity<?> getBookSetById(@PathVariable Long id) {
         return VsResponseUtil.success(bookSetService.findById(id));
     }
 
     @Operation(summary = "API Toggle Active Status of Book Set")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BOOK_SET')")
     @PatchMapping(UrlConstant.BookSet.TOGGLE_ACTIVE)
     public ResponseEntity<?> toggleActiveStatus(
             @PathVariable Long id,

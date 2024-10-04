@@ -17,6 +17,7 @@ import lombok.experimental.FieldDefaults;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestApiV1
@@ -28,6 +29,7 @@ public class ImportReceiptController {
     ImportReceiptService importReceiptService;
 
     @Operation(summary = "API Create Import Receipt")
+    @PreAuthorize("hasRole('ROLE_MANAGE_IMPORT_RECEIPT')")
     @PostMapping(UrlConstant.ImportReceipt.CREATE)
     public ResponseEntity<?> createImportReceipt(
             @Valid @RequestBody ImportReceiptRequestDto requestDto,
@@ -37,6 +39,7 @@ public class ImportReceiptController {
     }
 
     @Operation(summary = "API Update Import Receipt")
+    @PreAuthorize("hasRole('ROLE_MANAGE_IMPORT_RECEIPT')")
     @PutMapping(UrlConstant.ImportReceipt.UPDATE)
     public ResponseEntity<?> updateImportReceipt(
             @PathVariable Long id,
@@ -47,12 +50,14 @@ public class ImportReceiptController {
     }
 
     @Operation(summary = "API Get All Import Receipts")
+    @PreAuthorize("hasRole('ROLE_MANAGE_IMPORT_RECEIPT')")
     @GetMapping(UrlConstant.ImportReceipt.GET_ALL)
     public ResponseEntity<?> getAllImportReceipts(@ParameterObject PaginationFullRequestDto requestDto) {
         return VsResponseUtil.success(importReceiptService.findAll(requestDto));
     }
 
     @Operation(summary = "API Get Import Receipt By Id")
+    @PreAuthorize("hasRole('ROLE_MANAGE_IMPORT_RECEIPT')")
     @GetMapping(UrlConstant.ImportReceipt.GET_BY_ID)
     public ResponseEntity<?> getImportReceiptById(@PathVariable Long id) {
         return VsResponseUtil.success(importReceiptService.findById(id));

@@ -57,7 +57,7 @@ public class AuthorServiceImpl implements AuthorService {
             String line;
             br.readLine();
             while ((line = br.readLine()) != null) {
-                String[] values = line.split(",");
+                String[] values = line.split(";");
                 if (values.length < 11) continue;
 
                 // Tạo một tác giả mới
