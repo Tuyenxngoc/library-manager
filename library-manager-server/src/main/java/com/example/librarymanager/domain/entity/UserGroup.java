@@ -41,7 +41,7 @@ public class UserGroup extends UserDateAuditing {
     @JsonIgnore
     private Set<User> users = new HashSet<>();
 
-    @OneToMany(mappedBy = "userGroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "userGroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JsonIgnore
     private Set<UserGroupRole> userGroupRoles = new HashSet<>();
 

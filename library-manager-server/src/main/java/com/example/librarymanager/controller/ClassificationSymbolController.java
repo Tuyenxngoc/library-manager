@@ -51,7 +51,7 @@ public class ClassificationSymbolController {
     }
 
     @Operation(summary = "API Get All Classification Symbols")
-    @PreAuthorize("hasRole('ROLE_MANAGE_CLASSIFICATION_SYMBOL')")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGE_CLASSIFICATION_SYMBOL', 'ROLE_MANAGE_BOOK_DEFINITION')")
     @GetMapping(UrlConstant.ClassificationSymbol.GET_ALL)
     public ResponseEntity<?> getAllClassificationSymbols(@ParameterObject PaginationFullRequestDto requestDto) {
         return VsResponseUtil.success(classificationSymbolService.findAll(requestDto));

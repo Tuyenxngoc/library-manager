@@ -60,7 +60,7 @@ public class BookSetController {
     }
 
     @Operation(summary = "API Get All Book Sets")
-    @PreAuthorize("hasRole('ROLE_MANAGE_BOOK_SET')")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGE_BOOK_SET', 'ROLE_MANAGE_BOOK_DEFINITION')")
     @GetMapping(UrlConstant.BookSet.GET_ALL)
     public ResponseEntity<?> getAllBookSets(@ParameterObject PaginationFullRequestDto requestDto) {
         return VsResponseUtil.success(bookSetService.findAll(requestDto));

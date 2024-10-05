@@ -14,6 +14,7 @@ public enum RoleConstant {
     ROLE_MANAGE_PUBLISHER("Quản lý nhà xuất bản"),
     ROLE_MANAGE_USER("Quản lý người dùng"),
     ROLE_MANAGE_USER_GROUP("Quản lý nhóm người dùng"),
+    ROLE_MANAGE_SYSTEM_SETTINGS("Quản lý cài đặt hệ thống"),
     ROLE_READER("Độc giả");
 
     private final String roleName;

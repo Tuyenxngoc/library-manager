@@ -51,7 +51,7 @@ public class CategoryController {
     }
 
     @Operation(summary = "API Get Categories")
-    @PreAuthorize("hasRole('ROLE_MANAGE_CATEGORY')")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGE_CATEGORY', 'ROLE_MANAGE_BOOK_DEFINITION')")
     @GetMapping(UrlConstant.Category.GET_ALL)
     public ResponseEntity<?> getCategories(@ParameterObject PaginationFullRequestDto requestDto) {
         return VsResponseUtil.success(categoryService.findAll(requestDto));

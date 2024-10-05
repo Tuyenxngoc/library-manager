@@ -286,10 +286,6 @@ function UserGroupManagement() {
                     >
                         <Input placeholder="Nhập tên nhóm" autoComplete="off" />
                     </Form.Item>
-                    <Form.Item label="Ghi chú" name="notes">
-                        <TextArea rows={2} placeholder="Nhập ghi chú" />
-                    </Form.Item>
-
                     <Form.Item
                         label="Quyền thiết lập"
                         name="roleIds"
@@ -303,6 +299,9 @@ function UserGroupManagement() {
                             className="w-100"
                             placeholder="Chọn quyền"
                         />
+                    </Form.Item>
+                    <Form.Item label="Ghi chú" name="notes">
+                        <TextArea rows={2} placeholder="Nhập ghi chú" />
                     </Form.Item>
                 </Form>
             </Modal>
@@ -324,10 +323,6 @@ function UserGroupManagement() {
                     >
                         <Input placeholder="Nhập tên nhóm" autoComplete="off" />
                     </Form.Item>
-                    <Form.Item label="Ghi chú" name="notes">
-                        <TextArea rows={2} placeholder="Nhập ghi chú" />
-                    </Form.Item>
-
                     <Form.Item
                         label="Quyền thiết lập"
                         name="roleIds"
@@ -341,6 +336,9 @@ function UserGroupManagement() {
                             className="w-100"
                             placeholder="Chọn quyền"
                         />
+                    </Form.Item>
+                    <Form.Item label="Ghi chú" name="notes">
+                        <TextArea rows={2} placeholder="Nhập ghi chú" />
                     </Form.Item>
                 </Form>
             </Modal>

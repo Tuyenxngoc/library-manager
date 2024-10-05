@@ -51,7 +51,7 @@ public class PublisherController {
     }
 
     @Operation(summary = "API Get All Publishers")
-    @PreAuthorize("hasRole('ROLE_MANAGE_PUBLISHER')")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGE_PUBLISHER', 'ROLE_MANAGE_BOOK_DEFINITION')")
     @GetMapping(UrlConstant.Publisher.GET_ALL)
     public ResponseEntity<?> getAllPublishers(@ParameterObject PaginationFullRequestDto requestDto) {
         return VsResponseUtil.success(publisherService.findAll(requestDto));

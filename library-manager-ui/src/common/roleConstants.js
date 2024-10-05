@@ -12,6 +12,7 @@ export const ROLES = {
     ManageBookDefinition: 'ROLE_MANAGE_BOOK_DEFINITION',
     ManageCategoryGroup: 'ROLE_MANAGE_CATEGORY_GROUP',
     ManagePublisher: 'ROLE_MANAGE_PUBLISHER',
+    ManageSystemSettings: 'ROLE_MANAGE_SYSTEM_SETTINGS',
     Reader: 'ROLE_READER',
 };
 

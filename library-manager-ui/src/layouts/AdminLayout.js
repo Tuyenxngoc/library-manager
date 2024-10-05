@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Breadcrumb, Layout, Menu, theme } from 'antd';
-
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Layout, Menu, theme } from 'antd';
 import { AiFillDashboard } from 'react-icons/ai';
 import { IoMdSettings } from 'react-icons/io';
 import { FaUsers, FaUser, FaHistory, FaChartBar, FaRecycle, FaBook } from 'react-icons/fa';
@@ -24,6 +23,7 @@ const menuConfig = [
         label: 'Thiết lập hệ thống',
         key: '/admin/settings',
         icon: <IoMdSettings />,
+        roles: [ROLES.ManageSystemSettings],
         children: [
             { label: 'Thông tin thư viện', key: '/admin/settings/library-info' },
             { label: 'Nội quy thư viện', key: '/admin/settings/library-rules' },
@@ -59,6 +59,7 @@ const menuConfig = [
         roles: [
             ROLES.ManageBookDefinition,
             ROLES.ManageCategory,
+            ROLES.ManageCategoryGroup,
             ROLES.ManageBookSet,
             ROLES.ManageAuthor,
             ROLES.ManageClassificationSymbol,
@@ -77,11 +78,12 @@ const menuConfig = [
         label: 'Quản lý sách',
         key: '/admin/books',
         icon: <FaBook />,
+        roles: [ROLES.ManageBook, ROLES.ManageImportReceipt],
         children: [
-            { label: 'Danh sách sách', key: '/admin/books/list' },
-            { label: 'Nhập sách', key: '/admin/books/inward' },
-            { label: 'Kiểm kê sách', key: '/admin/books/inventory' },
-            { label: 'Xuất sách', key: '/admin/books/outward' },
+            { label: 'Danh sách sách', key: '/admin/books/list', roles: [ROLES.ManageBook] },
+            { label: 'Nhập sách', key: '/admin/books/inward', roles: [ROLES.ManageImportReceipt] },
+            { label: 'Kiểm kê sách', key: '/admin/books/inventory', roles: [ROLES.ManageBook] },
+            { label: 'Xuất sách', key: '/admin/books/outward', roles: [ROLES.ManageBook] },
         ],
     },
     {
@@ -103,11 +105,13 @@ const menuConfig = [
         label: 'Quản lý tin tức',
         key: '/admin/news-articles',
         icon: <BsNewspaper />,
+        roles: [ROLES.ManageNewsArticle],
     },
     {
         label: 'Lịch sử truy cập',
         key: '/admin/histories',
         icon: <FaHistory />,
+        roles: [ROLES.ManageLog],
     },
 ];
 
@@ -185,22 +189,7 @@ function AdminLayout() {
                     className="shadow-sm"
                 />
                 {/* Content */}
-                <Content
-                    style={{
-                        margin: '0 16px',
-                    }}
-                >
-                    <Breadcrumb
-                        style={{
-                            margin: '16px 0',
-                        }}
-                        items={[
-                            { title: 'Home' },
-                            { title: <Link to="">Application Center</Link> },
-                            { title: <Link to="">Application List</Link> },
-                            { title: 'An Application' },
-                        ]}
-                    />
+                <Content style={{ margin: '16px' }}>
                     <div
                         style={{
                             padding: 24,

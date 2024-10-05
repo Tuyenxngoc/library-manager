@@ -51,7 +51,7 @@ public class AuthorController {
     }
 
     @Operation(summary = "API Get Authors")
-    @PreAuthorize("hasAnyRole('ROLE_MANAGE_AUTHOR')")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGE_AUTHOR', 'ROLE_MANAGE_BOOK_DEFINITION')")
     @GetMapping(UrlConstant.Author.GET_ALL)
     public ResponseEntity<?> getAuthors(@ParameterObject PaginationFullRequestDto requestDto) {
         return VsResponseUtil.success(authorService.findAll(requestDto));
