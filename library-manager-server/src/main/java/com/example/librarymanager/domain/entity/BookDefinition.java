@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -114,4 +115,16 @@ public class BookDefinition extends UserDateAuditing {//Biên mục
     @JsonIgnore
     private List<BookAuthor> bookAuthors = new ArrayList<>();  // Tác giả
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BookDefinition that = (BookDefinition) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }

@@ -10,13 +10,14 @@ import queryString from 'query-string';
 import moment from 'moment';
 import FormInput from '~/components/FormInput';
 import { getBookDefinitions } from '~/services/bookDefinitionService';
-import { createImportReceipt, updateImportReceipt } from '~/services/importReceiptService';
+import { createImportReceipt, getImportReceiptById, updateImportReceipt } from '~/services/importReceiptService';
 import { handleError } from '~/utils/errorHandler';
+import { checkIdIsNumber } from '~/utils/helper';
 const { Option } = Select;
 
 const defaultValue = {
     receiptNumber: '',
-    importDate: null,
+    importDate: new Date(),
     generalRecordNumber: '',
     fundingSource: '',
     importReason: '',
@@ -96,7 +97,6 @@ function InwardBookForm() {
     };
 
     const handleAddNewColum = () => {
-        // Kiểm tra nếu đã chọn sách và số lượng hợp lệ
         if (!selectedBookDefinitionId) {
             messageApi.error('Bạn phải chọn một cuốn sách');
             return;
@@ -106,32 +106,23 @@ function InwardBookForm() {
             return;
         }
 
-        // Lấy danh sách sách đã chọn
         const currentBooks = formik.values.bookRequestDtos;
 
-        // Kiểm tra xem sách đã tồn tại trong danh sách chưa
         if (currentBooks.some((book) => book.bookDefinitionId === selectedBookDefinitionId)) {
             messageApi.error('Cuốn sách đã tồn tại trong danh sách');
             return;
         }
 
-        // Thêm sách vào danh sách
         const updatedBooks = [...currentBooks, { bookDefinitionId: selectedBookDefinitionId, quantity }];
         formik.setFieldValue('bookRequestDtos', updatedBooks);
 
-        // Reset các giá trị sau khi thêm
         setSelectedBookDefinitionId(null);
         setQuantity(1);
     };
 
     const handleDeleteColum = (id) => {
-        // Lấy danh sách sách hiện tại
         const currentBooks = formik.values.bookRequestDtos;
-
-        // Lọc bỏ sách có bookDefinitionId trùng với id
         const updatedBooks = currentBooks.filter((book) => book.bookDefinitionId !== id);
-
-        // Cập nhật lại danh sách trong formik
         formik.setFieldValue('bookRequestDtos', updatedBooks);
     };
 
@@ -139,6 +130,35 @@ function InwardBookForm() {
         fetchBookDefinitions();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        if (id) {
+            if (!checkIdIsNumber(id)) {
+                navigate('/admin/books/inward');
+                return;
+            }
+
+            // Nếu có id, lấy thông tin phiếu nhập
+            getImportReceiptById(id)
+                .then((response) => {
+                    const { receiptNumber, importDate, generalRecordNumber, fundingSource, importReason, books } =
+                        response.data.data;
+
+                    formik.setValues({
+                        receiptNumber,
+                        importDate: importDate ? moment(importDate) : null,
+                        generalRecordNumber,
+                        fundingSource,
+                        importReason,
+                        bookRequestDtos: books,
+                    });
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [id]);
 
     const columns = [
         {
@@ -171,7 +191,7 @@ function InwardBookForm() {
         <div>
             {contextHolder}
 
-            <h2>Thêm phiếu nhập</h2>
+            <h2>{id ? 'Sửa phiếu nhập' : 'Thêm phiếu nhập'}</h2>
 
             <form onSubmit={formik.handleSubmit}>
                 <div className="row g-3">
@@ -216,7 +236,12 @@ function InwardBookForm() {
                         <div className="text-danger">{formik.touched.fundingSource && formik.errors.fundingSource}</div>
                     </div>
 
-                    <FormInput id="generalRecordNumber" label="Số vào tổng quát" className="col-md-6" formik={formik} />
+                    <FormInput
+                        id="generalRecordNumber"
+                        label="Số vào sổ tổng quát"
+                        className="col-md-6"
+                        formik={formik}
+                    />
 
                     <FormInput id="importReason" label="Lý do nhập" className="col-md-6" formik={formik} />
 
@@ -275,7 +300,7 @@ function InwardBookForm() {
                             bordered
                             columns={columns}
                             dataSource={formik.values.bookRequestDtos}
-                            rowKey="id"
+                            rowKey="bookDefinitionId"
                             pagination={false}
                         />
                         <div className="text-danger">

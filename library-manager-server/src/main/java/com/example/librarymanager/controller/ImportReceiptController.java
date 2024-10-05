@@ -49,6 +49,16 @@ public class ImportReceiptController {
         return VsResponseUtil.success(importReceiptService.update(id, requestDto, userDetails.getUserId()));
     }
 
+    @Operation(summary = "API Delete Import Receipt")
+    @PreAuthorize("hasRole('ROLE_MANAGE_IMPORT_RECEIPT')")
+    @DeleteMapping(UrlConstant.ImportReceipt.DELETE)
+    public ResponseEntity<?> deleteImportReceipt(
+            @PathVariable Long id,
+            @CurrentUser CustomUserDetails userDetails
+    ) {
+        return VsResponseUtil.success(importReceiptService.delete(id, userDetails.getUserId()));
+    }
+
     @Operation(summary = "API Get All Import Receipts")
     @PreAuthorize("hasRole('ROLE_MANAGE_IMPORT_RECEIPT')")
     @GetMapping(UrlConstant.ImportReceipt.GET_ALL)

@@ -141,6 +141,12 @@ public class ErrorMessage {
         public static final String ERR_HAS_LINKED_BOOKS = "exception.import.receipt.has.linked";
     }
 
+    public static class ExportReceipt {
+        public static final String ERR_NOT_FOUND_ID = "exception.import.receipt.not.found.id";
+        public static final String ERR_DUPLICATE_NUMBER = "exception.import.receipt.duplicate.code";
+        public static final String ERR_HAS_LINKED_BOOKS = "exception.import.receipt.has.linked";
+    }
+
     public static class NewsArticle {
         public static final String ERR_NOT_FOUND_ID = "exception.import.receipt.not.found.id";
         public static final String ERR_DUPLICATE_NUMBER = "exception.import.receipt.duplicate.code";
@@ -151,6 +157,11 @@ public class ErrorMessage {
         public static final String ERR_NOT_FOUND_ID = "exception.user.group.not.found.id";
         public static final String ERR_DUPLICATE_CODE = "exception.user.group.duplicate.code";
         public static final String ERR_HAS_LINKED_USERS = "exception.user.group.has.linked";
+    }
+
+    public static class Book {
+        public static final String ERR_NOT_FOUND_ID = "exception.book.not.found.id";
+        public static final String ERR_HAS_LINKED = "exception.book.has.linked";
     }
 
 }

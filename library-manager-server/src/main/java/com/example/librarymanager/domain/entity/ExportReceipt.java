@@ -16,13 +16,14 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "export_receipts")
+@Table(name = "export_receipts",
+        uniqueConstraints = @UniqueConstraint(name = "UN_EXPORT_RECEIPTS_RECEIPT_NUMBER", columnNames = "receipt_number"))
 public class ExportReceipt {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "export_receipt_id")
-    private Long id;  // Số phiếu xuất
+    private Long id;
 
     @Column(name = "receipt_number", nullable = false)
     private String receiptNumber;  // Số phiếu xuất

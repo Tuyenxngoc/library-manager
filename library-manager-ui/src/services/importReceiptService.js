@@ -8,6 +8,10 @@ export const updateImportReceipt = (id, values) => {
     return axiosPrivate.put(`import-receipts/${id}`, values);
 };
 
+export const deleteImportReceipt = (id) => {
+    return axiosPrivate.delete(`import-receipts/${id}`);
+};
+
 export const getImportReceiptById = (id) => {
     return axiosPrivate.get(`import-receipts/${id}`);
 };

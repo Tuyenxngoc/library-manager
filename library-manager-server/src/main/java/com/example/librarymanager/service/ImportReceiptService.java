@@ -11,7 +11,10 @@ public interface ImportReceiptService {
 
     CommonResponseDto update(Long id, ImportReceiptRequestDto requestDto, String userId);
 
+    CommonResponseDto delete(Long id, String userId);
+
     PaginationResponseDto<GetImportReceiptResponseDto> findAll(PaginationFullRequestDto requestDto);
 
     GetImportReceiptResponseDto findById(Long id);
+
 }

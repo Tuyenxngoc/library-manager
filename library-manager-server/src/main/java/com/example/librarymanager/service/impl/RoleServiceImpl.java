@@ -32,6 +32,7 @@ public class RoleServiceImpl implements RoleService {
             roleRepository.save(new Role(ROLE_MANAGE_CATEGORY_GROUP));
             roleRepository.save(new Role(ROLE_MANAGE_CLASSIFICATION_SYMBOL));
             roleRepository.save(new Role(ROLE_MANAGE_IMPORT_RECEIPT));
+            roleRepository.save(new Role(ROLE_MANAGE_EXPORT_RECEIPT));
             roleRepository.save(new Role(ROLE_MANAGE_LOG));
             roleRepository.save(new Role(ROLE_MANAGE_NEWS_ARTICLE));
             roleRepository.save(new Role(ROLE_MANAGE_PUBLISHER));

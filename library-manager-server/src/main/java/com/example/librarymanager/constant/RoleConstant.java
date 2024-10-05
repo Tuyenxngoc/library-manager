@@ -9,6 +9,7 @@ public enum RoleConstant {
     ROLE_MANAGE_CATEGORY_GROUP("Quản lý nhóm danh mục"),
     ROLE_MANAGE_CLASSIFICATION_SYMBOL("Quản lý ký hiệu phân loại"),
     ROLE_MANAGE_IMPORT_RECEIPT("Quản lý phiếu nhập"),
+    ROLE_MANAGE_EXPORT_RECEIPT("Quản lý phiếu xuất"),
     ROLE_MANAGE_LOG("Quản lý nhật ký"),
     ROLE_MANAGE_NEWS_ARTICLE("Quản lý bài viết tin tức"),
     ROLE_MANAGE_PUBLISHER("Quản lý nhà xuất bản"),

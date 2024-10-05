@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Flex, Input, message, Select, Space, Table } from 'antd';
+import { Button, Flex, Input, message, Popconfirm, Select, Space, Table } from 'antd';
 import { MdOutlineModeEdit } from 'react-icons/md';
+import { FaRegTrashAlt } from 'react-icons/fa';
 import queryString from 'query-string';
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
-import { getImportReceipts } from '~/services/importReceiptService';
+import { deleteImportReceipt, getImportReceipts } from '~/services/importReceiptService';
 
 const options = [
     { value: 'receiptNumber', label: 'Số phiếu nhập' },
-    { label: 'Số vào tổng quát', value: 'generalRecordNumber' },
+    { label: 'Số vào sổ tổng quát', value: 'generalRecordNumber' },
     { value: 'fundingSource', label: 'Nguồn cấp phát' },
 ];
 
@@ -58,6 +59,20 @@ function InwardBook() {
         }));
     };
 
+    const handleDeleteEntity = async (id) => {
+        try {
+            const response = await deleteImportReceipt(id);
+            if (response.status === 200) {
+                setEntityData((prev) => prev.filter((a) => a.id !== id));
+
+                messageApi.success(response.data.data.message);
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi xóa.';
+            messageApi.error(errorMessage);
+        }
+    };
+
     useEffect(() => {
         const fetchEntities = async () => {
             setIsLoading(true);
@@ -87,7 +102,7 @@ function InwardBook() {
             showSorterTooltip: false,
         },
         {
-            title: 'Số vào tổng quát',
+            title: 'Số vào sổ tổng quát',
             dataIndex: 'generalRecordNumber',
             key: 'generalRecordNumber',
         },
@@ -114,7 +129,18 @@ function InwardBook() {
             title: '',
             key: 'action',
             render: (_, record) => (
-                <Button type="text" icon={<MdOutlineModeEdit />} onClick={() => navigate(`edit/${record.id}`)} />
+                <Space>
+                    <Button type="text" icon={<MdOutlineModeEdit />} onClick={() => navigate(`edit/${record.id}`)} />
+                    <Popconfirm
+                        title="Xóa phiếu nhập"
+                        description="Bạn có chắc muốn xóa phiếu nhập này không?"
+                        onConfirm={() => handleDeleteEntity(record.id)}
+                        okText="Xóa"
+                        cancelText="Hủy"
+                    >
+                        <Button type="text" danger icon={<FaRegTrashAlt />} />
+                    </Popconfirm>
+                </Space>
             ),
         },
     ];

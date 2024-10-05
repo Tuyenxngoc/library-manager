@@ -1,15 +1,17 @@
 package com.example.librarymanager.service;
 
-import com.example.librarymanager.domain.entity.ExportReceipt;
-
-import java.util.List;
+import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
+import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
+import com.example.librarymanager.domain.dto.request.ExportReceiptRequestDto;
+import com.example.librarymanager.domain.dto.response.CommonResponseDto;
+import com.example.librarymanager.domain.dto.response.GetExportReceiptResponseDto;
 
 public interface ExportReceiptService {
-    ExportReceipt findById(Long id);
+    CommonResponseDto save(ExportReceiptRequestDto requestDto, String userId);
 
-    List<ExportReceipt> findAll();
+    CommonResponseDto update(Long id, ExportReceiptRequestDto requestDto, String userId);
 
-    ExportReceipt save(ExportReceipt exportReceipt);
+    PaginationResponseDto<GetExportReceiptResponseDto> findAll(PaginationFullRequestDto requestDto);
 
-    void delete(Long id);
+    GetExportReceiptResponseDto findById(Long id);
 }

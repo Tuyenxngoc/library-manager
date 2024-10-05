@@ -1,7 +1,6 @@
 package com.example.librarymanager.domain.entity;
 
 import com.example.librarymanager.constant.RoleConstant;
-import com.example.librarymanager.domain.entity.common.DateAuditing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -19,7 +18,7 @@ import java.util.List;
 @Entity
 @Table(name = "roles",
         uniqueConstraints = @UniqueConstraint(name = "UN_ROLE_CODE", columnNames = "code"))
-public class Role extends DateAuditing {
+public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -64,7 +64,7 @@ public class BookDefinitionController {
     }
 
     @Operation(summary = "API Get All Book Definitions")
-    @PreAuthorize("hasRole('ROLE_MANAGE_BOOK_DEFINITION')")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGE_BOOK_DEFINITION', 'ROLE_MANAGE_IMPORT_RECEIPT', 'ROLE_MANAGE_EXPORT_RECEIPT')")
     @GetMapping(UrlConstant.BookDefinition.GET_ALL)
     public ResponseEntity<?> getAllBookDefinitions(@ParameterObject PaginationFullRequestDto requestDto) {
         return VsResponseUtil.success(bookDefinitionService.findAll(requestDto));
