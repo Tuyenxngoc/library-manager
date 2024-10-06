@@ -45,6 +45,7 @@ import SlideConfig from './pages/settings/SlideConfig';
 import UserManagement from './pages/UserManagement/UserManagement';
 import UserManagementForm from './pages/UserManagement/UserManagementForm';
 import UserGroupManagement from './pages/UserGroupManagement/UserGroupManagement';
+import OutwardBookForm from './pages/Books/OutwardBookForm';
 
 function App() {
     return (
@@ -128,7 +129,11 @@ function App() {
                                 <Route index element={<InventoryBook />} />
                             </Route>
 
-                            <Route path="outward" element={<OutwardBook />} />
+                            <Route path="outward">
+                                <Route index element={<OutwardBook />} />
+                                <Route path="new" element={<OutwardBookForm />} />
+                                <Route path="edit/:id" element={<OutwardBookForm />} />
+                            </Route>
                         </Route>
 
                         {/* Tác giả */}

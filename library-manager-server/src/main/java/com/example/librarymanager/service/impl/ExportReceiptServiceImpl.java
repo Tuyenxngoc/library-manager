@@ -9,11 +9,13 @@ import com.example.librarymanager.domain.dto.pagination.PagingMeta;
 import com.example.librarymanager.domain.dto.request.ExportReceiptRequestDto;
 import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.dto.response.GetExportReceiptResponseDto;
+import com.example.librarymanager.domain.entity.Book;
 import com.example.librarymanager.domain.entity.ExportReceipt;
 import com.example.librarymanager.domain.mapper.ExportReceiptMapper;
 import com.example.librarymanager.domain.specification.EntitySpecification;
 import com.example.librarymanager.exception.ConflictException;
 import com.example.librarymanager.exception.NotFoundException;
+import com.example.librarymanager.repository.BookRepository;
 import com.example.librarymanager.repository.ExportReceiptRepository;
 import com.example.librarymanager.service.ExportReceiptService;
 import com.example.librarymanager.service.LogService;
@@ -25,7 +27,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +46,8 @@ public class ExportReceiptServiceImpl implements ExportReceiptService {
 
     private final LogService logService;
 
+    private final BookRepository bookRepository;
+
     private ExportReceipt getEntity(Long id) {
         return exportReceiptRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.ImportReceipt.ERR_NOT_FOUND_ID, id));
@@ -53,6 +60,26 @@ public class ExportReceiptServiceImpl implements ExportReceiptService {
         }
         ExportReceipt exportReceipt = exportReceiptMapper.toExportReceipt(requestDto);
 
+        //Kiểm tra dữ liệu sách
+        Set<Long> bookIds = requestDto.getBookIds();
+        Set<Book> books = new HashSet<>();
+        for (Long bookId : bookIds) {
+            Book book = bookRepository.findById(bookId)
+                    .orElseThrow(() -> new NotFoundException(ErrorMessage.Book.ERR_NOT_FOUND_ID, bookId));
+            if (book.getBookBorrow() != null) {
+                throw new ConflictException(ErrorMessage.ExportReceipt.ERR_HAS_LINKED_BOOKS, book.getBookCode());
+            }
+            books.add(book);
+        }
+
+        //Thêm vào phiếu xuất
+        for (Book book : books) {
+            book.setDeleteFlag(true);
+            exportReceipt.getBook().add(book);
+        }
+
+        exportReceiptRepository.save(exportReceipt);
+
         logService.createLog(TAG, "Thêm", "Tạo phiếu xuất mới: " + exportReceipt.getReceiptNumber(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
@@ -61,7 +88,23 @@ public class ExportReceiptServiceImpl implements ExportReceiptService {
 
     @Override
     public CommonResponseDto update(Long id, ExportReceiptRequestDto requestDto, String userId) {
-        return null;
+        ExportReceipt exportReceipt = getEntity(id);
+
+        if (!Objects.equals(exportReceipt.getReceiptNumber(), requestDto.getReceiptNumber()) &&
+                exportReceiptRepository.existsByReceiptNumber(requestDto.getReceiptNumber())) {
+            throw new ConflictException(ErrorMessage.ExportReceipt.ERR_DUPLICATE_NUMBER, requestDto.getReceiptNumber());
+        }
+
+        exportReceipt.setReceiptNumber(requestDto.getReceiptNumber());
+        exportReceipt.setExportDate(requestDto.getExportDate());
+        exportReceipt.setExportReason(requestDto.getExportReason());
+
+        exportReceiptRepository.save(exportReceipt);
+
+        logService.createLog(TAG, "Sửa", "Sửa phiếu xuất: " + exportReceipt.getReceiptNumber(), userId);
+
+        String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
+        return new CommonResponseDto(message);
     }
 
     @Override

@@ -34,6 +34,9 @@ public class Book extends UserDateAuditing {
     @JsonIgnore
     private BookBorrow bookBorrow;// Phiếu mượn sách chi tiết
 
+    @Column(name = "delete_flag", nullable = false)
+    private Boolean deleteFlag = Boolean.FALSE;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_definition_id", foreignKey = @ForeignKey(name = "FK_BOOK_BOOK_DEFINITION_ID"), referencedColumnName = "book_definition_id", nullable = false)
     @JsonIgnore
