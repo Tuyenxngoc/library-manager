@@ -46,6 +46,7 @@ import UserManagement from './pages/UserManagement/UserManagement';
 import UserManagementForm from './pages/UserManagement/UserManagementForm';
 import UserGroupManagement from './pages/UserGroupManagement/UserGroupManagement';
 import OutwardBookForm from './pages/Books/OutwardBookForm';
+import Reader from './pages/Reader/Reader';
 
 function App() {
     return (
@@ -106,6 +107,13 @@ function App() {
                         {/* Quản lý người dùng */}
                         <Route path="users">
                             <Route index element={<UserManagement />} />
+                            <Route path="new" element={<UserManagementForm />} />
+                            <Route path="edit/:id" element={<UserManagementForm />} />
+                        </Route>
+
+                        {/* Quản lý bạn đọc */}
+                        <Route path="readers">
+                            <Route path="cards" element={<Reader />} />
                             <Route path="new" element={<UserManagementForm />} />
                             <Route path="edit/:id" element={<UserManagementForm />} />
                         </Route>

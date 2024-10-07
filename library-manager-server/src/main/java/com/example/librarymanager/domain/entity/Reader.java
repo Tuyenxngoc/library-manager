@@ -66,4 +66,9 @@ public class Reader extends UserDateAuditing {
     @OneToMany(mappedBy = "reader", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<BorrowReceipt> borrowReceipts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "reader", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<LibraryVisit> libraryVisits = new ArrayList<>();
+
 }

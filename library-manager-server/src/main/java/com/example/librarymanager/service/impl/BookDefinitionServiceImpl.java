@@ -125,7 +125,7 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
         bookDefinition.setActiveFlag(true);
         bookDefinitionRepository.save(bookDefinition);
 
-        logService.createLog(TAG, "Thêm", "Thêm biên mục mới mới: " + bookDefinition.getTitle(), userId);
+        logService.createLog(TAG, "Thêm", "Thêm biên mục mới: " + bookDefinition.getTitle(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message);

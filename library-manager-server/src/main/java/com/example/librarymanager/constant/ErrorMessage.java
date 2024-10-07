@@ -89,7 +89,10 @@ public class ErrorMessage {
     }
 
     public static class Reader {
-        public static final String ERR_NOT_FOUND_CARD_NUMBER = "exception.user.not.found.card.number";
+        public static final String ERR_NOT_FOUND_ID = "exception.reader.not.found.id";
+        public static final String ERR_NOT_FOUND_CARD_NUMBER = "exception.reader.not.found.card.number";
+        public static final String ERR_DUPLICATE_CARD_NUMBER = "exception.reader.duplicate.card.number";
+        public static final String ERR_HAS_LINKED_BOOKS = "exception.reader.duplicate.card.number";
     }
 
     public static class Author {

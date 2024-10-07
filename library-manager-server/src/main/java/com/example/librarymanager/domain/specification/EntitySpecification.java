@@ -348,4 +348,28 @@ public class EntitySpecification {
             return predicate;
         };
     }
+
+    public static Specification<Reader> filterReaders(String keyword, String searchBy, Boolean activeFlag) {
+        return (root, query, builder) -> {
+            query.distinct(true);
+
+            Predicate predicate = builder.conjunction();
+
+            if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(searchBy)) {
+                switch (searchBy) {
+                    case Reader_.CARD_NUMBER ->
+                            predicate = builder.and(predicate, builder.like(root.get(Reader_.cardNumber), "%" + keyword + "%"));
+
+                    case Reader_.FULL_NAME ->
+                            predicate = builder.and(predicate, builder.like(root.get(Reader_.fullName), "%" + keyword + "%"));
+                }
+            }
+
+            if (activeFlag != null) {
+                predicate = builder.and(predicate, builder.equal(root.get(Reader_.activeFlag), activeFlag));
+            }
+
+            return predicate;
+        };
+    }
 }

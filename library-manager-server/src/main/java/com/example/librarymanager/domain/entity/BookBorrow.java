@@ -23,6 +23,9 @@ public class BookBorrow {
     @Column(name = "due_date", nullable = false)
     private LocalDate dueDate; // Ngày hẹn trả
 
+    @Column(name = "returned", nullable = false)
+    private boolean returned = false; // Trạng thái đã trả
+
     @OneToOne
     @JoinColumn(name = "book_id", foreignKey = @ForeignKey(name = "FK_BOOK_BORROWS_BOOK_ID"), referencedColumnName = "book_id", nullable = false)
     @JsonIgnore
