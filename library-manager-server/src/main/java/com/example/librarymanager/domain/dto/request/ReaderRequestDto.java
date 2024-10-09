@@ -45,8 +45,6 @@ public class ReaderRequestDto {
     @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
     private String cardNumber; // Số thẻ
 
-    @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)
-    @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
     private String password; // Mật khẩu
 
     private LocalDate expiryDate; // Ngày hết hạn

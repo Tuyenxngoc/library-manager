@@ -75,6 +75,14 @@ public class ReaderServiceImpl implements ReaderService {
 
     @Override
     public CommonResponseDto save(ReaderRequestDto requestDto, MultipartFile image, String userId) {
+        //Kiểm tra mật khẩu
+        String password = requestDto.getPassword();
+        if (password == null || password.isEmpty()) {
+            throw new BadRequestException(ErrorMessage.INVALID_NOT_BLANK_FIELD);
+        } else if (password.length() > 100) {
+            throw new BadRequestException(ErrorMessage.INVALID_TEXT_LENGTH);
+        }
+
         //Kiểm tra file tải lên có phải định dạng ảnh không
         uploadFileUtil.checkImageIsValid(image);
 
@@ -125,8 +133,12 @@ public class ReaderServiceImpl implements ReaderService {
         reader.setAddress(requestDto.getAddress());
         reader.setPhoneNumber(requestDto.getPhoneNumber());
         reader.setCardNumber(requestDto.getCardNumber());
-        reader.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         reader.setExpiryDate(requestDto.getExpiryDate());
+
+        String password = requestDto.getPassword();
+        if (password != null && !password.isEmpty() && password.length() <= 100) {
+            reader.setPassword(passwordEncoder.encode(requestDto.getPassword()));
+        }
 
         readerRepository.save(reader);
 

@@ -20,7 +20,22 @@ export const createReader = (values) => {
 };
 
 export const updateReader = (id, values) => {
-    return axiosPrivate.put(`readers/${id}`, values);
+    const formData = new FormData();
+
+    for (const key in values) {
+        if (values.hasOwnProperty(key)) {
+            const value = values[key];
+            if (value !== null && value !== undefined) {
+                formData.append(key, value);
+            }
+        }
+    }
+
+    return axiosPrivate.put(`readers/${id}`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
 };
 
 export const deleteReader = (id) => {

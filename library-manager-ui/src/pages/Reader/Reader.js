@@ -1,10 +1,26 @@
 import { useEffect, useState } from 'react';
-import { Button, DatePicker, Flex, Form, Input, message, Modal, Popconfirm, Select, Space, Switch, Table } from 'antd';
+import {
+    Button,
+    Col,
+    DatePicker,
+    Flex,
+    Form,
+    Input,
+    message,
+    Modal,
+    Popconfirm,
+    Row,
+    Select,
+    Space,
+    Switch,
+    Table,
+} from 'antd';
 import { MdOutlineModeEdit } from 'react-icons/md';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import queryString from 'query-string';
 import { INITIAL_FILTERS, INITIAL_META, REGEXP_PHONE_NUMBER } from '~/common/commonConstants';
 import { createReader, deleteReader, getReaders, toggleActiveFlag, updateReader } from '~/services/readerService';
+import moment from 'moment';
 
 function Reader() {
     const [meta, setMeta] = useState(INITIAL_META);
@@ -36,8 +52,13 @@ function Reader() {
     };
 
     const showEditModal = (record) => {
-        setEditingItem(record);
-        editForm.setFieldsValue(record);
+        const values = {
+            ...record,
+            dateOfBirth: record.dateOfBirth ? moment(record.dateOfBirth, 'YYYY-MM-DD') : null,
+            expiryDate: record.expiryDate ? moment(record.expiryDate, 'YYYY-MM-DD') : null,
+        };
+        setEditingItem(values);
+        editForm.setFieldsValue(values);
         setIsEditModalOpen(true);
     };
 
@@ -258,109 +279,247 @@ function Reader() {
             {/* Modal thêm mới thẻ */}
             <Modal title="Thêm mới thẻ bạn đọc" open={isAddModalOpen} onOk={addForm.submit} onCancel={closeAddModal}>
                 <Form form={addForm} layout="vertical" onFinish={handleCreateEntity}>
-                    {/* Loại thẻ */}
-                    <Form.Item
-                        label="Loại thẻ"
-                        name="cardType"
-                        rules={[{ required: true, message: 'Vui lòng chọn loại thẻ' }]}
-                    >
-                        <Select placeholder="Chọn loại thẻ">
-                            <Select.Option value="STUDENT">Thẻ sinh viên</Select.Option>
-                            <Select.Option value="TEACHER">Thẻ giáo viên</Select.Option>
-                        </Select>
-                    </Form.Item>
+                    <Row gutter={16}>
+                        {/* Loại thẻ */}
+                        <Col span={12}>
+                            <Form.Item
+                                label="Loại thẻ"
+                                name="cardType"
+                                rules={[{ required: true, message: 'Vui lòng chọn loại thẻ' }]}
+                            >
+                                <Select placeholder="Chọn loại thẻ">
+                                    <Select.Option value="STUDENT">Thẻ sinh viên</Select.Option>
+                                    <Select.Option value="TEACHER">Thẻ giáo viên</Select.Option>
+                                </Select>
+                            </Form.Item>
+                        </Col>
 
-                    {/* Họ tên */}
-                    <Form.Item
-                        label="Họ tên"
-                        name="fullName"
-                        rules={[
-                            { required: true, message: 'Vui lòng nhập họ tên' },
-                            { max: 100, message: 'Tên quá dài' },
-                        ]}
-                    >
-                        <Input placeholder="Nhập họ tên" />
-                    </Form.Item>
+                        {/* Họ tên */}
+                        <Col span={12}>
+                            <Form.Item
+                                label="Họ tên"
+                                name="fullName"
+                                rules={[
+                                    { required: true, message: 'Vui lòng nhập họ tên' },
+                                    { max: 100, message: 'Tên quá dài' },
+                                ]}
+                            >
+                                <Input placeholder="Nhập họ tên" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
 
-                    {/* Ngày sinh */}
-                    <Form.Item
-                        label="Ngày sinh"
-                        name="dateOfBirth"
-                        rules={[{ required: true, message: 'Vui lòng chọn ngày sinh' }]}
-                    >
-                        <DatePicker format="YYYY-MM-DD" placeholder="Chọn ngày sinh" />
-                    </Form.Item>
+                    <Row gutter={16}>
+                        {/* Ngày sinh */}
+                        <Col span={12}>
+                            <Form.Item
+                                label="Ngày sinh"
+                                name="dateOfBirth"
+                                rules={[{ required: true, message: 'Vui lòng chọn ngày sinh' }]}
+                            >
+                                <DatePicker format="YYYY-MM-DD" placeholder="Chọn ngày sinh" className="w-100" />
+                            </Form.Item>
+                        </Col>
 
-                    {/* Giới tính */}
-                    <Form.Item label="Giới tính" name="gender">
-                        <Select placeholder="Chọn giới tính">
-                            <Select.Option value="MALE">Nam</Select.Option>
-                            <Select.Option value="FEMALE">Nữ</Select.Option>
-                        </Select>
-                    </Form.Item>
+                        {/* Giới tính */}
+                        <Col span={12}>
+                            <Form.Item label="Giới tính" name="gender">
+                                <Select placeholder="Chọn giới tính">
+                                    <Select.Option value="MALE">Nam</Select.Option>
+                                    <Select.Option value="FEMALE">Nữ</Select.Option>
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                    </Row>
 
-                    {/* Địa chỉ */}
-                    <Form.Item label="Địa chỉ" name="address" rules={[{ max: 255, message: 'Địa chỉ quá dài' }]}>
-                        <Input placeholder="Nhập địa chỉ" autoComplete="off" />
-                    </Form.Item>
+                    <Row gutter={16}>
+                        {/* Địa chỉ */}
+                        <Col span={12}>
+                            <Form.Item
+                                label="Địa chỉ"
+                                name="address"
+                                rules={[{ max: 255, message: 'Địa chỉ quá dài' }]}
+                            >
+                                <Input placeholder="Nhập địa chỉ" autoComplete="off" />
+                            </Form.Item>
+                        </Col>
 
-                    {/* Số điện thoại */}
-                    <Form.Item
-                        label="Số điện thoại"
-                        name="phoneNumber"
-                        rules={[
-                            { required: true, message: 'Vui lòng nhập số điện thoại' },
-                            {
-                                pattern: new RegExp(REGEXP_PHONE_NUMBER),
-                                message: 'Số điện thoại không hợp lệ',
-                            },
-                            { min: 10, max: 20, message: 'Số điện thoại phải từ 10 đến 20 ký tự' },
-                        ]}
-                    >
-                        <Input placeholder="Nhập số điện thoại" />
-                    </Form.Item>
+                        {/* Số điện thoại */}
+                        <Col span={12}>
+                            <Form.Item
+                                label="Số điện thoại"
+                                name="phoneNumber"
+                                rules={[
+                                    { required: true, message: 'Vui lòng nhập số điện thoại' },
+                                    { pattern: new RegExp(REGEXP_PHONE_NUMBER), message: 'Số điện thoại không hợp lệ' },
+                                    { min: 10, max: 20, message: 'Số điện thoại phải từ 10 đến 20 ký tự' },
+                                ]}
+                            >
+                                <Input placeholder="Nhập số điện thoại" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
 
-                    {/* Số thẻ */}
-                    <Form.Item
-                        label="Số thẻ"
-                        name="cardNumber"
-                        rules={[
-                            { required: true, message: 'Vui lòng nhập số thẻ' },
-                            { max: 100, message: 'Số thẻ quá dài' },
-                        ]}
-                    >
-                        <Input placeholder="Nhập số thẻ" />
-                    </Form.Item>
+                    <Row gutter={16}>
+                        {/* Số thẻ */}
+                        <Col span={12}>
+                            <Form.Item
+                                label="Số thẻ"
+                                name="cardNumber"
+                                rules={[
+                                    { required: true, message: 'Vui lòng nhập số thẻ' },
+                                    { max: 100, message: 'Số thẻ quá dài' },
+                                ]}
+                            >
+                                <Input placeholder="Nhập số thẻ" />
+                            </Form.Item>
+                        </Col>
 
-                    {/* Mật khẩu */}
-                    <Form.Item
-                        label="Mật khẩu"
-                        name="password"
-                        rules={[
-                            { required: true, message: 'Vui lòng nhập mật khẩu' },
-                            { max: 100, message: 'Mật khẩu quá dài' },
-                        ]}
-                    >
-                        <Input.Password placeholder="Nhập mật khẩu" />
-                    </Form.Item>
+                        {/* Mật khẩu */}
+                        <Col span={12}>
+                            <Form.Item
+                                label="Mật khẩu"
+                                name="password"
+                                rules={[
+                                    { required: true, message: 'Vui lòng nhập mật khẩu' },
+                                    { max: 100, message: 'Mật khẩu quá dài' },
+                                ]}
+                            >
+                                <Input.Password placeholder="Nhập mật khẩu" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
 
-                    {/* Ngày hết hạn */}
-                    <Form.Item label="Ngày hết hạn" name="expiryDate">
-                        <DatePicker format="YYYY-MM-DD" placeholder="Chọn ngày hết hạn" />
-                    </Form.Item>
+                    <Row gutter={16}>
+                        {/* Ngày hết hạn */}
+                        <Col span={12}>
+                            <Form.Item label="Ngày hết hạn" name="expiryDate">
+                                <DatePicker format="YYYY-MM-DD" placeholder="Chọn ngày hết hạn" className="w-100" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
                 </Form>
             </Modal>
 
             {/* Modal chỉnh sửa */}
             <Modal title="Sửa nhóm loại sách" open={isEditModalOpen} onOk={editForm.submit} onCancel={closeEditModal}>
                 <Form form={editForm} layout="vertical" onFinish={handleUpdateEntity}>
-                    <Form.Item
-                        label="Tên nhóm loại sách"
-                        name="groupName"
-                        rules={[{ required: true, message: 'Vui lòng nhập tên nhóm loại sách' }]}
-                    >
-                        <Input placeholder="Nhập tên nhóm loại sách" />
-                    </Form.Item>
+                    <Row gutter={16}>
+                        {/* Loại thẻ */}
+                        <Col span={12}>
+                            <Form.Item
+                                label="Loại thẻ"
+                                name="cardType"
+                                rules={[{ required: true, message: 'Vui lòng chọn loại thẻ' }]}
+                            >
+                                <Select placeholder="Chọn loại thẻ">
+                                    <Select.Option value="STUDENT">Thẻ sinh viên</Select.Option>
+                                    <Select.Option value="TEACHER">Thẻ giáo viên</Select.Option>
+                                </Select>
+                            </Form.Item>
+                        </Col>
+
+                        {/* Họ tên */}
+                        <Col span={12}>
+                            <Form.Item
+                                label="Họ tên"
+                                name="fullName"
+                                rules={[
+                                    { required: true, message: 'Vui lòng nhập họ tên' },
+                                    { max: 100, message: 'Tên quá dài' },
+                                ]}
+                            >
+                                <Input placeholder="Nhập họ tên" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+
+                    <Row gutter={16}>
+                        {/* Ngày sinh */}
+                        <Col span={12}>
+                            <Form.Item
+                                label="Ngày sinh"
+                                name="dateOfBirth"
+                                rules={[{ required: true, message: 'Vui lòng chọn ngày sinh' }]}
+                            >
+                                <DatePicker format="YYYY-MM-DD" placeholder="Chọn ngày sinh" className="w-100" />
+                            </Form.Item>
+                        </Col>
+
+                        {/* Giới tính */}
+                        <Col span={12}>
+                            <Form.Item label="Giới tính" name="gender">
+                                <Select placeholder="Chọn giới tính">
+                                    <Select.Option value="MALE">Nam</Select.Option>
+                                    <Select.Option value="FEMALE">Nữ</Select.Option>
+                                </Select>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+
+                    <Row gutter={16}>
+                        {/* Địa chỉ */}
+                        <Col span={12}>
+                            <Form.Item
+                                label="Địa chỉ"
+                                name="address"
+                                rules={[{ max: 255, message: 'Địa chỉ quá dài' }]}
+                            >
+                                <Input placeholder="Nhập địa chỉ" autoComplete="off" />
+                            </Form.Item>
+                        </Col>
+
+                        {/* Số điện thoại */}
+                        <Col span={12}>
+                            <Form.Item
+                                label="Số điện thoại"
+                                name="phoneNumber"
+                                rules={[
+                                    { required: true, message: 'Vui lòng nhập số điện thoại' },
+                                    { pattern: new RegExp(REGEXP_PHONE_NUMBER), message: 'Số điện thoại không hợp lệ' },
+                                    { min: 10, max: 20, message: 'Số điện thoại phải từ 10 đến 20 ký tự' },
+                                ]}
+                            >
+                                <Input placeholder="Nhập số điện thoại" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+
+                    <Row gutter={16}>
+                        {/* Số thẻ */}
+                        <Col span={12}>
+                            <Form.Item
+                                label="Số thẻ"
+                                name="cardNumber"
+                                rules={[
+                                    { required: true, message: 'Vui lòng nhập số thẻ' },
+                                    { max: 100, message: 'Số thẻ quá dài' },
+                                ]}
+                            >
+                                <Input placeholder="Nhập số thẻ" />
+                            </Form.Item>
+                        </Col>
+
+                        {/* Mật khẩu */}
+                        <Col span={12}>
+                            <Form.Item
+                                label="Mật khẩu"
+                                name="password"
+                                rules={[{ max: 100, message: 'Mật khẩu quá dài' }]}
+                            >
+                                <Input.Password placeholder="Nhập mật khẩu" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+
+                    <Row gutter={16}>
+                        {/* Ngày hết hạn */}
+                        <Col span={12}>
+                            <Form.Item label="Ngày hết hạn" name="expiryDate">
+                                <DatePicker format="YYYY-MM-DD" placeholder="Chọn ngày hết hạn" className="w-100" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
                 </Form>
             </Modal>
 

@@ -148,6 +148,7 @@ function History() {
                 <h2>Nhật ký truy cập</h2>
                 <Space>
                     <DatePicker
+                        name="startDate"
                         placeholder="Ngày bắt đầu"
                         value={startDate}
                         onChange={(date) => {
@@ -156,6 +157,7 @@ function History() {
                         disabled={isLoading}
                     />
                     <DatePicker
+                        name="endDate"
                         placeholder="Ngày kết thúc"
                         value={endDate}
                         onChange={(date) => {

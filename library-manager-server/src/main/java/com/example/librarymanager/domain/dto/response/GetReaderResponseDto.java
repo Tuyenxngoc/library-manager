@@ -28,8 +28,6 @@ public class GetReaderResponseDto extends UserDateAuditingDto {
 
     private final String cardNumber;
 
-    private final String password;
-
     private final LocalDate expiryDate;
 
     private final boolean activeFlag;
@@ -53,7 +51,6 @@ public class GetReaderResponseDto extends UserDateAuditingDto {
         this.address = reader.getAddress();
         this.phoneNumber = reader.getPhoneNumber();
         this.cardNumber = reader.getCardNumber();
-        this.password = reader.getPassword();
         this.expiryDate = reader.getExpiryDate();
         this.activeFlag = reader.getActiveFlag();
 
