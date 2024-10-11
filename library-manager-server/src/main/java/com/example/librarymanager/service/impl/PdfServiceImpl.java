@@ -19,8 +19,25 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PdfServiceImpl implements PdfService {
 
-    private static final String FONT_PATH = "src/main/resources/fonts/NotoSans-Regular.ttf";
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    private static Font boldFont;
+    private static Font normalFont;
+    private static Font headerFont;
+    private static Font signFont;
+
+    static {
+        String FONT_PATH = "src/main/resources/fonts/NotoSans-Regular.ttf";
+
+        try {
+            BaseFont baseFont = BaseFont.createFont(FONT_PATH, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+            boldFont = new Font(baseFont, 16, Font.BOLD);
+            normalFont = new Font(baseFont, 12);
+            headerFont = new Font(baseFont, 14, Font.BOLD);
+            signFont = new Font(baseFont, 12, Font.BOLD);
+        } catch (DocumentException | IOException e) {
+            log.error("Failed to create font: " + FONT_PATH);
+        }
+    }
 
     @Override
     public byte[] createPdf(CreateReaderCardsRequestDto requestDto, List<Reader> readers) {
@@ -31,13 +48,6 @@ public class PdfServiceImpl implements PdfService {
             PdfWriter writer = PdfWriter.getInstance(document, outputStream);
             document.open();
 
-            // Font settings
-            BaseFont baseFont = BaseFont.createFont(FONT_PATH, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-            Font headerFont = new Font(baseFont, 14, Font.BOLD);
-            Font normalFont = new Font(baseFont, 12);
-            Font smallFont = new Font(baseFont, 10);
-
-            // Number of cards per page (8 cards: 4 rows, 2 columns)
             int cardsPerPage = 8;
             int totalReaders = readers.size();
             int totalPages = (int) Math.ceil((double) totalReaders / cardsPerPage);
@@ -48,7 +58,6 @@ public class PdfServiceImpl implements PdfService {
                 mainTable.setSpacingBefore(10f);
                 mainTable.setSpacingAfter(10f);
 
-                // Add 8 cards (or less if it's the last page)
                 int lop = Math.min((pageIndex + 1) * cardsPerPage, totalReaders);
                 for (int i = pageIndex * cardsPerPage; i < lop; i++) {
                     Reader reader = readers.get(i);
@@ -56,14 +65,14 @@ public class PdfServiceImpl implements PdfService {
                     cardContainer.setWidthPercentage(100);
 
                     PdfPCell headerCell = new PdfPCell();
-                    headerCell.addElement(createParagraph(requestDto.getManagementUnit(), normalFont, Element.ALIGN_CENTER));
+                    headerCell.addElement(createParagraph(requestDto.getManagementUnit(), headerFont, Element.ALIGN_CENTER));
                     headerCell.addElement(createParagraph(requestDto.getSchoolName(), headerFont, Element.ALIGN_CENTER));
                     headerCell.setBorder(Rectangle.NO_BORDER);
                     cardContainer.addCell(headerCell);
 
                     PdfPTable cardContentTable = new PdfPTable(2);
                     cardContentTable.setWidthPercentage(100);
-                    cardContentTable.setWidths(new int[]{1, 3});
+                    cardContentTable.setWidths(new int[]{1, 2});
 
                     PdfPTable avatarTable = createAvatarTable(writer, reader);
                     PdfPCell avatarCell = new PdfPCell(avatarTable);
@@ -71,7 +80,7 @@ public class PdfServiceImpl implements PdfService {
                     avatarCell.setBorder(Rectangle.NO_BORDER);
                     cardContentTable.addCell(avatarCell);
 
-                    PdfPCell infoCell = createInfoCell(baseFont, requestDto, reader);
+                    PdfPCell infoCell = createInfoCell(requestDto, reader);
                     cardContentTable.addCell(infoCell);
 
                     PdfPCell cardCell = new PdfPCell(cardContentTable);
@@ -136,20 +145,17 @@ public class PdfServiceImpl implements PdfService {
         return avatarTable;
     }
 
-    private PdfPCell createInfoCell(BaseFont baseFont, CreateReaderCardsRequestDto requestDto, Reader reader) {
+    private PdfPCell createInfoCell(CreateReaderCardsRequestDto requestDto, Reader reader) {
         PdfPCell infoCell = new PdfPCell();
         infoCell.setBorder(Rectangle.NO_BORDER);
 
-        Font boldFont = new Font(baseFont, 16, Font.BOLD);
-        Font normalFont = new Font(baseFont, 12);
-
         infoCell.addElement(createParagraph("THẺ THƯ VIỆN", boldFont, Element.ALIGN_CENTER));
         infoCell.addElement(new Paragraph(String.format("Họ và tên: %s", reader.getFullName()), normalFont));
-        infoCell.addElement(new Paragraph("Lớp học: 6/1", normalFont));
+        infoCell.addElement(new Paragraph(String.format("Loại thẻ: %s", reader.getCardType().getDisplayName()), normalFont));
         infoCell.addElement(new Paragraph(String.format("Ngày sinh: %s", reader.getDateOfBirth().format(formatter)), normalFont));
         infoCell.addElement(new Paragraph(String.format("Ngày hết hạn: %s", reader.getExpiryDate() != null ? reader.getExpiryDate().format(formatter) : "Không có"), normalFont));
         infoCell.addElement(createParagraph("Ban giám hiệu", normalFont, Element.ALIGN_CENTER));
-        infoCell.addElement(createParagraph(requestDto.getPrincipalName().toUpperCase(), normalFont, Element.ALIGN_CENTER));
+        infoCell.addElement(createParagraph(requestDto.getPrincipalName().toUpperCase(), signFont, Element.ALIGN_CENTER));
 
         return infoCell;
     }
