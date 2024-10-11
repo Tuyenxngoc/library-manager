@@ -19,8 +19,16 @@ import { MdOutlineModeEdit } from 'react-icons/md';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import queryString from 'query-string';
 import { INITIAL_FILTERS, INITIAL_META, REGEXP_PHONE_NUMBER } from '~/common/commonConstants';
-import { createReader, deleteReader, getReaders, toggleActiveFlag, updateReader } from '~/services/readerService';
+import {
+    createReader,
+    deleteReader,
+    getReaders,
+    printCards,
+    toggleActiveFlag,
+    updateReader,
+} from '~/services/readerService';
 import moment from 'moment';
+import { axiosPrivate } from '~/apis/configHttp';
 
 function Reader() {
     const [meta, setMeta] = useState(INITIAL_META);
@@ -158,6 +166,33 @@ function Reader() {
             }
         } catch (error) {
             const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi cập nhật.';
+            messageApi.error(errorMessage);
+        }
+    };
+
+    const handleCreateCard = async () => {
+        try {
+            const response = await printCards({
+                principalName: 'Kiều Xuân Thực',
+                managementUnit: 'Bộ Công Thương',
+                schoolName: 'Trường Đại học Công nghiệp Hà Nội',
+                readerIds: [10, 9, 8, 7, 13],
+            });
+
+            if (response.status === 200) {
+                // Chuyển đổi mảng byte thành Blob
+                const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+                const url = URL.createObjectURL(pdfBlob);
+
+                // Mở hoặc tải xuống file PDF
+                const newTab = window.open(url, '_blank');
+                newTab.focus(); // Đưa tab mới lên trước
+
+                // Giải phóng URL sau khi sử dụng
+                URL.revokeObjectURL(url);
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi xuất dữ liệu.';
             messageApi.error(errorMessage);
         }
     };
@@ -526,9 +561,12 @@ function Reader() {
             <Flex className="py-2" wrap justify="space-between" align="center">
                 <h2>Thẻ bạn đọc</h2>
 
-                <Button type="primary" onClick={showAddModal}>
-                    Thêm mới
-                </Button>
+                <Space>
+                    <Button type="primary" onClick={showAddModal}>
+                        Thêm mới
+                    </Button>
+                    <Button onClick={handleCreateCard}>In thẻ</Button>
+                </Space>
             </Flex>
 
             <Table

@@ -53,3 +53,9 @@ export const getReaderById = (id) => {
 export const getReaders = (params) => {
     return axiosPrivate.get(`readers?${params}`);
 };
+
+export const printCards = (values) => {
+    return axiosPrivate.post('readers/print-cards', values, {
+        responseType: 'arraybuffer',
+    });
+};

@@ -5,9 +5,9 @@ import com.example.librarymanager.annotation.RestApiV1;
 import com.example.librarymanager.base.VsResponseUtil;
 import com.example.librarymanager.constant.UrlConstant;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
+import com.example.librarymanager.domain.dto.request.CreateReaderCardsRequestDto;
 import com.example.librarymanager.domain.dto.request.ReaderRequestDto;
 import com.example.librarymanager.security.CustomUserDetails;
-import com.example.librarymanager.service.PdfService;
 import com.example.librarymanager.service.ReaderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,8 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class ReaderController {
 
     ReaderService readerService;
-
-    PdfService pdfService;
 
     @Operation(summary = "API Create Reader")
     @PreAuthorize("hasRole('ROLE_MANAGE_READER')")
@@ -91,9 +89,11 @@ public class ReaderController {
         return VsResponseUtil.success(readerService.toggleActiveStatus(id, userDetails.getUserId()));
     }
 
-    @GetMapping("/generate-pdf")
-    public ResponseEntity<byte[]> generatePdf(@RequestParam String content) {
-        byte[] pdfBytes = pdfService.createPdf("Xin chào thế giới của tôi");
+    @Operation(summary = "API Generate Cards Reader")
+    @PreAuthorize("hasRole('ROLE_MANAGE_READER')")
+    @PostMapping(UrlConstant.Reader.PRINT_CARDS)
+    public ResponseEntity<byte[]> generateReaderCards(@Valid @RequestBody CreateReaderCardsRequestDto requestDto) {
+        byte[] pdfBytes = readerService.generateReaderCards(requestDto);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "application/pdf");

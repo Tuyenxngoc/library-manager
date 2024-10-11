@@ -1,7 +1,10 @@
 package com.example.librarymanager.service;
 
-import java.io.IOException;
+import com.example.librarymanager.domain.dto.request.CreateReaderCardsRequestDto;
+import com.example.librarymanager.domain.entity.Reader;
+
+import java.util.List;
 
 public interface PdfService {
-    byte[] createPdf(String content);
+    byte[] createPdf(CreateReaderCardsRequestDto requestDto, List<Reader> readers);
 }

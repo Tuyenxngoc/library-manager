@@ -2,6 +2,7 @@ package com.example.librarymanager.service;
 
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
+import com.example.librarymanager.domain.dto.request.CreateReaderCardsRequestDto;
 import com.example.librarymanager.domain.dto.request.ReaderRequestDto;
 import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.dto.response.GetReaderResponseDto;
@@ -21,4 +22,6 @@ public interface ReaderService {
     GetReaderResponseDto findById(Long id);
 
     CommonResponseDto toggleActiveStatus(Long id, String userId);
+
+    byte[] generateReaderCards(CreateReaderCardsRequestDto requestDto);
 }

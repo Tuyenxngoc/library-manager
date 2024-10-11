@@ -7,6 +7,7 @@ import com.example.librarymanager.constant.SuccessMessage;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
+import com.example.librarymanager.domain.dto.request.CreateReaderCardsRequestDto;
 import com.example.librarymanager.domain.dto.request.ReaderRequestDto;
 import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.dto.response.GetReaderResponseDto;
@@ -18,6 +19,7 @@ import com.example.librarymanager.exception.ConflictException;
 import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.ReaderRepository;
 import com.example.librarymanager.service.LogService;
+import com.example.librarymanager.service.PdfService;
 import com.example.librarymanager.service.ReaderService;
 import com.example.librarymanager.util.PaginationUtil;
 import com.example.librarymanager.util.UploadFileUtil;
@@ -51,6 +53,8 @@ public class ReaderServiceImpl implements ReaderService {
     private final UploadFileUtil uploadFileUtil;
 
     private final MessageSource messageSource;
+
+    private final PdfService pdfService;
 
     private Reader getEntity(Long id) {
         return readerRepository.findById(id)
@@ -209,6 +213,15 @@ public class ReaderServiceImpl implements ReaderService {
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, reader.getActiveFlag());
+    }
+
+    @Override
+    public byte[] generateReaderCards(CreateReaderCardsRequestDto requestDto) {
+        List<Reader> readers = readerRepository.findAllByIdIn(requestDto.getReaderIds());
+        if (readers.isEmpty()) {
+            throw new BadRequestException(ErrorMessage.Reader.ERR_NOT_FOUND_ID, 1);
+        }
+        return pdfService.createPdf(requestDto, readers);
     }
 
 }
