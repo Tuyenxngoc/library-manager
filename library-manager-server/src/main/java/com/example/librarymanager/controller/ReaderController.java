@@ -79,6 +79,13 @@ public class ReaderController {
         return VsResponseUtil.success(readerService.findById(id));
     }
 
+    @Operation(summary = "API Get Reader By CardNumber")
+    @PreAuthorize("hasRole('ROLE_MANAGE_READER')")
+    @GetMapping(UrlConstant.Reader.GET_BY_CARD_NUMBER)
+    public ResponseEntity<?> getReaderByCardNumber(@PathVariable String cardNumber) {
+        return VsResponseUtil.success(readerService.findByCardNumber(cardNumber));
+    }
+
     @Operation(summary = "API Toggle Active Status of Reader")
     @PreAuthorize("hasRole('ROLE_MANAGE_READER')")
     @PatchMapping(UrlConstant.Reader.TOGGLE_ACTIVE)

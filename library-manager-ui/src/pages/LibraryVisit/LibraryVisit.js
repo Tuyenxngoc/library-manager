@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import queryString from 'query-string';
-import { Button, Flex, Form, Input, message, Space, Table } from 'antd';
+import { Button, Col, Descriptions, Flex, Form, Image, Input, message, Row, Space, Table } from 'antd';
 import { IoMdPersonAdd } from 'react-icons/io';
 import { FaRegClock, FaList, FaSignOutAlt } from 'react-icons/fa';
+import images from '~/assets';
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
 import { closeLibrary, createLibraryVisit, getLibraryVisits } from '~/services/libraryVisitService';
-import { useNavigate } from 'react-router-dom';
+import { getReaderByCardNumber } from '~/services/readerService';
 
 function LibraryVisit() {
     const naviagate = useNavigate();
@@ -13,6 +15,7 @@ function LibraryVisit() {
     const [filters, setFilters] = useState(INITIAL_FILTERS);
 
     const [entityData, setEntityData] = useState(null);
+    const [selectedReader, setSelectedReader] = useState({});
 
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState(null);
@@ -52,12 +55,26 @@ function LibraryVisit() {
         }));
     };
 
+    const fetchNewReaderInfo = async (cardNumber) => {
+        try {
+            const response = await getReaderByCardNumber(cardNumber);
+            if (response.status === 200) {
+                setSelectedReader(response.data.data);
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Không thể tìm thông tin người đọc.';
+            messageApi.error(errorMessage);
+        }
+    };
+
     const handleCreateEntity = async (values) => {
         try {
             const response = await createLibraryVisit(values);
             if (response.status === 200 || response.status === 201) {
                 const { data, message } = response.data.data;
                 messageApi.success(message);
+
+                await fetchNewReaderInfo(data.cardNumber);
 
                 setEntityData((prevData) => {
                     const existingIndex = prevData.findIndex((item) => item.id === data.id);
@@ -178,6 +195,7 @@ function LibraryVisit() {
 
             <h2>Thông tin bạn đọc</h2>
             <b>Ngày: {currentDate}</b>
+
             <Flex className="py-2" wrap justify="space-between" align="center">
                 <Form form={form} onFinish={handleCreateEntity} layout="inline">
                     <Form.Item
@@ -203,6 +221,26 @@ function LibraryVisit() {
                     </Button>
                 </Space>
             </Flex>
+
+            <Row gutter={16} justify="center" className="mb-4">
+                <Col span={6}>
+                    <Image width={200} src={selectedReader.avatar || images.placeimg} fallback={images.placeimg} />
+                </Col>
+                <Col span={18}>
+                    <Descriptions
+                        column={2}
+                        items={[
+                            { key: '1', label: 'Họ tên', children: selectedReader.fullName || 'N/A' },
+                            { key: '2', label: 'Số thẻ', children: selectedReader.cardNumber || 'N/A' },
+                            { key: '3', label: 'Loại thẻ', children: selectedReader.cardType || 'N/A' },
+                            { key: '4', label: 'Ngày sinh', children: selectedReader.dateOfBirth || 'N/A' },
+                            { key: '5', label: 'Giới tính', children: selectedReader.gender || 'N/A' },
+                            { key: '6', label: 'Số điện thoại', children: selectedReader.phoneNumber || 'N/A' },
+                            { key: '7', label: 'Địa chỉ', children: selectedReader.address || 'N/A' },
+                        ]}
+                    />
+                </Col>
+            </Row>
 
             <h2>Danh sách bạn đọc vào thư viện</h2>
 

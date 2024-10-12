@@ -3,6 +3,7 @@ package com.example.librarymanager.service.impl;
 import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.constant.SuccessMessage;
+import com.example.librarymanager.domain.dto.filter.LibraryVisitFilter;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
@@ -78,11 +79,11 @@ public class LibraryVisitServiceImpl implements LibraryVisitService {
     }
 
     @Override
-    public PaginationResponseDto<GetLibraryVisitResponseDto> findAll(PaginationFullRequestDto requestDto) {
+    public PaginationResponseDto<GetLibraryVisitResponseDto> findAll(PaginationFullRequestDto requestDto, LibraryVisitFilter filter) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.LIBRARY_VISIT);
 
         Page<LibraryVisit> page = libraryVisitRepository.findAll(
-                EntitySpecification.filterLibraryVisits(requestDto.getKeyword(), requestDto.getSearchBy()),
+                EntitySpecification.filterLibraryVisits(requestDto.getKeyword(), requestDto.getSearchBy(), filter),
                 pageable);
 
         List<GetLibraryVisitResponseDto> items = page.getContent().stream()

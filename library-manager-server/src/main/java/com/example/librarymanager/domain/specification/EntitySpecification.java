@@ -1,5 +1,6 @@
 package com.example.librarymanager.domain.specification;
 
+import com.example.librarymanager.domain.dto.filter.LibraryVisitFilter;
 import com.example.librarymanager.domain.dto.filter.LogFilter;
 import com.example.librarymanager.domain.entity.*;
 import com.example.librarymanager.util.SpecificationsUtil;
@@ -377,20 +378,29 @@ public class EntitySpecification {
         };
     }
 
-    public static Specification<LibraryVisit> filterLibraryVisits(String keyword, String searchBy) {
+    public static Specification<LibraryVisit> filterLibraryVisits(String keyword, String searchBy, LibraryVisitFilter filter) {
         return (root, query, builder) -> {
             query.distinct(true);
 
             Predicate predicate = builder.conjunction();
 
-            LocalDate today = LocalDate.now();
-            LocalDateTime startOfDay = today.atStartOfDay();
-            LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+            if (filter == null) {//Nếu không có filter thì lọc theo thời gian trong ngày
+                LocalDate today = LocalDate.now();
+                LocalDateTime startOfDay = today.atStartOfDay();
+                LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
 
-            // Thêm điều kiện lọc theo thời gian trong ngày hôm nay
-            predicate = builder.and(predicate,
-                    builder.between(root.get(LibraryVisit_.entryTime), startOfDay, endOfDay)
-            );
+                // Thêm điều kiện lọc theo thời gian trong ngày hôm nay
+                predicate = builder.and(predicate,
+                        builder.between(root.get(LibraryVisit_.entryTime), startOfDay, endOfDay)
+                );
+            } else {
+                if (filter.getStartDate() != null) {
+                    predicate = builder.and(predicate, builder.greaterThanOrEqualTo(root.get(LibraryVisit_.entryTime), filter.getStartDate().atStartOfDay()));
+                }
+                if (filter.getEndDate() != null) {
+                    predicate = builder.and(predicate, builder.lessThanOrEqualTo(root.get(LibraryVisit_.entryTime), filter.getEndDate().atTime(23, 59, 59)));
+                }
+            }
 
             if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(searchBy)) {
                 switch (searchBy) {

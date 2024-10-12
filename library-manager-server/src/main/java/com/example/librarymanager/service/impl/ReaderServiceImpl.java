@@ -61,6 +61,11 @@ public class ReaderServiceImpl implements ReaderService {
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.Reader.ERR_NOT_FOUND_ID, id));
     }
 
+    private Reader getEntity(String cardNumber) {
+        return readerRepository.findByCardNumber(cardNumber)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.Reader.ERR_NOT_FOUND_CARD_NUMBER, cardNumber));
+    }
+
     @Override
     public void initReaders() {
         if (readerRepository.count() == 0) {
@@ -157,11 +162,11 @@ public class ReaderServiceImpl implements ReaderService {
         Reader reader = getEntity(id);
 
         if (!reader.getBorrowReceipts().isEmpty()) {
-            throw new BadRequestException(ErrorMessage.Reader.ERR_HAS_LINKED_BOOKS);
+            throw new BadRequestException(ErrorMessage.Reader.ERR_READER_HAS_DATA);
         }
 
         if (!reader.getLibraryVisits().isEmpty()) {
-            throw new BadRequestException(ErrorMessage.Reader.ERR_HAS_LINKED_BOOKS);
+            throw new BadRequestException(ErrorMessage.Reader.ERR_READER_HAS_DATA);
         }
 
         uploadFileUtil.destroyFileWithUrl(reader.getAvatar());
@@ -198,6 +203,12 @@ public class ReaderServiceImpl implements ReaderService {
     @Override
     public GetReaderResponseDto findById(Long id) {
         Reader reader = getEntity(id);
+        return new GetReaderResponseDto(reader);
+    }
+
+    @Override
+    public GetReaderResponseDto findByCardNumber(String cardNumber) {
+        Reader reader = getEntity(cardNumber);
         return new GetReaderResponseDto(reader);
     }
 

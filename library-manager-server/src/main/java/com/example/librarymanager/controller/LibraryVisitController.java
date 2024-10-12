@@ -3,6 +3,7 @@ package com.example.librarymanager.controller;
 import com.example.librarymanager.annotation.RestApiV1;
 import com.example.librarymanager.base.VsResponseUtil;
 import com.example.librarymanager.constant.UrlConstant;
+import com.example.librarymanager.domain.dto.filter.LibraryVisitFilter;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.request.LibraryVisitRequestDto;
 import com.example.librarymanager.service.LibraryVisitService;
@@ -53,8 +54,11 @@ public class LibraryVisitController {
     @Operation(summary = "API Get Visits")
     @PreAuthorize("hasRole('ROLE_MANAGE_READER')")
     @GetMapping(UrlConstant.LibraryVisit.GET_ALL)
-    public ResponseEntity<?> getVisits(@ParameterObject PaginationFullRequestDto requestDto) {
-        return VsResponseUtil.success(libraryVisitService.findAll(requestDto));
+    public ResponseEntity<?> getVisits(
+            @ParameterObject PaginationFullRequestDto requestDto,
+            @ParameterObject LibraryVisitFilter filter
+    ) {
+        return VsResponseUtil.success(libraryVisitService.findAll(requestDto, filter));
     }
 
     @Operation(summary = "API Get Visit By Id")

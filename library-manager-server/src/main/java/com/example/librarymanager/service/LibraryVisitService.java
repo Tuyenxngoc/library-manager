@@ -1,5 +1,6 @@
 package com.example.librarymanager.service;
 
+import com.example.librarymanager.domain.dto.filter.LibraryVisitFilter;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.request.LibraryVisitRequestDto;
@@ -11,7 +12,7 @@ public interface LibraryVisitService {
 
     CommonResponseDto update(Long id, LibraryVisitRequestDto requestDto);
 
-    PaginationResponseDto<GetLibraryVisitResponseDto> findAll(PaginationFullRequestDto requestDto);
+    PaginationResponseDto<GetLibraryVisitResponseDto> findAll(PaginationFullRequestDto requestDto, LibraryVisitFilter filter);
 
     GetLibraryVisitResponseDto findById(Long id);
 

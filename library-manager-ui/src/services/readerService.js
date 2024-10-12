@@ -50,6 +50,10 @@ export const getReaderById = (id) => {
     return axiosPrivate.get(`readers/${id}`);
 };
 
+export const getReaderByCardNumber = (cardNumber) => {
+    return axiosPrivate.get(`readers/card-number/${cardNumber}`);
+};
+
 export const getReaders = (params) => {
     return axiosPrivate.get(`readers?${params}`);
 };
