@@ -8,6 +8,10 @@ import jakarta.persistence.criteria.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 public class EntitySpecification {
 
     public static Specification<Author> filterAuthors(String keyword, String searchBy, Boolean activeFlag) {
@@ -369,6 +373,38 @@ public class EntitySpecification {
                 predicate = builder.and(predicate, builder.equal(root.get(Reader_.activeFlag), activeFlag));
             }
 
+            return predicate;
+        };
+    }
+
+    public static Specification<LibraryVisit> filterLibraryVisits(String keyword, String searchBy) {
+        return (root, query, builder) -> {
+            query.distinct(true);
+
+            Predicate predicate = builder.conjunction();
+
+            LocalDate today = LocalDate.now();
+            LocalDateTime startOfDay = today.atStartOfDay();
+            LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
+
+            // Thêm điều kiện lọc theo thời gian trong ngày hôm nay
+            predicate = builder.and(predicate,
+                    builder.between(root.get(LibraryVisit_.entryTime), startOfDay, endOfDay)
+            );
+
+            if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(searchBy)) {
+                switch (searchBy) {
+                    case "cardNumber" -> {
+                        Join<LibraryVisit, Reader> readerJoin = root.join(LibraryVisit_.reader);
+                        predicate = builder.and(predicate, builder.like(readerJoin.get(Reader_.cardNumber), "%" + keyword + "%"));
+                    }
+
+                    case "fullName" -> {
+                        Join<LibraryVisit, Reader> readerJoin = root.join(LibraryVisit_.reader);
+                        predicate = builder.and(predicate, builder.like(readerJoin.get(Reader_.fullName), "%" + keyword + "%"));
+                    }
+                }
+            }
             return predicate;
         };
     }

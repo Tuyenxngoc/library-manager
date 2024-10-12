@@ -27,7 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestApiV1
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Tag(name = "Reader Management")
+@Tag(name = "Reader")
 public class ReaderController {
 
     ReaderService readerService;

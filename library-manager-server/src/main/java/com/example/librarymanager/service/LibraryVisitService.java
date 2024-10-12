@@ -1,15 +1,19 @@
 package com.example.librarymanager.service;
 
-import com.example.librarymanager.domain.entity.LibraryVisit;
-
-import java.util.List;
+import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
+import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
+import com.example.librarymanager.domain.dto.request.LibraryVisitRequestDto;
+import com.example.librarymanager.domain.dto.response.CommonResponseDto;
+import com.example.librarymanager.domain.dto.response.GetLibraryVisitResponseDto;
 
 public interface LibraryVisitService {
-    LibraryVisit findById(Long id);
+    CommonResponseDto save(LibraryVisitRequestDto requestDto);
 
-    List<LibraryVisit> findAll();
+    CommonResponseDto update(Long id, LibraryVisitRequestDto requestDto);
 
-    LibraryVisit save(LibraryVisit libraryVisit);
+    PaginationResponseDto<GetLibraryVisitResponseDto> findAll(PaginationFullRequestDto requestDto);
 
-    void delete(Long id);
+    GetLibraryVisitResponseDto findById(Long id);
+
+    CommonResponseDto closeLibrary();
 }

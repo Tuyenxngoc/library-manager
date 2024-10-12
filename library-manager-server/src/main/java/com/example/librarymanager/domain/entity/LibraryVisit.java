@@ -19,6 +19,7 @@ public class LibraryVisit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "library_visit_id")
     private Long id;
 
     @Column(name = "entry_time", nullable = false)
