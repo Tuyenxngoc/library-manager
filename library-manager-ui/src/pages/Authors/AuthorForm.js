@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+import dayjs from 'dayjs';
 import { Button, DatePicker, Input, message, Radio, Space } from 'antd';
-import moment from 'moment';
 import { handleError } from '~/utils/errorHandler';
 import { checkIdIsNumber } from '~/utils/helper';
 import { createAuthor, getAuthorById, updateAuthor } from '~/services/authorService';
@@ -90,8 +90,8 @@ function AuthorForm() {
                         code,
                         penName,
                         gender,
-                        dateOfBirth: dateOfBirth ? moment(dateOfBirth) : null,
-                        dateOfDeath: dateOfDeath ? moment(dateOfDeath) : null,
+                        dateOfBirth: dateOfBirth ? dayjs(dateOfBirth) : null,
+                        dateOfDeath: dateOfDeath ? dayjs(dateOfDeath) : null,
                         title,
                         residence,
                         address,

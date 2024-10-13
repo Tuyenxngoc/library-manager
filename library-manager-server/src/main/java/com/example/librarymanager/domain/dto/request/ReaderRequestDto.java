@@ -1,9 +1,6 @@
 package com.example.librarymanager.domain.dto.request;
 
-import com.example.librarymanager.constant.CardType;
-import com.example.librarymanager.constant.CommonConstant;
-import com.example.librarymanager.constant.ErrorMessage;
-import com.example.librarymanager.constant.Gender;
+import com.example.librarymanager.constant.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -20,32 +17,37 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReaderRequestDto {
-
     @NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
-    private CardType cardType; // Loại thẻ
+    private CardType cardType;
 
     @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)
-    @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
-    private String fullName; // Họ tên
+    @Pattern(regexp = CommonConstant.REGEXP_FULL_NAME, message = ErrorMessage.INVALID_FORMAT_NAME)
+    @Size(min = 2, max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
+    private String fullName;
 
     @NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
-    private LocalDate dateOfBirth; // Ngày sinh
+    private LocalDate dateOfBirth;
 
-    private Gender gender; // Giới tính (Nam, Nữ)
+    @NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
+    private Gender gender;
 
     @Size(max = 255, message = ErrorMessage.INVALID_TEXT_LENGTH)
-    private String address; // Địa chỉ
+    private String address;
 
     @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)
     @Pattern(regexp = CommonConstant.REGEXP_PHONE_NUMBER, message = ErrorMessage.INVALID_FORMAT_PHONE)
     @Size(min = 10, max = 20, message = ErrorMessage.INVALID_TEXT_LENGTH)
-    private String phoneNumber; // Số điện thoại
+    private String phoneNumber;
 
     @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)
     @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
-    private String cardNumber; // Số thẻ
+    private String cardNumber;
 
-    private String password; // Mật khẩu
+    private String password;
 
-    private LocalDate expiryDate; // Ngày hết hạn
+    @NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
+    private LocalDate expiryDate;
+
+    @NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
+    private CardStatus status;
 }

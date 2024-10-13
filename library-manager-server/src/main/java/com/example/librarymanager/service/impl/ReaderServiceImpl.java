@@ -1,9 +1,6 @@
 package com.example.librarymanager.service.impl;
 
-import com.example.librarymanager.constant.CardType;
-import com.example.librarymanager.constant.ErrorMessage;
-import com.example.librarymanager.constant.SortByDataConstant;
-import com.example.librarymanager.constant.SuccessMessage;
+import com.example.librarymanager.constant.*;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
@@ -66,20 +63,16 @@ public class ReaderServiceImpl implements ReaderService {
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.Reader.ERR_NOT_FOUND_CARD_NUMBER, cardNumber));
     }
 
+    public void validatePassword(String password) {
+        if (password.length() > 30) {
+            throw new BadRequestException(ErrorMessage.INVALID_TEXT_LENGTH);
+        } else if (!password.matches(CommonConstant.REGEXP_PASSWORD)) {
+            throw new BadRequestException(ErrorMessage.INVALID_FORMAT_PASSWORD);
+        }
+    }
+
     @Override
     public void initReaders() {
-        if (readerRepository.count() == 0) {
-            Reader reader = new Reader();
-            reader.setCardType(CardType.STUDENT);
-            reader.setFullName("John Doe");
-            reader.setDateOfBirth(LocalDate.now());
-            reader.setCardNumber("1234567890");
-            reader.setPassword(passwordEncoder.encode("123"));
-            reader.setCreatedBy("Tuyen Ngoc");
-            reader.setLastModifiedBy("Tuyen Ngoc");
-
-            readerRepository.save(reader);
-        }
     }
 
     @Override
@@ -88,8 +81,8 @@ public class ReaderServiceImpl implements ReaderService {
         String password = requestDto.getPassword();
         if (password == null || password.isEmpty()) {
             throw new BadRequestException(ErrorMessage.INVALID_NOT_BLANK_FIELD);
-        } else if (password.length() > 100) {
-            throw new BadRequestException(ErrorMessage.INVALID_TEXT_LENGTH);
+        } else {
+            validatePassword(password);
         }
 
         //Kiểm tra file tải lên có phải định dạng ảnh không
@@ -100,13 +93,13 @@ public class ReaderServiceImpl implements ReaderService {
         }
 
         Reader reader = readerMappper.toReader(requestDto);
+        reader.setPassword(passwordEncoder.encode(requestDto.getPassword()));
 
         if (image != null && !image.isEmpty()) {
             String newImageUrl = uploadFileUtil.uploadFile(image);
             reader.setAvatar(newImageUrl);
         }
 
-        reader.setActiveFlag(true);
         readerRepository.save(reader);
 
         logService.createLog(TAG, "Thêm", "Thêm thẻ bạn đọc mới: " + reader.getCardNumber(), userId);
@@ -121,6 +114,13 @@ public class ReaderServiceImpl implements ReaderService {
         uploadFileUtil.checkImageIsValid(image);
 
         Reader reader = getEntity(id);
+
+        //Nếu mật khẩu khác null thì cập nhật lại mật khẩu
+        String password = requestDto.getPassword();
+        if (password != null && !password.isEmpty()) {
+            validatePassword(password);
+            reader.setPassword(passwordEncoder.encode(requestDto.getPassword()));
+        }
 
         if (!Objects.equals(reader.getCardNumber(), requestDto.getCardNumber()) &&
                 readerRepository.existsByCardNumber(requestDto.getCardNumber())) {
@@ -143,11 +143,7 @@ public class ReaderServiceImpl implements ReaderService {
         reader.setPhoneNumber(requestDto.getPhoneNumber());
         reader.setCardNumber(requestDto.getCardNumber());
         reader.setExpiryDate(requestDto.getExpiryDate());
-
-        String password = requestDto.getPassword();
-        if (password != null && !password.isEmpty() && password.length() <= 100) {
-            reader.setPassword(passwordEncoder.encode(requestDto.getPassword()));
-        }
+        reader.setStatus(requestDto.getStatus());
 
         readerRepository.save(reader);
 
@@ -184,7 +180,7 @@ public class ReaderServiceImpl implements ReaderService {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.READER);
 
         Page<Reader> page = readerRepository.findAll(
-                EntitySpecification.filterReaders(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag()),
+                EntitySpecification.filterReaders(requestDto.getKeyword(), requestDto.getSearchBy()),
                 pageable);
 
         List<GetReaderResponseDto> items = page.getContent().stream()
@@ -210,20 +206,6 @@ public class ReaderServiceImpl implements ReaderService {
     public GetReaderResponseDto findByCardNumber(String cardNumber) {
         Reader reader = getEntity(cardNumber);
         return new GetReaderResponseDto(reader);
-    }
-
-    @Override
-    public CommonResponseDto toggleActiveStatus(Long id, String userId) {
-        Reader reader = getEntity(id);
-
-        reader.setActiveFlag(!reader.getActiveFlag());
-
-        readerRepository.save(reader);
-
-        logService.createLog(TAG, "Sửa", "Thay đổi trạng thái thẻ bạn đọc: " + reader.getActiveFlag(), userId);
-
-        String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
-        return new CommonResponseDto(message, reader.getActiveFlag());
     }
 
     @Override

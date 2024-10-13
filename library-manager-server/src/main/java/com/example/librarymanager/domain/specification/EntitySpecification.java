@@ -1,5 +1,6 @@
 package com.example.librarymanager.domain.specification;
 
+import com.example.librarymanager.constant.CardStatus;
 import com.example.librarymanager.domain.dto.filter.LibraryVisitFilter;
 import com.example.librarymanager.domain.dto.filter.LogFilter;
 import com.example.librarymanager.domain.entity.*;
@@ -354,7 +355,7 @@ public class EntitySpecification {
         };
     }
 
-    public static Specification<Reader> filterReaders(String keyword, String searchBy, Boolean activeFlag) {
+    public static Specification<Reader> filterReaders(String keyword, String searchBy) {
         return (root, query, builder) -> {
             query.distinct(true);
 
@@ -367,11 +368,15 @@ public class EntitySpecification {
 
                     case Reader_.FULL_NAME ->
                             predicate = builder.and(predicate, builder.like(root.get(Reader_.fullName), "%" + keyword + "%"));
-                }
-            }
 
-            if (activeFlag != null) {
-                predicate = builder.and(predicate, builder.equal(root.get(Reader_.activeFlag), activeFlag));
+                    case Reader_.STATUS -> {
+                        try {
+                            CardStatus statusEnum = CardStatus.valueOf(keyword.toUpperCase());
+                            predicate = builder.and(predicate, builder.equal(root.get(Reader_.status), statusEnum));
+                        } catch (IllegalArgumentException ignored) {
+                        }
+                    }
+                }
             }
 
             return predicate;

@@ -182,7 +182,6 @@ public class UrlConstant {
         public static final String GET_BY_CARD_NUMBER = PRE_FIX + "/card-number/{cardNumber}";
         public static final String UPDATE = PRE_FIX + "/{id}";
         public static final String DELETE = PRE_FIX + "/{id}";
-        public static final String TOGGLE_ACTIVE = PRE_FIX + "/{id}/toggle-active";
         public static final String PRINT_CARDS = PRE_FIX + "/print-cards";
     }
 

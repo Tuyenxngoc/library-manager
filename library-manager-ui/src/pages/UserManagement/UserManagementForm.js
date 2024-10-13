@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import queryString from 'query-string';
+import dayjs from 'dayjs';
 import { Button, DatePicker, message, Space } from 'antd';
 import { handleError } from '~/utils/errorHandler';
 import FormInput from '~/components/FormInput';
@@ -10,7 +11,6 @@ import FormTextArea from '~/components/FormTextArea';
 import FormSelect from '~/components/FormSelect';
 import { getUserGroups } from '~/services/userGroupService';
 import { createUser, getUserById, updateUser } from '~/services/userService';
-import moment from 'moment';
 
 const statusOptions = [
     { value: 'ACTIVATED', label: 'Đã kích hoạt' },
@@ -145,7 +145,7 @@ const UserManagementForm = () => {
                         username,
                         password,
                         userGroupId: userGroup ? userGroup.id : null,
-                        expiryDate: expiryDate ? moment(expiryDate) : null,
+                        expiryDate: expiryDate ? dayjs(expiryDate) : null,
                         status,
                         fullName,
                         position,

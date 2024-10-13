@@ -1,5 +1,6 @@
 package com.example.librarymanager.domain.dto.response;
 
+import com.example.librarymanager.constant.CardStatus;
 import com.example.librarymanager.constant.CardType;
 import com.example.librarymanager.constant.Gender;
 import com.example.librarymanager.domain.dto.common.UserDateAuditingDto;
@@ -30,7 +31,7 @@ public class GetReaderResponseDto extends UserDateAuditingDto {
 
     private final LocalDate expiryDate;
 
-    private final boolean activeFlag;
+    private final CardStatus status;
 
     private final long currentBorrowedBooks;
 
@@ -52,7 +53,7 @@ public class GetReaderResponseDto extends UserDateAuditingDto {
         this.phoneNumber = reader.getPhoneNumber();
         this.cardNumber = reader.getCardNumber();
         this.expiryDate = reader.getExpiryDate();
-        this.activeFlag = reader.getActiveFlag();
+        this.status = reader.getStatus();
 
         // Tính số sách đang mượn (số lượng BorrowReceipts chưa được trả)
         this.currentBorrowedBooks = reader.getBorrowReceipts().stream()

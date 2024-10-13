@@ -7,7 +7,7 @@ import { FaPlusCircle } from 'react-icons/fa';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import { FaPlus } from 'react-icons/fa6';
 import queryString from 'query-string';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import FormInput from '~/components/FormInput';
 import { getBookDefinitions } from '~/services/bookDefinitionService';
 import { createImportReceipt, getImportReceiptById, updateImportReceipt } from '~/services/importReceiptService';
@@ -146,7 +146,7 @@ function InwardBookForm() {
 
                     formik.setValues({
                         receiptNumber,
-                        importDate: importDate ? moment(importDate) : null,
+                        importDate: importDate ? dayjs(importDate) : null,
                         generalRecordNumber,
                         fundingSource,
                         importReason,
@@ -204,7 +204,7 @@ function InwardBookForm() {
                         <DatePicker
                             id="importDate"
                             name="importDate"
-                            value={formik.values.importDate ? moment(formik.values.importDate) : null}
+                            value={formik.values.importDate ? dayjs(formik.values.importDate) : null}
                             onChange={(date) => formik.setFieldValue('importDate', date ? date.toISOString() : null)}
                             onBlur={() => formik.setFieldTouched('importDate', true)}
                             format="DD/MM/YYYY"

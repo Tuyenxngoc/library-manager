@@ -42,10 +42,6 @@ export const deleteReader = (id) => {
     return axiosPrivate.delete(`readers/${id}`);
 };
 
-export const toggleActiveFlag = (id) => {
-    return axiosPrivate.patch(`readers/${id}/toggle-active`);
-};
-
 export const getReaderById = (id) => {
     return axiosPrivate.get(`readers/${id}`);
 };

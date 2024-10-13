@@ -34,7 +34,7 @@ public class UserRequestDto {
 
     @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)
     @Pattern(regexp = CommonConstant.REGEXP_FULL_NAME, message = ErrorMessage.INVALID_FORMAT_NAME)
-    @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
+    @Size(min = 2, max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
     private String fullName;
 
     private String position;

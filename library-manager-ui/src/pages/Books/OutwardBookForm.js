@@ -7,7 +7,7 @@ import { FaPlusCircle } from 'react-icons/fa';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import { FaPlus } from 'react-icons/fa6';
 import queryString from 'query-string';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import FormInput from '~/components/FormInput';
 import { handleError } from '~/utils/errorHandler';
 import { checkIdIsNumber } from '~/utils/helper';
@@ -126,7 +126,7 @@ function OutwardBookForm() {
 
                     formik.setValues({
                         receiptNumber,
-                        exportDate: exportDate ? moment(exportDate) : null,
+                        exportDate: exportDate ? dayjs(exportDate) : null,
                         exportReason,
                         bookIds: [],
                     });
@@ -171,7 +171,7 @@ function OutwardBookForm() {
                         <DatePicker
                             id="exportDate"
                             name="exportDate"
-                            value={formik.values.exportDate ? moment(formik.values.exportDate) : null}
+                            value={formik.values.exportDate ? dayjs(formik.values.exportDate) : null}
                             onChange={(date) => formik.setFieldValue('exportDate', date ? date.toISOString() : null)}
                             onBlur={() => formik.setFieldTouched('exportDate', true)}
                             format="DD/MM/YYYY"

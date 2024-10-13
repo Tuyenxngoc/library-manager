@@ -23,7 +23,5 @@ public interface ReaderService {
 
     GetReaderResponseDto findByCardNumber(String cardNumber);
 
-    CommonResponseDto toggleActiveStatus(Long id, String userId);
-
     byte[] generateReaderCards(CreateReaderCardsRequestDto requestDto);
 }

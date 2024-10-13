@@ -1,5 +1,6 @@
 package com.example.librarymanager.domain.entity;
 
+import com.example.librarymanager.constant.CardStatus;
 import com.example.librarymanager.constant.CardType;
 import com.example.librarymanager.constant.Gender;
 import com.example.librarymanager.domain.entity.common.UserDateAuditing;
@@ -57,11 +58,12 @@ public class Reader extends UserDateAuditing {
     @Column(name = "password", nullable = false)
     private String password; // Mật khẩu
 
-    @Column(name = "expiry_date")
+    @Column(name = "expiry_date", nullable = false)
     private LocalDate expiryDate; // Ngày hết hạn
 
-    @Column(name = "active_flag", nullable = false)
-    private Boolean activeFlag = Boolean.TRUE;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private CardStatus status; // Trạng thái thẻ
 
     @OneToMany(mappedBy = "reader", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore

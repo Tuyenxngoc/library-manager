@@ -93,6 +93,10 @@ public class ErrorMessage {
         public static final String ERR_NOT_FOUND_CARD_NUMBER = "exception.reader.not.found.card.number";
         public static final String ERR_DUPLICATE_CARD_NUMBER = "exception.reader.duplicate.card.number";
         public static final String ERR_READER_HAS_DATA = "exception.reader.has.data";
+        public static final String ERR_READER_INACTIVE = "exception.reader.inactive";
+        public static final String ERR_READER_SUSPENDED = "exception.reader.suspended";
+        public static final String ERR_READER_REVOKED = "exception.reader.revoked";
+        public static final String ERR_READER_EXPIRED = "exception.reader.expired";
     }
 
     public static class Author {

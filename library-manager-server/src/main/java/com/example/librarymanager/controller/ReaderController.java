@@ -86,16 +86,6 @@ public class ReaderController {
         return VsResponseUtil.success(readerService.findByCardNumber(cardNumber));
     }
 
-    @Operation(summary = "API Toggle Active Status of Reader")
-    @PreAuthorize("hasRole('ROLE_MANAGE_READER')")
-    @PatchMapping(UrlConstant.Reader.TOGGLE_ACTIVE)
-    public ResponseEntity<?> toggleActiveStatus(
-            @PathVariable Long id,
-            @CurrentUser CustomUserDetails userDetails
-    ) {
-        return VsResponseUtil.success(readerService.toggleActiveStatus(id, userDetails.getUserId()));
-    }
-
     @Operation(summary = "API Generate Cards Reader")
     @PreAuthorize("hasRole('ROLE_MANAGE_READER')")
     @PostMapping(UrlConstant.Reader.PRINT_CARDS)

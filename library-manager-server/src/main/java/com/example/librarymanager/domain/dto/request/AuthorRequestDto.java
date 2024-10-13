@@ -1,8 +1,10 @@
 package com.example.librarymanager.domain.dto.request;
 
+import com.example.librarymanager.constant.CommonConstant;
 import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.Gender;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,8 +20,9 @@ import java.time.LocalDate;
 public class AuthorRequestDto {
 
     @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)
-    @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
-    private String fullName; // Họ tên
+    @Pattern(regexp = CommonConstant.REGEXP_FULL_NAME, message = ErrorMessage.INVALID_FORMAT_NAME)
+    @Size(min = 2, max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
+    private String fullName;
 
     @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)
     @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)

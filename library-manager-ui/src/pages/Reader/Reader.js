@@ -1,46 +1,35 @@
 import { useEffect, useState } from 'react';
-import {
-    Button,
-    Col,
-    DatePicker,
-    Dropdown,
-    Flex,
-    Form,
-    Image,
-    Input,
-    message,
-    Modal,
-    Popconfirm,
-    Row,
-    Select,
-    Space,
-    Switch,
-    Table,
-    Tag,
-    Upload,
-} from 'antd';
+import { Image, Input, message, Modal, Popconfirm, Row, Select, Space } from 'antd';
+import { Button, Col, DatePicker, Dropdown, Flex, Form, Table, Tag, Upload } from 'antd';
 import { MdOutlineModeEdit, MdOutlineFileUpload } from 'react-icons/md';
 import { FaRegTrashAlt, FaPrint } from 'react-icons/fa';
 import queryString from 'query-string';
-import moment from 'moment';
-import { INITIAL_FILTERS, INITIAL_META, REGEXP_PHONE_NUMBER } from '~/common/commonConstants';
-import {
-    createReader,
-    deleteReader,
-    getReaders,
-    printCards,
-    toggleActiveFlag,
-    updateReader,
-} from '~/services/readerService';
+import dayjs from 'dayjs';
 import images from '~/assets';
+import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
+import { REGEXP_FULL_NAME, REGEXP_PASSWORD, REGEXP_PHONE_NUMBER } from '~/common/commonConstants';
+import { createReader, deleteReader, getReaders, printCards, updateReader } from '~/services/readerService';
+import { cardGender, cardStatus, cardTypes } from '~/common/cardConstants';
 
 const cardTypeMapping = {
     TEACHER: { label: 'Giảng viên', color: 'blue' },
     STUDENT: { label: 'Học sinh', color: 'green' },
 };
 
+const cardStatusMapping = {
+    ACTIVE: { label: 'Đã kích hoạt', color: 'green' },
+    INACTIVE: { label: 'Chưa kích hoạt', color: 'default' },
+    SUSPENDED: { label: 'Tạm dừng', color: 'warning' },
+    REVOKED: { label: 'Thu hồi thẻ', color: 'red' },
+};
+
 const getTagByCardType = (text) => {
     const { label, color } = cardTypeMapping[text] || { label: 'Khác', color: 'default' };
+    return <Tag color={color}>{label}</Tag>;
+};
+
+const getTagByCardStatus = (text) => {
+    const { label, color } = cardStatusMapping[text] || { label: 'Khác', color: 'default' };
     return <Tag color={color}>{label}</Tag>;
 };
 
@@ -101,9 +90,10 @@ function Reader() {
     const showEditModal = (record) => {
         const values = {
             ...record,
-            dateOfBirth: record.dateOfBirth ? moment(record.dateOfBirth) : null,
-            expiryDate: record.expiryDate ? moment(record.expiryDate) : null,
+            dateOfBirth: record.dateOfBirth ? dayjs(record.dateOfBirth) : null,
+            expiryDate: record.expiryDate ? dayjs(record.expiryDate) : null,
         };
+
         setEditingItem(values);
         editForm.setFieldsValue(values);
         setPreviousImage(record.avatar || images.placeimg);
@@ -139,6 +129,7 @@ function Reader() {
     };
 
     const handleCreateEntity = async (values) => {
+        setIsLoading(true);
         try {
             const formattedValues = {
                 ...values,
@@ -151,16 +142,21 @@ function Reader() {
                 const { data, message } = response.data.data;
                 messageApi.success(message);
 
-                setEntityData((prevData) => [data, ...prevData.slice(0, -1)]);
+                setEntityData((prevData) =>
+                    prevData.length >= filters.pageSize ? [data, ...prevData.slice(0, -1)] : [data, ...prevData],
+                );
                 closeAddModal();
             }
         } catch (error) {
             const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi thêm mới.';
             messageApi.error(errorMessage);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     const handleUpdateEntity = async (values) => {
+        setIsLoading(true);
         try {
             const formattedValues = {
                 ...values,
@@ -179,6 +175,8 @@ function Reader() {
         } catch (error) {
             const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi cập nhật.';
             messageApi.error(errorMessage);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -192,22 +190,6 @@ function Reader() {
             }
         } catch (error) {
             const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi xóa.';
-            messageApi.error(errorMessage);
-        }
-    };
-
-    const handleToggleActiveFlag = async (checked, record) => {
-        try {
-            const response = await toggleActiveFlag(record.id);
-            if (response.status === 200) {
-                const { data, message } = response.data.data;
-                setEntityData((prevData) =>
-                    prevData.map((item) => (item.id === record.id ? { ...item, activeFlag: data } : item)),
-                );
-                messageApi.success(message);
-            }
-        } catch (error) {
-            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi cập nhật.';
             messageApi.error(errorMessage);
         }
     };
@@ -270,7 +252,7 @@ function Reader() {
         onChange: (selectedRowKeys) => {
             setSelectedRowKeys(selectedRowKeys);
         },
-        getCheckboxProps: (record) => ({
+        getCheckboxProps: (record, index) => ({
             name: record.id,
         }),
     };
@@ -316,23 +298,26 @@ function Reader() {
         },
         {
             title: 'Trạng thái',
-            dataIndex: 'activeFlag',
-            key: 'activeFlag',
+            dataIndex: 'status',
+            key: 'status',
             sorter: true,
             showSorterTooltip: false,
-            render: (text, record) => (
-                <Space>
-                    {text ? 'Đang theo dõi' : 'Ngừng theo dõi'}
-                    <Switch checked={text} onChange={(checked) => handleToggleActiveFlag(checked, record)} />
-                </Space>
-            ),
+            render: getTagByCardStatus,
         },
         {
-            title: 'Số lượt mượn sách',
-            dataIndex: 'currentBorrowedBooks',
-            key: 'currentBorrowedBooks',
-            sorter: true,
-            showSorterTooltip: false,
+            title: 'Thống kê',
+            children: [
+                {
+                    title: 'Sách mượn',
+                    dataIndex: 'currentBorrowedBooks',
+                    key: 'currentBorrowedBooks',
+                },
+                {
+                    title: 'Vào thư viện',
+                    dataIndex: 'libraryVisitCount',
+                    key: 'libraryVisitCount',
+                },
+            ],
         },
         {
             title: '',
@@ -384,12 +369,35 @@ function Reader() {
                 onOk={addForm.submit}
                 onCancel={closeAddModal}
                 width={800}
+                footer={[
+                    <Button key="back" onClick={closeAddModal}>
+                        Hủy
+                    </Button>,
+                    <Button key="submit" type="primary" loading={isLoading} onClick={addForm.submit}>
+                        {isLoading ? 'Đang xử lý...' : 'Thêm mới'}
+                    </Button>,
+                ]}
             >
-                <Form form={addForm} layout="vertical" onFinish={handleCreateEntity}>
+                <Form
+                    form={addForm}
+                    layout="vertical"
+                    onFinish={handleCreateEntity}
+                    initialValues={{
+                        cardType: cardTypes[0].value,
+                        status: cardStatus[0].value,
+                        gender: cardGender[0].value,
+                        dateOfBirth: dayjs(),
+                        expiryDate: dayjs().add(1, 'month'),
+                    }}
+                >
                     <Row gutter={16}>
                         <Col span={8} className="text-center">
                             <Image width={200} src={previousImage} fallback={images.placeimg} />
-                            <Form.Item className="mt-2" name="image">
+                            <Form.Item
+                                className="mt-2"
+                                name="image"
+                                help="Vui lòng chọn hình ảnh dung lượng không quá 2MB"
+                            >
                                 <Upload
                                     accept="image/*"
                                     fileList={fileList}
@@ -409,6 +417,7 @@ function Reader() {
                                 </Upload>
                             </Form.Item>
                         </Col>
+
                         <Col span={16}>
                             <Row gutter={16}>
                                 {/* Loại thẻ */}
@@ -419,8 +428,11 @@ function Reader() {
                                         rules={[{ required: true, message: 'Vui lòng chọn loại thẻ' }]}
                                     >
                                         <Select placeholder="Chọn loại thẻ">
-                                            <Select.Option value="STUDENT">Thẻ sinh viên</Select.Option>
-                                            <Select.Option value="TEACHER">Thẻ giáo viên</Select.Option>
+                                            {cardTypes.map((card) => (
+                                                <Select.Option key={card.value} value={card.value}>
+                                                    {card.label}
+                                                </Select.Option>
+                                            ))}
                                         </Select>
                                     </Form.Item>
                                 </Col>
@@ -430,9 +442,14 @@ function Reader() {
                                     <Form.Item
                                         label="Họ tên"
                                         name="fullName"
+                                        hasFeedback
                                         rules={[
                                             { required: true, message: 'Vui lòng nhập họ tên' },
-                                            { max: 100, message: 'Tên quá dài' },
+                                            {
+                                                pattern: REGEXP_FULL_NAME,
+                                                message: 'Họ tên không hợp lệ',
+                                            },
+                                            { min: 2, max: 100, message: 'Độ dài từ 2 - 100 kí tự' },
                                         ]}
                                     >
                                         <Input placeholder="Nhập họ tên" />
@@ -458,8 +475,11 @@ function Reader() {
                                 <Col span={12}>
                                     <Form.Item label="Giới tính" name="gender">
                                         <Select placeholder="Chọn giới tính">
-                                            <Select.Option value="MALE">Nam</Select.Option>
-                                            <Select.Option value="FEMALE">Nữ</Select.Option>
+                                            {cardGender.map((card) => (
+                                                <Select.Option key={card.value} value={card.value}>
+                                                    {card.label}
+                                                </Select.Option>
+                                            ))}
                                         </Select>
                                     </Form.Item>
                                 </Col>
@@ -480,10 +500,11 @@ function Reader() {
                                     <Form.Item
                                         label="Số điện thoại"
                                         name="phoneNumber"
+                                        hasFeedback
                                         rules={[
                                             { required: true, message: 'Vui lòng nhập số điện thoại' },
                                             {
-                                                pattern: new RegExp(REGEXP_PHONE_NUMBER),
+                                                pattern: REGEXP_PHONE_NUMBER,
                                                 message: 'Số điện thoại không hợp lệ',
                                             },
                                             { min: 10, max: 20, message: 'Số điện thoại phải từ 10 đến 20 ký tự' },
@@ -498,6 +519,7 @@ function Reader() {
                                     <Form.Item
                                         label="Số thẻ"
                                         name="cardNumber"
+                                        hasFeedback
                                         rules={[
                                             { required: true, message: 'Vui lòng nhập số thẻ' },
                                             { max: 100, message: 'Số thẻ quá dài' },
@@ -512,9 +534,11 @@ function Reader() {
                                     <Form.Item
                                         label="Mật khẩu"
                                         name="password"
+                                        hasFeedback
                                         rules={[
                                             { required: true, message: 'Vui lòng nhập mật khẩu' },
-                                            { max: 100, message: 'Mật khẩu quá dài' },
+                                            { pattern: REGEXP_PASSWORD, message: 'Mật khẩu không đúng định dạng' },
+                                            { min: 6, max: 30, message: 'Mật khẩu từ 6 - 30 kí tự' },
                                         ]}
                                     >
                                         <Input.Password placeholder="Nhập mật khẩu" />
@@ -523,12 +547,33 @@ function Reader() {
 
                                 {/* Ngày hết hạn */}
                                 <Col span={12}>
-                                    <Form.Item label="Ngày hết hạn" name="expiryDate">
+                                    <Form.Item
+                                        label="Ngày hết hạn"
+                                        name="expiryDate"
+                                        rules={[{ required: true, message: 'Vui lòng chọn ngày hết hạn' }]}
+                                    >
                                         <DatePicker
                                             format="YYYY-MM-DD"
                                             placeholder="Chọn ngày hết hạn"
                                             className="w-100"
                                         />
+                                    </Form.Item>
+                                </Col>
+
+                                {/* Trạng thái */}
+                                <Col span={12}>
+                                    <Form.Item
+                                        label="Trạng thái"
+                                        name="status"
+                                        rules={[{ required: true, message: 'Vui lòng chọn trạng thái thẻ' }]}
+                                    >
+                                        <Select placeholder="Chọn trạng thái thẻ">
+                                            {cardStatus.map((card) => (
+                                                <Select.Option key={card.value} value={card.value}>
+                                                    {card.label}
+                                                </Select.Option>
+                                            ))}
+                                        </Select>
                                     </Form.Item>
                                 </Col>
                             </Row>
@@ -544,12 +589,24 @@ function Reader() {
                 onOk={editForm.submit}
                 onCancel={closeEditModal}
                 width={800}
+                footer={[
+                    <Button key="back" onClick={closeEditModal}>
+                        Hủy
+                    </Button>,
+                    <Button key="submit" type="primary" loading={isLoading} onClick={editForm.submit}>
+                        {isLoading ? 'Đang xử lý...' : 'Lưu thay đổi'}
+                    </Button>,
+                ]}
             >
                 <Form form={editForm} layout="vertical" onFinish={handleUpdateEntity}>
                     <Row gutter={16}>
                         <Col span={8} className="text-center">
                             <Image width={200} src={previousImage} fallback={images.placeimg} />
-                            <Form.Item className="mt-2" name="image">
+                            <Form.Item
+                                className="mt-2"
+                                name="image"
+                                help="Vui lòng chọn hình ảnh dung lượng không quá 2MB"
+                            >
                                 <Upload
                                     accept="image/*"
                                     fileList={fileList}
@@ -569,6 +626,7 @@ function Reader() {
                                 </Upload>
                             </Form.Item>
                         </Col>
+
                         <Col span={16}>
                             <Row gutter={16}>
                                 {/* Loại thẻ */}
@@ -579,8 +637,11 @@ function Reader() {
                                         rules={[{ required: true, message: 'Vui lòng chọn loại thẻ' }]}
                                     >
                                         <Select placeholder="Chọn loại thẻ">
-                                            <Select.Option value="STUDENT">Thẻ sinh viên</Select.Option>
-                                            <Select.Option value="TEACHER">Thẻ giáo viên</Select.Option>
+                                            {cardTypes.map((card) => (
+                                                <Select.Option key={card.value} value={card.value}>
+                                                    {card.label}
+                                                </Select.Option>
+                                            ))}
                                         </Select>
                                     </Form.Item>
                                 </Col>
@@ -590,9 +651,14 @@ function Reader() {
                                     <Form.Item
                                         label="Họ tên"
                                         name="fullName"
+                                        hasFeedback
                                         rules={[
                                             { required: true, message: 'Vui lòng nhập họ tên' },
-                                            { max: 100, message: 'Tên quá dài' },
+                                            {
+                                                pattern: REGEXP_FULL_NAME,
+                                                message: 'Họ tên không hợp lệ',
+                                            },
+                                            { min: 2, max: 100, message: 'Độ dài từ 2 - 100 kí tự' },
                                         ]}
                                     >
                                         <Input placeholder="Nhập họ tên" />
@@ -618,8 +684,11 @@ function Reader() {
                                 <Col span={12}>
                                     <Form.Item label="Giới tính" name="gender">
                                         <Select placeholder="Chọn giới tính">
-                                            <Select.Option value="MALE">Nam</Select.Option>
-                                            <Select.Option value="FEMALE">Nữ</Select.Option>
+                                            {cardGender.map((card) => (
+                                                <Select.Option key={card.value} value={card.value}>
+                                                    {card.label}
+                                                </Select.Option>
+                                            ))}
                                         </Select>
                                     </Form.Item>
                                 </Col>
@@ -640,10 +709,11 @@ function Reader() {
                                     <Form.Item
                                         label="Số điện thoại"
                                         name="phoneNumber"
+                                        hasFeedback
                                         rules={[
                                             { required: true, message: 'Vui lòng nhập số điện thoại' },
                                             {
-                                                pattern: new RegExp(REGEXP_PHONE_NUMBER),
+                                                pattern: REGEXP_PHONE_NUMBER,
                                                 message: 'Số điện thoại không hợp lệ',
                                             },
                                             { min: 10, max: 20, message: 'Số điện thoại phải từ 10 đến 20 ký tự' },
@@ -658,6 +728,7 @@ function Reader() {
                                     <Form.Item
                                         label="Số thẻ"
                                         name="cardNumber"
+                                        hasFeedback
                                         rules={[
                                             { required: true, message: 'Vui lòng nhập số thẻ' },
                                             { max: 100, message: 'Số thẻ quá dài' },
@@ -676,12 +747,33 @@ function Reader() {
 
                                 {/* Ngày hết hạn */}
                                 <Col span={12}>
-                                    <Form.Item label="Ngày hết hạn" name="expiryDate">
+                                    <Form.Item
+                                        label="Ngày hết hạn"
+                                        name="expiryDate"
+                                        rules={[{ required: true, message: 'Vui lòng chọn ngày hết hạn' }]}
+                                    >
                                         <DatePicker
                                             format="YYYY-MM-DD"
                                             placeholder="Chọn ngày hết hạn"
                                             className="w-100"
                                         />
+                                    </Form.Item>
+                                </Col>
+
+                                {/* Trạng thái */}
+                                <Col span={12}>
+                                    <Form.Item
+                                        label="Trạng thái"
+                                        name="status"
+                                        rules={[{ required: true, message: 'Vui lòng chọn trạng thái thẻ' }]}
+                                    >
+                                        <Select placeholder="Chọn trạng thái thẻ">
+                                            {cardStatus.map((card) => (
+                                                <Select.Option key={card.value} value={card.value}>
+                                                    {card.label}
+                                                </Select.Option>
+                                            ))}
+                                        </Select>
                                     </Form.Item>
                                 </Col>
                             </Row>
@@ -694,7 +786,7 @@ function Reader() {
                 <h2>Thẻ bạn đọc</h2>
 
                 <Space>
-                    <Button type="primary" onClick={showAddModal}>
+                    <Button type="primary" onClick={showAddModal} loading={isLoading}>
                         Thêm mới
                     </Button>
                     <Dropdown menu={{ items }} trigger={['click']}>

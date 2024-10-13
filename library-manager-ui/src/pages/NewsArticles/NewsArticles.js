@@ -3,12 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Flex, Input, message, Popconfirm, Select, Space, Switch, Table } from 'antd';
 import { MdOutlineModeEdit } from 'react-icons/md';
 import { FaRegTrashAlt } from 'react-icons/fa';
-
+import dayjs from 'dayjs';
 import queryString from 'query-string';
-
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
 import { deleteNewsArticle, getNewsArticles, toggleActiveFlag } from '~/services/newsArticlesService';
-import moment from 'moment';
 
 const options = [{ value: 'title', label: 'Tiêu đề' }];
 
@@ -143,7 +141,7 @@ function NewsArticles() {
             key: 'createdDate',
             sorter: true,
             showSorterTooltip: false,
-            render: (text) => moment(text).format('YYYY-MM-DD HH:mm:ss'),
+            render: (text) => dayjs(text).format('YYYY-MM-DD HH:mm:ss'),
         },
         {
             title: 'Trạng thái',
