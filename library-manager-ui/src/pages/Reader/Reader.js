@@ -11,6 +11,12 @@ import { REGEXP_FULL_NAME, REGEXP_PASSWORD, REGEXP_PHONE_NUMBER } from '~/common
 import { createReader, deleteReader, getReaders, printCards, updateReader } from '~/services/readerService';
 import { cardGender, cardStatus, cardTypes } from '~/common/cardConstants';
 
+const options = [
+    { value: 'cardNumber', label: 'Số thẻ' },
+    { value: 'fullName', label: 'Họ tên' },
+    { value: 'status', label: 'Trạng thái' },
+];
+
 const cardTypeMapping = {
     TEACHER: { label: 'Giảng viên', color: 'blue' },
     STUDENT: { label: 'Học sinh', color: 'green' },
@@ -38,6 +44,9 @@ function Reader() {
     const [filters, setFilters] = useState(INITIAL_FILTERS);
 
     const [entityData, setEntityData] = useState(null);
+
+    const [searchInput, setSearchInput] = useState('');
+    const [activeFilterOption, setActiveFilterOption] = useState(options[0].value);
 
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState(null);
@@ -125,6 +134,15 @@ function Reader() {
             ...prev,
             sortBy: sorter.field,
             isAscending: sortOrder,
+        }));
+    };
+
+    const handleSearch = (searchBy, keyword) => {
+        setFilters((prev) => ({
+            ...prev,
+            pageNum: 1,
+            searchBy: searchBy || activeFilterOption,
+            keyword: keyword || searchInput,
         }));
     };
 
@@ -786,6 +804,26 @@ function Reader() {
                 <h2>Thẻ bạn đọc</h2>
 
                 <Space>
+                    <Space.Compact className="my-2">
+                        <Select
+                            options={options}
+                            disabled={isLoading}
+                            value={activeFilterOption}
+                            onChange={(value) => setActiveFilterOption(value)}
+                        />
+                        <Input
+                            allowClear
+                            name="searchInput"
+                            placeholder="Nhập từ cần tìm..."
+                            value={searchInput}
+                            disabled={isLoading}
+                            onChange={(e) => setSearchInput(e.target.value)}
+                        />
+                        <Button type="primary" loading={isLoading} onClick={() => handleSearch()}>
+                            Tìm
+                        </Button>
+                    </Space.Compact>
+
                     <Button type="primary" onClick={showAddModal} loading={isLoading}>
                         Thêm mới
                     </Button>

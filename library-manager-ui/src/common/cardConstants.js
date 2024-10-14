@@ -14,3 +14,9 @@ export const cardGender = [
     { value: 'MALE', label: 'Nam' },
     { value: 'FEMALE', label: 'Nữ' },
 ];
+
+export const cardPenaltyForm = [
+    { value: 'CARD_SUSPENSION', label: 'Tạm dừng thẻ' },
+    { value: 'CARD_REVOCATION', label: 'Thu hồi thẻ' },
+    { value: 'FINE', label: 'Phạt tiền' },
+];

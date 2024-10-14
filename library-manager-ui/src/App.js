@@ -49,6 +49,7 @@ import OutwardBookForm from './pages/Books/OutwardBookForm';
 import Reader from './pages/Reader/Reader';
 import LibraryVisit from './pages/LibraryVisit/LibraryVisit';
 import VisitorStatistics from './pages/LibraryVisit/VisitorStatistics';
+import ReaderViolations from './pages/Reader/ReaderViolations';
 
 function App() {
     return (
@@ -120,6 +121,7 @@ function App() {
                                 <Route index element={<LibraryVisit />} />
                                 <Route path="statistics" element={<VisitorStatistics />} />
                             </Route>
+                            <Route path="violations" element={<ReaderViolations />} />
                         </Route>
 
                         {/* Quản lý nhóm người dùng */}

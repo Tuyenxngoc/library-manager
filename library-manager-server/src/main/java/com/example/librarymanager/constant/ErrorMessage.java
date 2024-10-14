@@ -99,6 +99,10 @@ public class ErrorMessage {
         public static final String ERR_READER_EXPIRED = "exception.reader.expired";
     }
 
+    public static class ReaderViolation {
+        public static final String ERR_NOT_FOUND_ID = "exception.reader.violation.not.found.id";
+    }
+
     public static class Author {
         public static final String ERR_DUPLICATE_CODE = "exception.author.duplicate.code";
         public static final String ERR_NOT_FOUND_ID = "exception.author.not.found.id";

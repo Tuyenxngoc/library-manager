@@ -195,4 +195,14 @@ public class UrlConstant {
         public static final String DELETE = PRE_FIX + "/{id}";
         public static final String CLOSE = PRE_FIX + "/close";
     }
+
+    public static class ReaderViolation {
+        private static final String PRE_FIX = "/reader-violations";
+
+        public static final String CREATE = PRE_FIX;
+        public static final String GET_ALL = PRE_FIX;
+        public static final String GET_BY_ID = PRE_FIX + "/{id}";
+        public static final String UPDATE = PRE_FIX + "/{id}";
+        public static final String DELETE = PRE_FIX + "/{id}";
+    }
 }

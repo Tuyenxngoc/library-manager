@@ -73,4 +73,7 @@ public class Reader extends UserDateAuditing {
     @JsonIgnore
     private List<LibraryVisit> libraryVisits = new ArrayList<>();
 
+    @OneToMany(mappedBy = "reader", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<ReaderViolation> readerViolations = new ArrayList<>();
 }
