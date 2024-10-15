@@ -74,7 +74,7 @@ public class ReaderServiceImpl implements ReaderService {
     }
 
     @Override
-    public void initReaders() {
+    public void initReadersFromCsv(String readersCsvPath) {
     }
 
     @Override

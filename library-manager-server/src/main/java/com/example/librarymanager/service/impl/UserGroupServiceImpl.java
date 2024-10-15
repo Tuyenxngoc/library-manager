@@ -1,6 +1,5 @@
 package com.example.librarymanager.service.impl;
 
-import com.example.librarymanager.config.properties.AdminInfo;
 import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.RoleConstant;
 import com.example.librarymanager.constant.SortByDataConstant;
@@ -26,6 +25,7 @@ import com.example.librarymanager.service.LogService;
 import com.example.librarymanager.service.UserGroupService;
 import com.example.librarymanager.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -36,6 +36,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserGroupServiceImpl implements UserGroupService {
@@ -60,13 +61,11 @@ public class UserGroupServiceImpl implements UserGroupService {
     }
 
     @Override
-    public UserGroup initUserGroup(AdminInfo adminInfo) {
+    public UserGroup initUserGroup() {
         if (userGroupRepository.count() == 0) {
             UserGroup userGroup = new UserGroup();
             userGroup.setName("Quản trị viên");
             userGroup.setCode("ADMIN");
-            userGroup.setCreatedBy(adminInfo.getUsername());
-            userGroup.setLastModifiedBy(adminInfo.getUsername());
             userGroup.getUserGroupRoles().addAll(
                     roleRepository.findAll().stream()
                             .filter(role -> !role.getCode().equals(RoleConstant.ROLE_READER))
@@ -75,7 +74,7 @@ public class UserGroupServiceImpl implements UserGroupService {
             );
 
             userGroupRepository.save(userGroup);
-            System.out.println("Initializing user groups: Admin");
+            log.info("Initializing user groups: Admin");
 
             return userGroup;
         }

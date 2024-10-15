@@ -7,6 +7,7 @@ import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.entity.CategoryGroup;
 
 public interface CategoryGroupService {
+    void initCategoryGroupsFromCsv(String categoryGroupsCsvPath);
 
     CommonResponseDto save(CategoryGroupRequestDto requestDto);
 
@@ -19,5 +20,4 @@ public interface CategoryGroupService {
     CategoryGroup findById(Long id);
 
     CommonResponseDto toggleActiveStatus(Long id);
-
 }

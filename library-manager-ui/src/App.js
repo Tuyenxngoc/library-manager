@@ -96,6 +96,7 @@ function App() {
                         {/* Đường dẫn yêu cầu quyền quản trị */}
 
                         {/* Trang chủ */}
+                        <Route index element={<Dashboard />} />
                         <Route path="home" element={<Dashboard />} />
 
                         {/* Thiết lập hệ thống */}

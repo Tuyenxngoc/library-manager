@@ -9,7 +9,7 @@ import com.example.librarymanager.domain.dto.response.GetReaderResponseDto;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface ReaderService {
-    void initReaders();
+    void initReadersFromCsv(String readersCsvPath);
 
     CommonResponseDto save(ReaderRequestDto requestDto, MultipartFile image, String userId);
 

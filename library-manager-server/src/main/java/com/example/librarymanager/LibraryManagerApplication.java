@@ -5,10 +5,9 @@ import com.example.librarymanager.config.MailConfig;
 import com.example.librarymanager.config.properties.AdminInfo;
 import com.example.librarymanager.domain.entity.UserGroup;
 import com.example.librarymanager.service.*;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,7 +18,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Slf4j
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @SpringBootApplication
 @EnableConfigurationProperties({
         AdminInfo.class,
@@ -29,15 +27,36 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class LibraryManagerApplication {
 
-    RoleService roleService;
+    @Value("${data.authors.csv}")
+    private String authorsCsvPath;
 
-    UserGroupService userGroupService;
+    @Value("${data.booksets.csv}")
+    private String bookSetsCsvPath;
 
-    UserService userService;
+    @Value("${data.categorygroups.csv}")
+    private String categoryGroupsCsvPath;
 
-    ReaderService readerService;
+    @Value("${data.publishers.csv}")
+    private String publishersCsvPath;
 
-    AuthorService authorService;
+    @Value("${data.readers.csv}")
+    private String readersCsvPath;
+
+    private final RoleService roleService;
+
+    private final UserGroupService userGroupService;
+
+    private final UserService userService;
+
+    private final ReaderService readerService;
+
+    private final AuthorService authorService;
+
+    private final BookSetService bookSetService;
+
+    private final CategoryGroupService categoryGroupService;
+
+    private final PublisherService publisherService;
 
     public static void main(String[] args) {
         Environment env = SpringApplication.run(LibraryManagerApplication.class, args).getEnvironment();
@@ -56,10 +75,13 @@ public class LibraryManagerApplication {
     CommandLineRunner init(AdminInfo adminInfo) {
         return args -> {
             roleService.initRoles();
-            UserGroup userGroup = userGroupService.initUserGroup(adminInfo);
+            UserGroup userGroup = userGroupService.initUserGroup();
             userService.initAdmin(adminInfo, userGroup);
-            readerService.initReaders();
-            authorService.initAuthorsFromCsv(adminInfo.getUsername());
+            readerService.initReadersFromCsv(readersCsvPath);
+            authorService.initAuthorsFromCsv(authorsCsvPath);
+            bookSetService.initBookSetsFromCSv(bookSetsCsvPath);
+            categoryGroupService.initCategoryGroupsFromCsv(categoryGroupsCsvPath);
+            publisherService.initPublishersFromCsv(publishersCsvPath);
         };
     }
 

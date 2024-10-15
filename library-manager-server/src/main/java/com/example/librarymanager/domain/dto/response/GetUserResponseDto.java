@@ -1,7 +1,7 @@
 package com.example.librarymanager.domain.dto.response;
 
 import com.example.librarymanager.constant.AccountStatus;
-import com.example.librarymanager.domain.dto.common.UserDateAuditingDto;
+import com.example.librarymanager.domain.dto.common.DateAuditingDto;
 import com.example.librarymanager.domain.entity.User;
 import com.example.librarymanager.domain.entity.UserGroup;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Getter;
 import java.time.LocalDate;
 
 @Getter
-public class GetUserResponseDto extends UserDateAuditingDto {
+public class GetUserResponseDto extends DateAuditingDto {
     private final String username;
 
     private final BaseEntityDto userGroup;
@@ -35,9 +35,6 @@ public class GetUserResponseDto extends UserDateAuditingDto {
     public GetUserResponseDto(User user) {
         this.createdDate = user.getCreatedDate();
         this.lastModifiedDate = user.getLastModifiedDate();
-        this.createdBy = user.getCreatedBy();
-        this.lastModifiedBy = user.getLastModifiedBy();
-
         this.username = user.getUsername();
         UserGroup g = user.getUserGroup();
         this.userGroup = new BaseEntityDto(g.getId(), g.getName());

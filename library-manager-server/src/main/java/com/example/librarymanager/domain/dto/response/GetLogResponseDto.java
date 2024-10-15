@@ -14,13 +14,13 @@ public class GetLogResponseDto {
 
     private final long id;
 
-    private final String feature; // Chức năng được thao tác
+    private final String feature;
 
-    private final String event; // Sự kiện (Truy cập, Thêm, Xóa, v.v.)
+    private final String event;
 
-    private final String content; // Nội dung mô tả chi tiết
+    private final String content;
 
-    private final String user; // Người thực hiện
+    private final String user;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = CommonConstant.PATTERN_DATE_TIME)
     private final LocalDateTime timestamp; // Thời gian hành động

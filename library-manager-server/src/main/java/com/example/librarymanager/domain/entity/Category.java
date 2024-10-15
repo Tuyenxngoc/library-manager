@@ -1,6 +1,6 @@
 package com.example.librarymanager.domain.entity;
 
-import com.example.librarymanager.domain.entity.common.UserDateAuditing;
+import com.example.librarymanager.domain.entity.common.DateAuditing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,7 +19,7 @@ import java.util.List;
                 @UniqueConstraint(name = "UN_CATEGORY_NAME", columnNames = "category_name"),
                 @UniqueConstraint(name = "UN_CATEGORY_CODE", columnNames = "category_code")
         })
-public class Category extends UserDateAuditing {//Danh mục
+public class Category extends DateAuditing {//Danh mục
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

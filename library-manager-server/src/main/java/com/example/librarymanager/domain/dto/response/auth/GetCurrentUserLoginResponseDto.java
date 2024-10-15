@@ -4,15 +4,13 @@ import com.example.librarymanager.constant.RoleConstant;
 import com.example.librarymanager.domain.entity.Reader;
 import com.example.librarymanager.domain.entity.User;
 import com.example.librarymanager.domain.entity.UserGroupRole;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@Setter
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
 public class GetCurrentUserLoginResponseDto {
 

@@ -1,36 +1,39 @@
 package com.example.librarymanager.domain.dto.response;
 
 import com.example.librarymanager.constant.PenaltyForm;
+import com.example.librarymanager.domain.dto.common.DateAuditingDto;
 import com.example.librarymanager.domain.entity.ReaderViolation;
 import lombok.Getter;
 
 import java.time.LocalDate;
 
 @Getter
-public class GetReaderViolationResponseDto {
-    private final Long id; // ID của vi phạm
+public class GetReaderViolationResponseDto extends DateAuditingDto {
+    private final long id;
 
-    private final String violationDetails; // Nội dung vi phạm
+    private final String violationDetails;
 
-    private final PenaltyForm penaltyForm; // Hình thức phạt
+    private final PenaltyForm penaltyForm;
 
-    private final String otherPenaltyForm; // Hình thức phạt khác (nếu có)
+    private final String otherPenaltyForm;
 
-    private final LocalDate penaltyDate; // Ngày phạt
+    private final LocalDate penaltyDate;
 
-    private final LocalDate endDate; // Ngày kết thúc
+    private final LocalDate endDate;
 
-    private final Double fineAmount; // Số tiền phạt
+    private final double fineAmount;
 
-    private final String notes; // Ghi chú
+    private final String notes;
 
     private final long readerId;
 
-    private final String cardNumber; // ID của bạn đọc liên kết
+    private final String cardNumber;
 
-    private final String fullName; // Họ tên của bạn đọc liên kết
+    private final String fullName;
 
     public GetReaderViolationResponseDto(ReaderViolation violation) {
+        this.createdDate = violation.getCreatedDate();
+        this.lastModifiedDate = violation.getLastModifiedDate();
         this.id = violation.getId();
         this.violationDetails = violation.getViolationDetails();
         this.penaltyForm = violation.getPenaltyForm();

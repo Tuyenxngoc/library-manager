@@ -390,7 +390,7 @@ public class EntitySpecification {
 
             Predicate predicate = builder.conjunction();
 
-            if (filter == null) {//Nếu không có filter thì lọc theo thời gian trong ngày
+            if (filter == null || (filter.getStartDate() == null && filter.getEndDate() == null)) {
                 LocalDate today = LocalDate.now();
                 LocalDateTime startOfDay = today.atStartOfDay();
                 LocalDateTime endOfDay = today.atTime(LocalTime.MAX);
@@ -401,10 +401,12 @@ public class EntitySpecification {
                 );
             } else {
                 if (filter.getStartDate() != null) {
-                    predicate = builder.and(predicate, builder.greaterThanOrEqualTo(root.get(LibraryVisit_.entryTime), filter.getStartDate().atStartOfDay()));
+                    predicate = builder.and(predicate,
+                            builder.greaterThanOrEqualTo(root.get(LibraryVisit_.entryTime), filter.getStartDate().atStartOfDay()));
                 }
                 if (filter.getEndDate() != null) {
-                    predicate = builder.and(predicate, builder.lessThanOrEqualTo(root.get(LibraryVisit_.entryTime), filter.getEndDate().atTime(23, 59, 59)));
+                    predicate = builder.and(predicate,
+                            builder.lessThanOrEqualTo(root.get(LibraryVisit_.entryTime), filter.getEndDate().atTime(23, 59, 59)));
                 }
             }
 

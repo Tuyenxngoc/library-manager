@@ -18,14 +18,19 @@ import com.example.librarymanager.repository.PublisherRepository;
 import com.example.librarymanager.service.PublisherService;
 import com.example.librarymanager.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Objects;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PublisherServiceImpl implements PublisherService {
@@ -35,6 +40,35 @@ public class PublisherServiceImpl implements PublisherService {
     private final MessageSource messageSource;
 
     private final PublisherMapper publisherMapper;
+
+    @Override
+    public void initPublishersFromCsv(String publishersCsvPath) {
+        if (publisherRepository.count() > 0) {
+            return;
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(publishersCsvPath))) {
+            String line;
+            br.readLine();
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(";");
+                if (values.length < 5) continue;
+
+                Publisher publisher = new Publisher();
+                publisher.setCode(values[0]);
+                publisher.setName(values[1]);
+                publisher.setAddress(values[2]);
+                publisher.setCity(values[3]);
+                publisher.setNotes(values[4]);
+
+                if (!publisherRepository.existsByCode(publisher.getCode())) {
+                    publisherRepository.save(publisher);
+                }
+            }
+        } catch (IOException e) {
+            log.error("Error while initializing publishers from CSV: {}", e.getMessage(), e);
+        }
+    }
 
     @Override
     public CommonResponseDto save(PublisherRequestDto requestDto) {

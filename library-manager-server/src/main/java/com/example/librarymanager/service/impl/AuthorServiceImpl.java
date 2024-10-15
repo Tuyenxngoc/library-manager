@@ -19,13 +19,11 @@ import com.example.librarymanager.service.AuthorService;
 import com.example.librarymanager.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -38,9 +36,6 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class AuthorServiceImpl implements AuthorService {
 
-    @Value("${data.authors.csv}")
-    private String authorsCsvPath;
-
     private final AuthorRepository authorRepository;
 
     private final AuthorMapper authorMapper;
@@ -48,8 +43,7 @@ public class AuthorServiceImpl implements AuthorService {
     private final MessageSource messageSource;
 
     @Override
-    @Transactional
-    public void initAuthorsFromCsv(String username) {
+    public void initAuthorsFromCsv(String authorsCsvPath) {
         if (authorRepository.count() > 0) {
             return;
         }
@@ -58,27 +52,22 @@ public class AuthorServiceImpl implements AuthorService {
             br.readLine();
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(";");
-                if (values.length < 11) continue;
+                if (values.length < 10) continue;
 
-                // Tạo một tác giả mới
                 Author author = new Author();
-                author.setFullName(values[1]);
-                author.setCode(values[2]);
-                author.setPenName(values[3].isEmpty() ? null : values[3]);
-                author.setGender(Gender.valueOf(values[4]));
-                author.setDateOfBirth(LocalDate.parse(values[5]));
-                if (!values[6].isEmpty()) {
-                    author.setDateOfDeath(LocalDate.parse(values[6]));
+                author.setFullName(values[0]);
+                author.setCode(values[1]);
+                author.setPenName(values[2].isEmpty() ? null : values[2]);
+                author.setGender(Gender.valueOf(values[3]));
+                author.setDateOfBirth(LocalDate.parse(values[4]));
+                if (!values[5].isEmpty()) {
+                    author.setDateOfDeath(LocalDate.parse(values[5]));
                 }
-                author.setTitle(values[7]);
-                author.setResidence(values[8]);
-                author.setAddress(values[9].isEmpty() ? null : values[9]);
-                author.setNotes(values[10].isEmpty() ? null : values[10]);
-                author.setActiveFlag(true);
-                author.setCreatedBy(username);
-                author.setLastModifiedBy(username);
+                author.setTitle(values[6]);
+                author.setResidence(values[7]);
+                author.setAddress(values[8].isEmpty() ? null : values[8]);
+                author.setNotes(values[9].isEmpty() ? null : values[9]);
 
-                // Kiểm tra xem tác giả đã tồn tại chưa
                 if (!authorRepository.existsByCode(author.getCode())) {
                     authorRepository.save(author);
                 }

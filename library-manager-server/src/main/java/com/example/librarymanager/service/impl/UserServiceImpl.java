@@ -80,8 +80,6 @@ public class UserServiceImpl implements UserService {
                 user.setFullName(adminInfo.getName());
                 user.setPassword(passwordEncoder.encode(adminInfo.getPassword()));
                 user.setUserGroup(userGroup);
-                user.setCreatedBy("System");
-                user.setLastModifiedBy("System");
                 user.setStatus(AccountStatus.ACTIVATED);
                 userRepository.save(user);
 

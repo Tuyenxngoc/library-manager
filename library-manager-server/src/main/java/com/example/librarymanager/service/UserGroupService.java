@@ -1,6 +1,5 @@
 package com.example.librarymanager.service;
 
-import com.example.librarymanager.config.properties.AdminInfo;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.request.UserGroupRequestDto;
@@ -9,7 +8,7 @@ import com.example.librarymanager.domain.dto.response.GetUserGroupResponseDto;
 import com.example.librarymanager.domain.entity.UserGroup;
 
 public interface UserGroupService {
-    UserGroup initUserGroup(AdminInfo adminInfo);
+    UserGroup initUserGroup();
 
     CommonResponseDto save(UserGroupRequestDto requestDto, String userId);
 

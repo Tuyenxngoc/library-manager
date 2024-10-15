@@ -1,88 +1,71 @@
 package com.example.librarymanager.domain.dto.response;
 
+import com.example.librarymanager.domain.dto.common.DateAuditingDto;
 import com.example.librarymanager.domain.entity.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Setter
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-public class GetBookDefinitionResponseDto {
+public class GetBookDefinitionResponseDto extends DateAuditingDto {
 
-    private LocalDateTime createdDate;
+    private final Boolean activeFlag;
 
-    private LocalDateTime lastModifiedDate;
+    private final long id;
 
-    private String createdBy;
+    private final String title;
 
-    private String lastModifiedBy;
+    private final Double price;
 
-    private Boolean activeFlag;
+    private final String isbn;
 
-    private long id;
+    private final String publishingYear;
 
-    private String title;
+    private final String edition;
 
-    private Double price;
+    private final Double referencePrice;
 
-    private String isbn;
+    private final String publicationPlace;
 
-    private String publishingYear;
+    private final String bookCode;
 
-    private String edition;
+    private final Integer pageCount;
 
-    private Double referencePrice;
+    private final String bookSize;
 
-    private String publicationPlace;
+    private final String parallelTitle;
 
-    private String bookCode;
+    private final String summary;
 
-    private Integer pageCount;
+    private final String subtitle;
 
-    private String bookSize;
+    private final String additionalMaterial;
 
-    private String parallelTitle;
+    private final String keywords;
 
-    private String summary;
+    private final String language;
 
-    private String subtitle;
+    private final String imageUrl;
 
-    private String additionalMaterial;
+    private final String series;
 
-    private String keywords;
+    private final String additionalInfo;
 
-    private String language;
+    private final List<BaseEntityDto> authors = new ArrayList<>();
 
-    private String imageUrl;
+    private final BaseEntityDto publisher;
 
-    private String series;
+    private final BaseEntityDto bookSet;
 
-    private String additionalInfo;
+    private final BaseEntityDto category;
 
-    private List<BaseEntityDto> authors = new ArrayList<>();
-
-    private BaseEntityDto publisher;
-
-    private BaseEntityDto bookSet;
-
-    private BaseEntityDto category;
-
-    private BaseEntityDto classificationSymbol;
+    private final BaseEntityDto classificationSymbol;
 
     public GetBookDefinitionResponseDto(BookDefinition bookDefinition) {
         this.createdDate = bookDefinition.getCreatedDate();
         this.lastModifiedDate = bookDefinition.getLastModifiedDate();
-        this.createdBy = bookDefinition.getCreatedBy();
-        this.lastModifiedBy = bookDefinition.getLastModifiedBy();
         this.activeFlag = bookDefinition.getActiveFlag();
-
         this.id = bookDefinition.getId();
         this.title = bookDefinition.getTitle();
         this.price = bookDefinition.getPrice();
@@ -127,8 +110,6 @@ public class GetBookDefinitionResponseDto {
 
         // Set classificationSymbol
         ClassificationSymbol cl = bookDefinition.getClassificationSymbol();
-        if (cl != null) {
-            this.classificationSymbol = new BaseEntityDto(cl.getId(), cl.getName());
-        }
+        this.classificationSymbol = cl != null ? new BaseEntityDto(cl.getId(), cl.getName()) : null;
     }
 }

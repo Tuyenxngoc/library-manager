@@ -7,6 +7,7 @@ import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.entity.Publisher;
 
 public interface PublisherService {
+    void initPublishersFromCsv(String publishersCsvPath);
 
     CommonResponseDto save(PublisherRequestDto requestDto);
 
@@ -19,5 +20,4 @@ public interface PublisherService {
     Publisher findById(Long id);
 
     CommonResponseDto toggleActiveStatus(Long id);
-
 }

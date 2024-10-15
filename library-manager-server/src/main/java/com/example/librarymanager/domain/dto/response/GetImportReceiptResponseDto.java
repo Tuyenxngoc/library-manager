@@ -1,47 +1,34 @@
 package com.example.librarymanager.domain.dto.response;
 
+import com.example.librarymanager.domain.dto.common.DateAuditingDto;
 import com.example.librarymanager.domain.dto.request.BookRequestDto;
 import com.example.librarymanager.domain.entity.Book;
 import com.example.librarymanager.domain.entity.ImportReceipt;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Getter
-@AllArgsConstructor
-public class GetImportReceiptResponseDto {
-
-    private final LocalDateTime createdDate;
-
-    private final LocalDateTime lastModifiedDate;
-
-    private final String createdBy;
-
-    private final String lastModifiedBy;
+public class GetImportReceiptResponseDto extends DateAuditingDto {
 
     private final Long id;
 
-    private final String receiptNumber;  // Số phiếu nhập
+    private final String receiptNumber;
 
-    private final LocalDate importDate;  // Ngày nhập
+    private final LocalDate importDate;
 
-    private final String generalRecordNumber;  // Số vào sổ tổng quát
+    private final String generalRecordNumber;
 
-    private final String fundingSource;  // Nguồn cấp
+    private final String fundingSource;
 
-    private final String importReason;  // Lý do
+    private final String importReason;
 
-    private Set<BookRequestDto> books = new HashSet<>(); // Danh sách sách
+    private final Set<BookRequestDto> books = new HashSet<>();
 
     public GetImportReceiptResponseDto(ImportReceipt importReceipt) {
         this.createdDate = importReceipt.getCreatedDate();
         this.lastModifiedDate = importReceipt.getLastModifiedDate();
-        this.createdBy = importReceipt.getCreatedBy();
-        this.lastModifiedBy = importReceipt.getLastModifiedBy();
-
         this.id = importReceipt.getId();
         this.receiptNumber = importReceipt.getReceiptNumber();
         this.importDate = importReceipt.getImportDate();

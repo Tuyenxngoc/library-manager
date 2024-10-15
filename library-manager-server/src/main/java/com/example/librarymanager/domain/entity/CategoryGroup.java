@@ -1,6 +1,6 @@
 package com.example.librarymanager.domain.entity;
 
-import com.example.librarymanager.domain.entity.common.UserDateAuditing;
+import com.example.librarymanager.domain.entity.common.DateAuditing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "category_groups")
-public class CategoryGroup extends UserDateAuditing {//Nhóm danh mục
+public class CategoryGroup extends DateAuditing {//Nhóm danh mục
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

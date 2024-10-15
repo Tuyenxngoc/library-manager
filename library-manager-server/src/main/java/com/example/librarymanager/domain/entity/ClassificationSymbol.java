@@ -1,6 +1,6 @@
 package com.example.librarymanager.domain.entity;
 
-import com.example.librarymanager.domain.entity.common.UserDateAuditing;
+import com.example.librarymanager.domain.entity.common.DateAuditing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,7 +16,7 @@ import java.util.List;
 @Entity
 @Table(name = "classification_symbols",
         uniqueConstraints = @UniqueConstraint(name = "UN_CLASSIFICATION_SYMBOLS_CODE", columnNames = "code"))
-public class ClassificationSymbol extends UserDateAuditing {//Kí hiệu phân loại sách
+public class ClassificationSymbol extends DateAuditing {//Kí hiệu phân loại sách
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

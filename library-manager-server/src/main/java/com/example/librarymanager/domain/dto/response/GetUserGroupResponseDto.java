@@ -1,5 +1,6 @@
 package com.example.librarymanager.domain.dto.response;
 
+import com.example.librarymanager.domain.dto.common.DateAuditingDto;
 import com.example.librarymanager.domain.entity.Role;
 import com.example.librarymanager.domain.entity.UserGroup;
 import lombok.Getter;
@@ -9,7 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
-public class GetUserGroupResponseDto {
+public class GetUserGroupResponseDto extends DateAuditingDto {
 
     private final long id;
 
@@ -26,6 +27,8 @@ public class GetUserGroupResponseDto {
     private final Set<GetRoleResponseDto> roles = new HashSet<>();
 
     public GetUserGroupResponseDto(UserGroup userGroup) {
+        this.createdDate = userGroup.getCreatedDate();
+        this.lastModifiedDate = userGroup.getLastModifiedDate();
         this.id = userGroup.getId();
         this.code = userGroup.getCode();
         this.name = userGroup.getName();

@@ -18,12 +18,18 @@ import com.example.librarymanager.repository.CategoryGroupRepository;
 import com.example.librarymanager.service.CategoryGroupService;
 import com.example.librarymanager.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CategoryGroupServiceImpl implements CategoryGroupService {
@@ -33,6 +39,31 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
     private final CategoryGroupMapper categoryGroupMapper;
 
     private final MessageSource messageSource;
+
+    @Override
+    public void initCategoryGroupsFromCsv(String categoryGroupsCsvPath) {
+        if (categoryGroupRepository.count() > 0) {
+            return;
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(categoryGroupsCsvPath))) {
+            String line;
+            br.readLine();
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(";");
+                if (values.length < 1) continue;
+
+                CategoryGroup categoryGroup = new CategoryGroup();
+                categoryGroup.setGroupName(values[0]);
+
+                if (!categoryGroupRepository.existsByGroupName(categoryGroup.getGroupName())) {
+                    categoryGroupRepository.save(categoryGroup);
+                }
+            }
+        } catch (IOException e) {
+            log.error("Error while initializing category groups from CSV: {}", e.getMessage(), e);
+        }
+    }
 
     @Override
     public CommonResponseDto save(CategoryGroupRequestDto requestDto) {

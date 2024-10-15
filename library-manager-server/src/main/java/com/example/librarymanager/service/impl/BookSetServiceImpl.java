@@ -20,15 +20,20 @@ import com.example.librarymanager.service.BookSetService;
 import com.example.librarymanager.service.LogService;
 import com.example.librarymanager.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BookSetServiceImpl implements BookSetService {
@@ -42,6 +47,31 @@ public class BookSetServiceImpl implements BookSetService {
     private final BookSetMapper bookSetMapper;
 
     private final LogService logService;
+
+    @Override
+    public void initBookSetsFromCSv(String bookSetsCsvPath) {
+        if (bookSetRepository.count() > 0) {
+            return;
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(bookSetsCsvPath))) {
+            String line;
+            br.readLine();
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(";");
+                if (values.length < 1) continue;
+
+                BookSet bookSet = new BookSet();
+                bookSet.setName(values[0]);
+
+                if (!bookSetRepository.existsByName(bookSet.getName())) {
+                    bookSetRepository.save(bookSet);
+                }
+            }
+        } catch (IOException e) {
+            log.error("Error while initializing book sets from CSV: {}", e.getMessage(), e);
+        }
+    }
 
     @Override
     public CommonResponseDto save(BookSetRequestDto requestDto, String userId) {
