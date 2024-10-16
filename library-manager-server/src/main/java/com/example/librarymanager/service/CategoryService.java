@@ -8,6 +8,8 @@ import com.example.librarymanager.domain.dto.response.GetCategoryResponseDto;
 import com.example.librarymanager.domain.entity.Category;
 
 public interface CategoryService {
+    void initCategoriesFromCsv(String categoriesCsvPath);
+
     Category findById(Long id);
 
     PaginationResponseDto<GetCategoryResponseDto> findAll(PaginationFullRequestDto requestDto);

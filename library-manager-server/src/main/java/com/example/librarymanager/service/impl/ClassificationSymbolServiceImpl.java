@@ -18,14 +18,19 @@ import com.example.librarymanager.repository.ClassificationSymbolRepository;
 import com.example.librarymanager.service.ClassificationSymbolService;
 import com.example.librarymanager.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Objects;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ClassificationSymbolServiceImpl implements ClassificationSymbolService {
@@ -35,6 +40,39 @@ public class ClassificationSymbolServiceImpl implements ClassificationSymbolServ
     private final ClassificationSymbolMapper classificationSymbolMapper;
 
     private final MessageSource messageSource;
+
+    @Override
+    public void initClassificationSymbolsFromCsv(String classificationSymbolsCsvPath) {
+        if (classificationSymbolRepository.count() > 0) {
+            return;
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(classificationSymbolsCsvPath))) {
+            String line;
+            br.readLine();
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(";");
+                if (values.length < 3) continue;
+
+                ClassificationSymbol classificationSymbol = new ClassificationSymbol();
+                classificationSymbol.setName(values[0]);
+                classificationSymbol.setCode(values[1]);
+                try {
+                    int level = Integer.parseInt(values[2].trim());
+                    classificationSymbol.setLevel(level);
+                } catch (NumberFormatException e) {
+                    log.warn("Invalid level value for line '{}', must be an integer. Error: {}", line, e.getMessage());
+                    continue;
+                }
+
+                if (!classificationSymbolRepository.existsByCode(classificationSymbol.getCode())) {
+                    classificationSymbolRepository.save(classificationSymbol);
+                }
+            }
+        } catch (IOException e) {
+            log.error("Error while initializing classification symbol from CSV: {}", e.getMessage(), e);
+        }
+    }
 
     @Override
     public CommonResponseDto save(ClassificationSymbolRequestDto requestDto) {

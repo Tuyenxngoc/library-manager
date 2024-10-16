@@ -7,6 +7,8 @@ import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.entity.ClassificationSymbol;
 
 public interface ClassificationSymbolService {
+    void initClassificationSymbolsFromCsv(String classificationSymbolsCsvPath);
+
     CommonResponseDto save(ClassificationSymbolRequestDto requestDto);
 
     CommonResponseDto update(Long id, ClassificationSymbolRequestDto requestDto);

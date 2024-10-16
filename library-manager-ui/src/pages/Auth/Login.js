@@ -8,6 +8,7 @@ import * as yup from 'yup';
 import { readerLogin } from '~/services/authService';
 import useAuth from '~/hooks/useAuth';
 import { handleError } from '~/utils/errorHandler';
+import { ROLES } from '~/common/roleConstants';
 
 const validationSchema = yup.object({
     cardNumber: yup.string().trim().required('Vui lòng nhập số thẻ'),
@@ -24,7 +25,7 @@ function Login() {
     const location = useLocation();
 
     const [messageApi, contextHolder] = message.useMessage();
-    const { isAuthenticated, login } = useAuth();
+    const { isAuthenticated, user, login } = useAuth();
 
     const from = location.state?.from?.pathname || '/';
 
@@ -50,10 +51,10 @@ function Login() {
     });
 
     useEffect(() => {
-        if (isAuthenticated) {
+        if (isAuthenticated && user.roleNames.includes(ROLES.Reader)) {
             navigate('/', { replace: true });
         }
-    }, [isAuthenticated, navigate]);
+    }, [isAuthenticated, user.roleNames, navigate]);
 
     return (
         <main className="py-5">

@@ -36,6 +36,12 @@ public class LibraryManagerApplication {
     @Value("${data.categorygroups.csv}")
     private String categoryGroupsCsvPath;
 
+    @Value("${data.categories.csv}")
+    private String categoriesCsvPath;
+
+    @Value("${data.classificationsymbols.csv}")
+    private String classificationSymbolsCsvPath;
+
     @Value("${data.publishers.csv}")
     private String publishersCsvPath;
 
@@ -56,7 +62,11 @@ public class LibraryManagerApplication {
 
     private final CategoryGroupService categoryGroupService;
 
+    private final CategoryService categoryService;
+
     private final PublisherService publisherService;
+
+    private final ClassificationSymbolService classificationSymbolService;
 
     public static void main(String[] args) {
         Environment env = SpringApplication.run(LibraryManagerApplication.class, args).getEnvironment();
@@ -81,7 +91,9 @@ public class LibraryManagerApplication {
             authorService.initAuthorsFromCsv(authorsCsvPath);
             bookSetService.initBookSetsFromCSv(bookSetsCsvPath);
             categoryGroupService.initCategoryGroupsFromCsv(categoryGroupsCsvPath);
+            categoryService.initCategoriesFromCsv(categoriesCsvPath);
             publisherService.initPublishersFromCsv(publishersCsvPath);
+            classificationSymbolService.initClassificationSymbolsFromCsv(classificationSymbolsCsvPath);
         };
     }
 

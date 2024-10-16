@@ -21,15 +21,20 @@ import com.example.librarymanager.repository.CategoryRepository;
 import com.example.librarymanager.service.CategoryService;
 import com.example.librarymanager.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
@@ -41,6 +46,37 @@ public class CategoryServiceImpl implements CategoryService {
     private final MessageSource messageSource;
 
     private final CategoryGroupRepository categoryGroupRepository;
+
+    @Override
+    public void initCategoriesFromCsv(String categoriesCsvPath) {
+        if (categoryRepository.count() > 0) {
+            return;
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(categoriesCsvPath))) {
+            String line;
+            br.readLine();
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(";");
+                if (values.length < 3) continue;
+
+                Category category = new Category();
+                category.setCategoryName(values[0]);
+                category.setCategoryCode(values[1]);
+
+                Long categoryGroupId = Long.parseLong(values[2]);
+                CategoryGroup categoryGroup = categoryGroupRepository.findById(categoryGroupId)
+                        .orElseThrow(() -> new RuntimeException("Category group not found with id: " + categoryGroupId));
+                category.setCategoryGroup(categoryGroup);
+
+                if (!categoryRepository.existsByCategoryCode(category.getCategoryCode())) {
+                    categoryRepository.save(category);
+                }
+            }
+        } catch (IOException e) {
+            log.error("Error while initializing categories from CSV: {}", e.getMessage(), e);
+        }
+    }
 
     @Override
     public Category findById(Long id) {

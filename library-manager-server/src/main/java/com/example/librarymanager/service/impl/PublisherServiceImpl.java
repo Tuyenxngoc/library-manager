@@ -52,14 +52,13 @@ public class PublisherServiceImpl implements PublisherService {
             br.readLine();
             while ((line = br.readLine()) != null) {
                 String[] values = line.split(";");
-                if (values.length < 5) continue;
+                if (values.length < 4) continue;
 
                 Publisher publisher = new Publisher();
                 publisher.setCode(values[0]);
                 publisher.setName(values[1]);
                 publisher.setAddress(values[2]);
                 publisher.setCity(values[3]);
-                publisher.setNotes(values[4]);
 
                 if (!publisherRepository.existsByCode(publisher.getCode())) {
                     publisherRepository.save(publisher);
