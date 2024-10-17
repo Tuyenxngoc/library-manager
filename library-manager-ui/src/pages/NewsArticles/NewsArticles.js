@@ -129,21 +129,6 @@ function NewsArticles() {
             showSorterTooltip: false,
         },
         {
-            title: 'Người tạo',
-            dataIndex: 'createdBy',
-            key: 'createdBy',
-            sorter: true,
-            showSorterTooltip: false,
-        },
-        {
-            title: 'Ngày tạo',
-            dataIndex: 'createdDate',
-            key: 'createdDate',
-            sorter: true,
-            showSorterTooltip: false,
-            render: (text) => dayjs(text).format('YYYY-MM-DD HH:mm:ss'),
-        },
-        {
             title: 'Trạng thái',
             dataIndex: 'activeFlag',
             key: 'activeFlag',

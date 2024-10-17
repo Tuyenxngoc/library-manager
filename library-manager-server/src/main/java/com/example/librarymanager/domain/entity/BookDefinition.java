@@ -1,6 +1,5 @@
 package com.example.librarymanager.domain.entity;
 
-import com.example.librarymanager.domain.entity.common.DateAuditing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -19,7 +18,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "book_definitions",
         uniqueConstraints = @UniqueConstraint(name = "UN_BOOK_DEFINITIONS_BOOK_CODE", columnNames = "book_code"))
-public class BookDefinition extends DateAuditing {//Biên mục
+public class BookDefinition {//Biên mục
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

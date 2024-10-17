@@ -1,6 +1,5 @@
 package com.example.librarymanager.domain.dto.response;
 
-import com.example.librarymanager.domain.dto.common.DateAuditingDto;
 import com.example.librarymanager.domain.dto.request.BookRequestDto;
 import com.example.librarymanager.domain.entity.Book;
 import com.example.librarymanager.domain.entity.ImportReceipt;
@@ -10,9 +9,9 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Getter
-public class GetImportReceiptResponseDto extends DateAuditingDto {
+public class GetImportReceiptResponseDto {
 
-    private final Long id;
+    private final long id;
 
     private final String receiptNumber;
 
@@ -27,8 +26,6 @@ public class GetImportReceiptResponseDto extends DateAuditingDto {
     private final Set<BookRequestDto> books = new HashSet<>();
 
     public GetImportReceiptResponseDto(ImportReceipt importReceipt) {
-        this.createdDate = importReceipt.getCreatedDate();
-        this.lastModifiedDate = importReceipt.getLastModifiedDate();
         this.id = importReceipt.getId();
         this.receiptNumber = importReceipt.getReceiptNumber();
         this.importDate = importReceipt.getImportDate();

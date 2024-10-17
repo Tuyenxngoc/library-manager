@@ -1,14 +1,13 @@
 package com.example.librarymanager.domain.dto.response;
 
 import com.example.librarymanager.constant.PenaltyForm;
-import com.example.librarymanager.domain.dto.common.DateAuditingDto;
 import com.example.librarymanager.domain.entity.ReaderViolation;
 import lombok.Getter;
 
 import java.time.LocalDate;
 
 @Getter
-public class GetReaderViolationResponseDto extends DateAuditingDto {
+public class GetReaderViolationResponseDto {
     private final long id;
 
     private final String violationDetails;
@@ -21,7 +20,7 @@ public class GetReaderViolationResponseDto extends DateAuditingDto {
 
     private final LocalDate endDate;
 
-    private final double fineAmount;
+    private final Double fineAmount;
 
     private final String notes;
 
@@ -32,8 +31,6 @@ public class GetReaderViolationResponseDto extends DateAuditingDto {
     private final String fullName;
 
     public GetReaderViolationResponseDto(ReaderViolation violation) {
-        this.createdDate = violation.getCreatedDate();
-        this.lastModifiedDate = violation.getLastModifiedDate();
         this.id = violation.getId();
         this.violationDetails = violation.getViolationDetails();
         this.penaltyForm = violation.getPenaltyForm();

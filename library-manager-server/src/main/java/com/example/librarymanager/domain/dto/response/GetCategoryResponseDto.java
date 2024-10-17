@@ -1,14 +1,11 @@
 package com.example.librarymanager.domain.dto.response;
 
-import com.example.librarymanager.domain.dto.common.DateAuditingDto;
 import com.example.librarymanager.domain.entity.Category;
 import com.example.librarymanager.domain.entity.CategoryGroup;
 import lombok.Getter;
 
 @Getter
-public class GetCategoryResponseDto extends DateAuditingDto {
-
-    private final Boolean activeFlag;
+public class GetCategoryResponseDto {
 
     private final Long id;
 
@@ -16,15 +13,15 @@ public class GetCategoryResponseDto extends DateAuditingDto {
 
     private final String categoryCode;
 
+    private final Boolean activeFlag;
+
     private final BaseEntityDto categoryGroup;
 
     public GetCategoryResponseDto(Category category) {
-        this.createdDate = category.getCreatedDate();
-        this.lastModifiedDate = category.getLastModifiedDate();
-        this.activeFlag = category.getActiveFlag();
         this.id = category.getId();
         this.categoryName = category.getCategoryName();
         this.categoryCode = category.getCategoryCode();
+        this.activeFlag = category.getActiveFlag();
         CategoryGroup group = category.getCategoryGroup();
         this.categoryGroup = new BaseEntityDto(group.getId(), group.getGroupName());
     }

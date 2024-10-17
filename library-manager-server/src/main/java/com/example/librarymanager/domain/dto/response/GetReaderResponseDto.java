@@ -3,14 +3,13 @@ package com.example.librarymanager.domain.dto.response;
 import com.example.librarymanager.constant.CardStatus;
 import com.example.librarymanager.constant.CardType;
 import com.example.librarymanager.constant.Gender;
-import com.example.librarymanager.domain.dto.common.DateAuditingDto;
 import com.example.librarymanager.domain.entity.Reader;
 import lombok.Getter;
 
 import java.time.LocalDate;
 
 @Getter
-public class GetReaderResponseDto extends DateAuditingDto {
+public class GetReaderResponseDto {
 
     private final long id;
 
@@ -39,8 +38,6 @@ public class GetReaderResponseDto extends DateAuditingDto {
     private final long libraryVisitCount;
 
     public GetReaderResponseDto(Reader reader) {
-        this.createdDate = reader.getCreatedDate();
-        this.lastModifiedDate = reader.getLastModifiedDate();
         this.id = reader.getId();
         this.cardType = reader.getCardType();
         this.fullName = reader.getFullName();

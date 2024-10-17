@@ -8,6 +8,7 @@ import com.example.librarymanager.domain.dto.response.GetBookDefinitionResponseD
 import org.springframework.web.multipart.MultipartFile;
 
 public interface BookDefinitionService {
+    void initBookDefinitionsFromCsv(String bookDefinitionsCsvPath);
 
     CommonResponseDto save(BookDefinitionRequestDto requestDto, MultipartFile image, String userId);
 

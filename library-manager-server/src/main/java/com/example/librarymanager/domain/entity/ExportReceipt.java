@@ -1,6 +1,5 @@
 package com.example.librarymanager.domain.entity;
 
-import com.example.librarymanager.domain.entity.common.DateAuditing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -19,7 +18,7 @@ import java.util.List;
 @Entity
 @Table(name = "export_receipts",
         uniqueConstraints = @UniqueConstraint(name = "UN_EXPORT_RECEIPTS_RECEIPT_NUMBER", columnNames = "receipt_number"))
-public class ExportReceipt extends DateAuditing {
+public class ExportReceipt {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

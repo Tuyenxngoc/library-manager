@@ -1,6 +1,5 @@
 package com.example.librarymanager.domain.dto.response;
 
-import com.example.librarymanager.domain.dto.common.DateAuditingDto;
 import com.example.librarymanager.domain.entity.*;
 import lombok.Getter;
 
@@ -8,9 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class GetBookDefinitionResponseDto extends DateAuditingDto {
-
-    private final Boolean activeFlag;
+public class GetBookDefinitionResponseDto {
 
     private final long id;
 
@@ -52,6 +49,8 @@ public class GetBookDefinitionResponseDto extends DateAuditingDto {
 
     private final String additionalInfo;
 
+    private final Boolean activeFlag;
+
     private final List<BaseEntityDto> authors = new ArrayList<>();
 
     private final BaseEntityDto publisher;
@@ -63,9 +62,6 @@ public class GetBookDefinitionResponseDto extends DateAuditingDto {
     private final BaseEntityDto classificationSymbol;
 
     public GetBookDefinitionResponseDto(BookDefinition bookDefinition) {
-        this.createdDate = bookDefinition.getCreatedDate();
-        this.lastModifiedDate = bookDefinition.getLastModifiedDate();
-        this.activeFlag = bookDefinition.getActiveFlag();
         this.id = bookDefinition.getId();
         this.title = bookDefinition.getTitle();
         this.price = bookDefinition.getPrice();
@@ -86,6 +82,7 @@ public class GetBookDefinitionResponseDto extends DateAuditingDto {
         this.imageUrl = bookDefinition.getImageUrl();
         this.series = bookDefinition.getSeries();
         this.additionalInfo = bookDefinition.getAdditionalInfo();
+        this.activeFlag = bookDefinition.getActiveFlag();
 
         // Set category
         Category c = bookDefinition.getCategory();

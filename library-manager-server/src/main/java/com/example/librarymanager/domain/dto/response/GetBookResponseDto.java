@@ -1,12 +1,11 @@
 package com.example.librarymanager.domain.dto.response;
 
 import com.example.librarymanager.constant.BookCondition;
-import com.example.librarymanager.domain.dto.common.DateAuditingDto;
 import com.example.librarymanager.domain.entity.Book;
 import lombok.Getter;
 
 @Getter
-public class GetBookResponseDto extends DateAuditingDto {
+public class GetBookResponseDto {
 
     private final long id;
 
@@ -17,8 +16,6 @@ public class GetBookResponseDto extends DateAuditingDto {
     private final GetBookDefinitionResponseDto bookDefinition;
 
     public GetBookResponseDto(Book book) {
-        this.createdDate = book.getCreatedDate();
-        this.lastModifiedDate = book.getLastModifiedDate();
         this.id = book.getId();
         this.bookCode = book.getBookCode();
         this.bookCondition = book.getBookCondition();

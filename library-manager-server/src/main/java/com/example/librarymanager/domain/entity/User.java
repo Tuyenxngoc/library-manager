@@ -1,7 +1,6 @@
 package com.example.librarymanager.domain.entity;
 
 import com.example.librarymanager.constant.AccountStatus;
-import com.example.librarymanager.domain.entity.common.DateAuditing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,7 +21,7 @@ import java.util.List;
                 @UniqueConstraint(name = "UN_USER_USERNAME", columnNames = "username"),
                 @UniqueConstraint(name = "UN_USER_EMAIL", columnNames = "email")
         })
-public class User extends DateAuditing {
+public class User {
 
     @Id
     @UuidGenerator

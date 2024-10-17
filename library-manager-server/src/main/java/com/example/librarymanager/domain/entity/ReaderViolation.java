@@ -1,7 +1,6 @@
 package com.example.librarymanager.domain.entity;
 
 import com.example.librarymanager.constant.PenaltyForm;
-import com.example.librarymanager.domain.entity.common.DateAuditing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,7 +14,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Entity
 @Table(name = "reader_violations")
-public class ReaderViolation extends DateAuditing {
+public class ReaderViolation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

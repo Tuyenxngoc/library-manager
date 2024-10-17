@@ -108,13 +108,6 @@ function UserManagement() {
             showSorterTooltip: false,
         },
         {
-            title: 'Ngày tạo',
-            dataIndex: 'createdDate',
-            key: 'createdDate',
-            sorter: true,
-            showSorterTooltip: false,
-        },
-        {
             title: 'Trạng thái',
             dataIndex: 'status',
             key: 'status',

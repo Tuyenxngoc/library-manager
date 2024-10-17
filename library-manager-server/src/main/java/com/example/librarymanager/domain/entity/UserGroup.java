@@ -1,6 +1,5 @@
 package com.example.librarymanager.domain.entity;
 
-import com.example.librarymanager.domain.entity.common.DateAuditing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -18,7 +17,7 @@ import java.util.Set;
 @Entity
 @Table(name = "user_groups",
         uniqueConstraints = @UniqueConstraint(name = "UN_USER_GROUP_CODE", columnNames = "code"))
-public class UserGroup extends DateAuditing {
+public class UserGroup {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

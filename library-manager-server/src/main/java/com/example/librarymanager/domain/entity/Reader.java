@@ -3,7 +3,6 @@ package com.example.librarymanager.domain.entity;
 import com.example.librarymanager.constant.CardStatus;
 import com.example.librarymanager.constant.CardType;
 import com.example.librarymanager.constant.Gender;
-import com.example.librarymanager.domain.entity.common.DateAuditing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -22,7 +21,7 @@ import java.util.List;
 @Entity
 @Table(name = "readers",
         uniqueConstraints = @UniqueConstraint(name = "UN_READER_CARD_NUMBER", columnNames = "card_number"))
-public class Reader extends DateAuditing {
+public class Reader {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

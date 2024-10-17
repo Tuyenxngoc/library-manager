@@ -1,6 +1,5 @@
 package com.example.librarymanager.domain.entity;
 
-import com.example.librarymanager.domain.entity.common.DateAuditing;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @Entity
 @Table(name = "news_articles")
-public class NewsArticle extends DateAuditing {
+public class NewsArticle {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

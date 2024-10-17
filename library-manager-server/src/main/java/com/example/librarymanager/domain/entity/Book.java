@@ -1,7 +1,6 @@
 package com.example.librarymanager.domain.entity;
 
 import com.example.librarymanager.constant.BookCondition;
-import com.example.librarymanager.domain.entity.common.DateAuditing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,7 +15,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "books",
         uniqueConstraints = @UniqueConstraint(name = "UN_BOOK_BOOK_CODE", columnNames = "book_code"))
-public class Book extends DateAuditing {
+public class Book {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

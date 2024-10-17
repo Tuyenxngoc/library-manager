@@ -1,6 +1,5 @@
 package com.example.librarymanager.domain.entity;
 
-import com.example.librarymanager.domain.entity.common.DateAuditing;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,7 +15,7 @@ import java.util.List;
 @Entity
 @Table(name = "publishers",
         uniqueConstraints = @UniqueConstraint(name = "UN_PUBLISHER_CODE", columnNames = "code"))
-public class Publisher extends DateAuditing {
+public class Publisher {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

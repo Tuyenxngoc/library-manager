@@ -20,6 +20,7 @@ import com.example.librarymanager.service.LogService;
 import com.example.librarymanager.util.PaginationUtil;
 import com.example.librarymanager.util.UploadFileUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -27,11 +28,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BookDefinitionServiceImpl implements BookDefinitionService {
@@ -59,6 +64,37 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
     private final ClassificationSymbolRepository classificationSymbolRepository;
 
     private final LogService logService;
+
+    @Override
+    public void initBookDefinitionsFromCsv(String bookDefinitionsCsvPath) {
+        if (bookDefinitionRepository.count() > 0) {
+            return;
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(bookDefinitionsCsvPath))) {
+            String line;
+            br.readLine();
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(";");
+                if (values.length < 3) continue;
+
+                BookDefinition bookDefinition = new BookDefinition();
+                bookDefinition.setTitle(values[0]);
+                bookDefinition.setBookCode(values[1]);
+
+                Long categoryId = Long.parseLong(values[2]);
+                Category category = categoryRepository.findById(categoryId)
+                        .orElseThrow(() -> new IllegalArgumentException("Category not found for id: " + categoryId));
+                bookDefinition.setCategory(category);
+
+                if (!bookDefinitionRepository.existsByBookCode(bookDefinition.getBookCode())) {
+                    bookDefinitionRepository.save(bookDefinition);
+                }
+            }
+        } catch (IOException e) {
+            log.error("Error while initializing book definitions from CSV: {}", e.getMessage(), e);
+        }
+    }
 
     @Override
     public CommonResponseDto save(BookDefinitionRequestDto requestDto, MultipartFile file, String userId) {

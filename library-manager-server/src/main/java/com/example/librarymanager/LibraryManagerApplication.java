@@ -33,6 +33,9 @@ public class LibraryManagerApplication {
     @Value("${data.booksets.csv}")
     private String bookSetsCsvPath;
 
+    @Value("${data.bookDefinitions.csv}")
+    private String bookDefinitionsCsvPath;
+
     @Value("${data.categorygroups.csv}")
     private String categoryGroupsCsvPath;
 
@@ -59,6 +62,8 @@ public class LibraryManagerApplication {
     private final AuthorService authorService;
 
     private final BookSetService bookSetService;
+
+    private final BookDefinitionService bookDefinitionService;
 
     private final CategoryGroupService categoryGroupService;
 
@@ -94,6 +99,7 @@ public class LibraryManagerApplication {
             categoryService.initCategoriesFromCsv(categoriesCsvPath);
             publisherService.initPublishersFromCsv(publishersCsvPath);
             classificationSymbolService.initClassificationSymbolsFromCsv(classificationSymbolsCsvPath);
+            bookDefinitionService.initBookDefinitionsFromCsv(bookDefinitionsCsvPath);
         };
     }
 

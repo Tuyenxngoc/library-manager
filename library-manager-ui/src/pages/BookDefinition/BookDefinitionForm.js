@@ -59,7 +59,7 @@ const validationSchema = yup.object({
 
     classificationSymbolId: yup.number().nullable().typeError('Kí hiệu phân loại phải là số hợp lệ'),
 
-    publicationPlace: yup.string(),
+    publicationPlace: yup.string().nullable(),
 
     bookCode: yup.string().required('Kí hiệu tên sách là bắt buộc'),
 
@@ -70,7 +70,7 @@ const validationSchema = yup.object({
         .min(1900, 'Năm xuất bản phải lớn hơn 1900')
         .max(new Date().getFullYear(), `Năm xuất bản không được lớn hơn ${new Date().getFullYear()}`),
 
-    edition: yup.string(),
+    edition: yup.string().nullable(),
 
     pageCount: yup.number().nullable().typeError('Số trang phải là số hợp lệ').min(1, 'Số trang phải ít nhất là 1'),
 
@@ -82,25 +82,28 @@ const validationSchema = yup.object({
         .typeError('Giá tham khảo phải là số hợp lệ')
         .positive('Giá tham khảo phải là số dương'),
 
-    bookSize: yup.string(),
+    bookSize: yup.string().nullable(),
 
-    parallelTitle: yup.string(),
+    parallelTitle: yup.string().nullable(),
 
-    subtitle: yup.string(),
+    subtitle: yup.string().nullable(),
 
-    additionalMaterial: yup.string(),
+    additionalMaterial: yup.string().nullable(),
 
-    summary: yup.string(),
+    summary: yup.string().nullable(),
 
-    isbn: yup.string().matches(/^(97(8|9))?\d{9}(\d|X)$/, 'ISBN phải đúng định dạng hợp lệ'),
+    isbn: yup
+        .string()
+        .nullable()
+        .matches(/^(97(8|9))?\d{9}(\d|X)$/, 'ISBN phải đúng định dạng hợp lệ'),
 
-    keywords: yup.string(),
+    keywords: yup.string().nullable(),
 
-    language: yup.string(),
+    language: yup.string().nullable(),
 
-    additionalInfo: yup.string(),
+    additionalInfo: yup.string().nullable(),
 
-    series: yup.string(),
+    series: yup.string().nullable(),
 
     imageUrl: yup.string().nullable().url(),
 });
@@ -273,30 +276,30 @@ const BookDefinitionForm = ({ mode }) => {
             getBookDefinitionById(id)
                 .then((response) => {
                     const {
-                        title,
-                        price,
-                        isbn,
-                        publishingYear,
-                        edition,
-                        referencePrice,
-                        publicationPlace,
-                        bookCode,
-                        pageCount,
-                        bookSize,
-                        parallelTitle,
-                        summary,
-                        subtitle,
-                        additionalMaterial,
-                        keywords,
-                        language,
-                        imageUrl,
-                        series,
-                        additionalInfo,
-                        authors,
-                        publisher,
-                        bookSet,
-                        classificationSymbol,
-                        category,
+                        title = '',
+                        price = '',
+                        isbn = '',
+                        publishingYear = '',
+                        edition = '',
+                        referencePrice = '',
+                        publicationPlace = '',
+                        bookCode = '',
+                        pageCount = '',
+                        bookSize = '',
+                        parallelTitle = '',
+                        summary = '',
+                        subtitle = '',
+                        additionalMaterial = '',
+                        keywords = '',
+                        language = '',
+                        imageUrl = '',
+                        series = '',
+                        additionalInfo = '',
+                        authors = [],
+                        publisher = null,
+                        bookSet = null,
+                        classificationSymbol = null,
+                        category = {},
                     } = response.data.data;
                     formik.setValues({
                         title,
