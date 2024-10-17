@@ -1,0 +1,56 @@
+package com.example.librarymanager.domain.dto.response;
+
+import com.example.librarymanager.domain.entity.BookAuthor;
+import com.example.librarymanager.domain.entity.BookDefinition;
+import com.example.librarymanager.domain.entity.Publisher;
+import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Getter
+public class GetBookByBookDefinitionResponseDto {
+    private final long id;
+
+    private final String title;
+
+    private final String bookCode;
+
+    private final String publishingYear;
+
+    private final int totalBooks; // Tổng số sách
+
+    private final int availableBooks; // Số sách đang trong thư viện
+
+    private final int borrowedBooks; // Số sách đang mượn
+
+    private final int lostBooks; // Số sách đã mất
+
+    private final List<BaseEntityDto> authors = new ArrayList<>();
+
+    private final BaseEntityDto publisher;
+
+    public GetBookByBookDefinitionResponseDto(BookDefinition bookDefinition) {
+        this.id = bookDefinition.getId();
+        this.title = bookDefinition.getTitle();
+        this.bookCode = bookDefinition.getBookCode();
+        this.publishingYear = bookDefinition.getPublishingYear();
+        this.totalBooks = bookDefinition.getBooks().size();
+        this.availableBooks = 0;
+        this.borrowedBooks = 0;
+        this.lostBooks = 0;
+
+        // Set authors
+        List<BookAuthor> au = bookDefinition.getBookAuthors();
+        if (au != null) {
+            this.authors.addAll(au.stream()
+                    .map(BookAuthor::getAuthor)
+                    .map(author -> new BaseEntityDto(author.getId(), author.getFullName()))
+                    .toList());
+        }
+
+        // Set publisher
+        Publisher p = bookDefinition.getPublisher();
+        this.publisher = p != null ? new BaseEntityDto(p.getId(), p.getName()) : null;
+    }
+}

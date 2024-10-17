@@ -3,7 +3,8 @@ import { Button, Input, Select, Space, Table, Tree } from 'antd';
 import { FaPrint } from 'react-icons/fa';
 import queryString from 'query-string';
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
-import { getBookDefinitions } from '~/services/bookDefinitionService';
+import { getBookByBookDefinitions } from '~/services/bookDefinitionService';
+import { getCategoryGroupsTree } from '~/services/categoryGroupService';
 
 const options = [{ value: 'title', label: 'Nhan đề' }];
 
@@ -12,6 +13,8 @@ function BookListByCategory() {
     const [filters, setFilters] = useState(INITIAL_FILTERS);
 
     const [entityData, setEntityData] = useState(null);
+    const [treeData, setTreeData] = useState([]);
+    const [expandedKeys, setExpandedKeys] = useState([]);
 
     const [searchInput, setSearchInput] = useState('');
     const [activeFilterOption, setActiveFilterOption] = useState(options[0].value);
@@ -49,13 +52,65 @@ function BookListByCategory() {
         }));
     };
 
+    const onSelectTree = (selectedKeys, info) => {
+        if (selectedKeys.length > 0) {
+            const selectedKey = selectedKeys[0];
+
+            if (selectedKey.startsWith('group-')) {
+                const selectedCategoryGroupId = selectedKey.split('-')[1];
+                if (selectedCategoryGroupId > 0) {
+                    setFilters((prev) => ({
+                        ...prev,
+                        pageNum: 1,
+                        categoryGroupId: selectedCategoryGroupId,
+                        categoryId: null,
+                    }));
+                } else {
+                    setFilters((prev) => ({
+                        ...prev,
+                        pageNum: 1,
+                        categoryGroupId: null,
+                        categoryId: null,
+                    }));
+                }
+            } else if (selectedKey.startsWith('category-')) {
+                const selectedCategoryId = selectedKey.split('-')[1];
+                setFilters((prev) => ({
+                    ...prev,
+                    pageNum: 1,
+                    categoryId: selectedCategoryId,
+                    categoryGroupId: null,
+                }));
+            }
+        }
+    };
+
+    const transformToTreeData = (data) => {
+        return data.map((group) => ({
+            title: (
+                <>
+                    {group.name} <b>({group.count})</b>
+                </>
+            ),
+            key: `group-${group.id}`,
+            children: group.categories.map((category) => ({
+                title: (
+                    <>
+                        {category.name} <b>({category.count})</b>
+                    </>
+                ),
+                key: `category-${category.id}`,
+            })),
+        }));
+    };
+
     useEffect(() => {
         const fetchEntities = async () => {
             setIsLoading(true);
             setErrorMessage(null);
             try {
                 const params = queryString.stringify(filters);
-                const response = await getBookDefinitions(params);
+                const response = await getBookByBookDefinitions(params);
                 const { meta, items } = response.data.data;
                 setEntityData(items);
                 setMeta(meta);
@@ -68,6 +123,31 @@ function BookListByCategory() {
 
         fetchEntities();
     }, [filters]);
+
+    useEffect(() => {
+        const fetchTreeData = async () => {
+            setIsLoading(true);
+            setErrorMessage(null);
+            try {
+                const response = await getCategoryGroupsTree();
+                const transformedTreeData = transformToTreeData(response.data.data);
+                setTreeData(transformedTreeData);
+
+                const allKeys = transformedTreeData.flatMap((group) => {
+                    const groupKey = group.key;
+                    const categoryKeys = group.children ? group.children.map((child) => child.key) : [];
+                    return [groupKey, ...categoryKeys];
+                });
+                setExpandedKeys(allKeys);
+            } catch (error) {
+                setErrorMessage(error.message);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchTreeData();
+    }, []);
 
     const columns = [
         {
@@ -118,28 +198,23 @@ function BookListByCategory() {
         },
         {
             title: 'Tổng số bản',
-            dataIndex: 'bookCondition',
-            key: 'bookCondition',
-            sorter: true,
-            showSorterTooltip: false,
-            render: (text, record) => text || '',
+            dataIndex: 'totalBooks',
+            key: 'totalBooks',
         },
         {
             title: 'Còn',
-            dataIndex: 'bookCondition',
-            key: 'bookCondition',
             children: [
                 {
                     title: 'Trong thư viện',
-                    dataIndex: 'building',
-                    key: 'building',
+                    dataIndex: 'availableBooks',
+                    key: 'availableBooks',
                     align: 'center',
                     width: 100,
                 },
                 {
                     title: 'Đang cho mượn',
-                    dataIndex: 'number',
-                    key: 'number',
+                    dataIndex: 'borrowedBooks',
+                    key: 'borrowedBooks',
                     align: 'center',
                     width: 100,
                 },
@@ -147,46 +222,10 @@ function BookListByCategory() {
         },
         {
             title: 'Đã mất',
-            dataIndex: 'bookCondition',
-            key: 'bookCondition',
-            render: (text, record) => text || '',
+            dataIndex: 'lostBooks',
+            key: 'lostBooks',
         },
     ];
-
-    const treeData = [
-        {
-            title: 'Sách tham khảo',
-            key: '0-0',
-            children: [
-                {
-                    title: 'Sách pháp luật',
-                    key: '0-0-0',
-                },
-                {
-                    title: 'Sách đạo đức',
-                    key: '0-0-1',
-                },
-                {
-                    title: 'parent 1-2',
-                    key: '0-0-2',
-                },
-            ],
-        },
-        {
-            title: 'Sách khác',
-            key: '0-1',
-            children: [
-                {
-                    title: 'parent 2-0',
-                    key: '0-1-0',
-                },
-            ],
-        },
-    ];
-
-    const onSelect = (selectedKeys, info) => {
-        console.log('selected', selectedKeys, info);
-    };
 
     if (errorMessage) {
         return (
@@ -225,7 +264,12 @@ function BookListByCategory() {
 
             <div className="row">
                 <div className="col-md-2">
-                    <Tree showLine onSelect={onSelect} defaultExpandAll treeData={treeData} />
+                    <Tree
+                        treeData={treeData}
+                        expandedKeys={expandedKeys}
+                        onExpand={setExpandedKeys}
+                        onSelect={onSelectTree}
+                    />
                 </div>
                 <div className="col-md-10">
                     <Table

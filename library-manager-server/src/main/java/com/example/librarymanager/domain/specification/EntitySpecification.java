@@ -7,6 +7,7 @@ import com.example.librarymanager.domain.dto.filter.LogFilter;
 import com.example.librarymanager.domain.entity.*;
 import com.example.librarymanager.util.SpecificationsUtil;
 import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
@@ -134,7 +135,7 @@ public class EntitySpecification {
         };
     }
 
-    public static Specification<BookDefinition> filterBookDefinitions(String keyword, String searchBy, Boolean activeFlag) {
+    public static Specification<BookDefinition> filterBookDefinitions(String keyword, String searchBy, Boolean activeFlag, Long categoryGroupId, Long categoryId) {
         return (root, query, builder) -> {
             query.distinct(true);
 
@@ -152,6 +153,17 @@ public class EntitySpecification {
 
             if (activeFlag != null) {
                 predicate = builder.and(predicate, builder.equal(root.get(BookDefinition_.activeFlag), activeFlag));
+            }
+
+            if (categoryId != null) {
+                Join<BookDefinition, Category> categoryJoin = root.join(BookDefinition_.category, JoinType.INNER);
+                predicate = builder.and(predicate, builder.equal(categoryJoin.get(Category_.id), categoryId));
+            }
+
+            if (categoryGroupId != null) {
+                Join<BookDefinition, Category> categoryJoin = root.join(BookDefinition_.category, JoinType.INNER);
+                Join<Category, CategoryGroup> categoryGroupJoin = categoryJoin.join(Category_.categoryGroup, JoinType.INNER);
+                predicate = builder.and(predicate, builder.equal(categoryGroupJoin.get(CategoryGroup_.id), categoryGroupId));
             }
 
             return predicate;

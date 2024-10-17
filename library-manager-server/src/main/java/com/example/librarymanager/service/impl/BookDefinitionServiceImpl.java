@@ -8,6 +8,7 @@ import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
 import com.example.librarymanager.domain.dto.request.BookDefinitionRequestDto;
 import com.example.librarymanager.domain.dto.response.CommonResponseDto;
+import com.example.librarymanager.domain.dto.response.GetBookByBookDefinitionResponseDto;
 import com.example.librarymanager.domain.dto.response.GetBookDefinitionResponseDto;
 import com.example.librarymanager.domain.entity.*;
 import com.example.librarymanager.domain.mapper.BookDefinitionMapper;
@@ -319,7 +320,7 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BOOK_DEFINITION);
 
         Page<BookDefinition> page = bookDefinitionRepository.findAll(
-                EntitySpecification.filterBookDefinitions(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag()),
+                EntitySpecification.filterBookDefinitions(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag(), null, null),
                 pageable);
 
         List<GetBookDefinitionResponseDto> items = page.getContent().stream()
@@ -359,6 +360,27 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, bookDefinition.getActiveFlag());
+    }
+
+    @Override
+    public PaginationResponseDto<GetBookByBookDefinitionResponseDto> getBooks(PaginationFullRequestDto requestDto, Long categoryGroupId, Long categoryId) {
+        Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BOOK_DEFINITION);
+
+        Page<BookDefinition> page = bookDefinitionRepository.findAll(
+                EntitySpecification.filterBookDefinitions(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag(), categoryGroupId, categoryId),
+                pageable);
+
+        List<GetBookByBookDefinitionResponseDto> items = page.getContent().stream()
+                .map(GetBookByBookDefinitionResponseDto::new)
+                .toList();
+
+        PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.BOOK_DEFINITION, page);
+
+        PaginationResponseDto<GetBookByBookDefinitionResponseDto> responseDto = new PaginationResponseDto<>();
+        responseDto.setItems(items);
+        responseDto.setMeta(pagingMeta);
+
+        return responseDto;
     }
 
 }

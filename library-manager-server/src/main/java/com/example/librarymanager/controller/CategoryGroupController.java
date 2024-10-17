@@ -57,6 +57,13 @@ public class CategoryGroupController {
         return VsResponseUtil.success(categoryGroupService.findAll(requestDto));
     }
 
+    @Operation(summary = "API Get Category Groups Tree")
+    @PreAuthorize("hasRole('ROLE_MANAGE_CATEGORY_GROUP')")
+    @GetMapping(UrlConstant.CategoryGroup.GET_TREE)
+    public ResponseEntity<?> getCategoryGroupsTree() {
+        return VsResponseUtil.success(categoryGroupService.findTree());
+    }
+
     @Operation(summary = "API Get Category Group By Id")
     @PreAuthorize("hasRole('ROLE_MANAGE_CATEGORY_GROUP')")
     @GetMapping(UrlConstant.CategoryGroup.GET_BY_ID)

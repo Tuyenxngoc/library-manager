@@ -7,6 +7,7 @@ import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
 import com.example.librarymanager.domain.dto.request.CategoryGroupRequestDto;
+import com.example.librarymanager.domain.dto.response.CategoryGroupTree;
 import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.entity.CategoryGroup;
 import com.example.librarymanager.domain.mapper.CategoryGroupMapper;
@@ -28,6 +29,8 @@ import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -143,6 +146,25 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, categoryGroup.getActiveFlag());
+    }
+
+    @Override
+    public List<CategoryGroupTree> findTree() {
+        List<CategoryGroupTree> groupTrees = categoryGroupRepository.findAll().stream()
+                .map(CategoryGroupTree::new)
+                .toList();
+
+        int totalCount = groupTrees.stream()
+                .mapToInt(CategoryGroupTree::getCount)
+                .sum();
+
+        CategoryGroupTree allCategoriesGroup = new CategoryGroupTree(-1, "Tất cả", totalCount, new ArrayList<>());
+
+        List<CategoryGroupTree> responseDto = new ArrayList<>();
+        responseDto.add(allCategoriesGroup);
+        responseDto.addAll(groupTrees);
+
+        return responseDto;
     }
 
 }

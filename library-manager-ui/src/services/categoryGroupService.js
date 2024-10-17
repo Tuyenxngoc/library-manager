@@ -23,3 +23,7 @@ export const getCategoryGroupById = (id) => {
 export const getCategoryGroups = (params) => {
     return axiosPrivate.get(`category-groups?${params}`);
 };
+
+export const getCategoryGroupsTree = () => {
+    return axiosPrivate.get('category-groups/tree');
+};

@@ -69,6 +69,7 @@ public class UrlConstant {
         public static final String UPDATE = PRE_FIX + "/{id}";
         public static final String DELETE = PRE_FIX + "/{id}";
         public static final String TOGGLE_ACTIVE = PRE_FIX + "/{id}/toggle-active";
+        public static final String GET_TREE = PRE_FIX + "/tree";
     }
 
     public static class BookSet {
@@ -102,6 +103,7 @@ public class UrlConstant {
         public static final String UPDATE = PRE_FIX + "/{id}";
         public static final String DELETE = PRE_FIX + "/{id}";
         public static final String TOGGLE_ACTIVE = PRE_FIX + "/{id}/toggle-active";
+        public static final String GET_BOOKS = PRE_FIX + "/books";
     }
 
     public static class ClassificationSymbol {

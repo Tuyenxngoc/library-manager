@@ -8,6 +8,10 @@ export const getBookDefinitions = (params) => {
     return axiosPrivate.get(`book-definitions?${params}`);
 };
 
+export const getBookByBookDefinitions = (params) => {
+    return axiosPrivate.get(`book-definitions/books?${params}`);
+};
+
 export const updateBookDefinition = (id, values) => {
     const formData = new FormData();
 

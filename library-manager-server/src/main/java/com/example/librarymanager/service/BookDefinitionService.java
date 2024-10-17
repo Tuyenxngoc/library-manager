@@ -4,6 +4,7 @@ import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.request.BookDefinitionRequestDto;
 import com.example.librarymanager.domain.dto.response.CommonResponseDto;
+import com.example.librarymanager.domain.dto.response.GetBookByBookDefinitionResponseDto;
 import com.example.librarymanager.domain.dto.response.GetBookDefinitionResponseDto;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,4 +22,6 @@ public interface BookDefinitionService {
     GetBookDefinitionResponseDto findById(Long id);
 
     CommonResponseDto toggleActiveStatus(Long id, String userId);
+
+    PaginationResponseDto<GetBookByBookDefinitionResponseDto> getBooks(PaginationFullRequestDto requestDto, Long categoryGroupId, Long categoryId);
 }
