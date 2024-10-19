@@ -6,10 +6,18 @@ import { FaUser } from 'react-icons/fa';
 import classNames from 'classnames/bind';
 import styles from '~/styles/Post.module.scss';
 import images from '~/assets';
+import dayjs from 'dayjs';
 
 const cx = classNames.bind(styles);
 
 function Post({ className, data, layout = 'vertical' }) {
+    const isNew = () => {
+        const currentDate = dayjs();
+        const postDate = dayjs(data.createdDate);
+        const diffDays = currentDate.diff(postDate, 'day');
+        return diffDays <= 7;
+    };
+
     return (
         <div
             className={cx('wrapper', className, {
@@ -30,9 +38,11 @@ function Post({ className, data, layout = 'vertical' }) {
                             {data.createdDate}
                         </Link>
                     </li>
-                    <li className="ms-2">
-                        <Tag color="red">Mới nhất</Tag>
-                    </li>
+                    {isNew() && (
+                        <li className="ms-2">
+                            <Tag color="red">Mới nhất</Tag>
+                        </li>
+                    )}
                 </ul>
 
                 <div className={cx('posttitle')}>

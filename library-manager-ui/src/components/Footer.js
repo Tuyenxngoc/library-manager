@@ -4,7 +4,7 @@ import { MdMailOutline } from 'react-icons/md';
 
 import classNames from 'classnames/bind';
 import styles from '~/styles/Footer.module.scss';
-import images from '~/assets';
+import SocialIcons from './SocialIcons';
 
 const cx = classNames.bind(styles);
 
@@ -30,33 +30,7 @@ function Footer() {
                             </li>
                         </ul>
 
-                        <ul className="socialicons">
-                            <li className="facebook">
-                                <a href="/">
-                                    <img width={30} src={images.facebook} alt="icon" />
-                                </a>
-                            </li>
-                            <li className="twitter">
-                                <a href="/">
-                                    <img width={30} src={images.twitter} alt="icon" />
-                                </a>
-                            </li>
-                            <li className="linkedin">
-                                <a href="/">
-                                    <img width={30} src={images.linkedin} alt="icon" />
-                                </a>
-                            </li>
-                            <li className="googleplus">
-                                <a href="/">
-                                    <img width={30} src={images.googleplus} alt="icon" />
-                                </a>
-                            </li>
-                            <li className="rss">
-                                <a href="/">
-                                    <img width={30} src={images.rss} alt="icon" />
-                                </a>
-                            </li>
-                        </ul>
+                        <SocialIcons />
                     </div>
                 </div>
             </div>

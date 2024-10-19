@@ -1,13 +1,14 @@
 import { Button } from 'antd';
 import { Parallax } from 'react-parallax';
 import { Link } from 'react-router-dom';
-import images, { backgrounds } from '~/assets';
+import { backgrounds } from '~/assets';
 import Breadcrumb from '~/components/Breadcrumb';
 import Product from '~/components/Product';
 import SectionHeader from '~/components/SectionHeader';
 
 import classNames from 'classnames/bind';
 import styles from '~/styles/BookDetail.module.scss';
+import SocialIcons from '~/components/SocialIcons';
 
 const cx = classNames.bind(styles);
 
@@ -79,33 +80,7 @@ function BookDetail() {
 
                                     <div className={cx('share')}>
                                         <span>Share:</span>
-                                        <ul className="socialicons">
-                                            <li className="facebook">
-                                                <a href="/">
-                                                    <img width={30} src={images.facebook} alt="icon" />
-                                                </a>
-                                            </li>
-                                            <li className="twitter">
-                                                <a href="/">
-                                                    <img width={30} src={images.twitter} alt="icon" />
-                                                </a>
-                                            </li>
-                                            <li className="linkedin">
-                                                <a href="/">
-                                                    <img width={30} src={images.linkedin} alt="icon" />
-                                                </a>
-                                            </li>
-                                            <li className="googleplus">
-                                                <a href="/">
-                                                    <img width={30} src={images.googleplus} alt="icon" />
-                                                </a>
-                                            </li>
-                                            <li className="rss">
-                                                <a href="/">
-                                                    <img width={30} src={images.rss} alt="icon" />
-                                                </a>
-                                            </li>
-                                        </ul>
+                                        <SocialIcons />
                                     </div>
 
                                     <div className={cx('description')}>

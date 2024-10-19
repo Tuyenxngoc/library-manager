@@ -13,7 +13,6 @@
 
 .booktitle {
     padding-bottom: 20px;
-
     h3 {
         margin-bottom: 0;
     }
@@ -25,11 +24,9 @@
 
 .productinfo {
     padding-bottom: 30px;
-
     li {
         width: 100%;
         background: #f7f7f7;
-
         &:nth-child(even) {
             background: #fcfcfc;
         }
@@ -39,16 +36,16 @@
         }
 
         span:first-child {
-            width: 40%;
             float: left;
-            color: #404040;
-            font-weight: 500;
+            width: 40%;
             font-family: 'Work Sans', Arial, Helvetica, sans-serif;
+            font-weight: 500;
+            color: #404040;
         }
 
         span:last-child {
-            width: 60%;
             float: left;
+            width: 60%;
             color: #666;
         }
     }
