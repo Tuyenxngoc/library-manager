@@ -136,7 +136,7 @@ function NewsArticles() {
             showSorterTooltip: false,
             render: (text, record) => (
                 <Space>
-                    {text ? 'Đang theo giõi' : 'Ngừng theo giõi'}
+                    {text ? 'Đang theo dõi' : 'Ngừng theo dõi'}
                     <Switch checked={text} onChange={(checked) => handleToggleActiveFlag(checked, record)} />
                 </Space>
             ),

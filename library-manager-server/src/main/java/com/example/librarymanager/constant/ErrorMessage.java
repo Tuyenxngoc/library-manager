@@ -159,9 +159,8 @@ public class ErrorMessage {
     }
 
     public static class NewsArticle {
-        public static final String ERR_NOT_FOUND_ID = "exception.import.receipt.not.found.id";
-        public static final String ERR_DUPLICATE_NUMBER = "exception.import.receipt.duplicate.code";
-        public static final String ERR_HAS_LINKED_BOOKS = "exception.import.receipt.has.linked";
+        public static final String ERR_NOT_FOUND_ID = "exception.news.not.found.id";
+        public static final String ERR_NOT_FOUND_TITLE = "exception.news.not.found.tile";
     }
 
     public static class UserGroup {

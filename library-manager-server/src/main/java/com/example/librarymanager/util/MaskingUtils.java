@@ -1,5 +1,7 @@
 package com.example.librarymanager.util;
 
+import java.text.Normalizer;
+
 public class MaskingUtils {
 
     public static String maskEmail(String email) {
@@ -20,6 +22,19 @@ public class MaskingUtils {
             return phoneNumber; // Không che dấu nếu số quá ngắn
         }
         return phoneNumber.substring(0, 2) + "*****" + phoneNumber.substring(phoneNumber.length() - 3);
+    }
+
+    public static String toSlug(String input) {
+        String normalized = Normalizer.normalize(input.toLowerCase(), Normalizer.Form.NFD);
+        String withoutDiacritics = normalized.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+
+        String lowerCase = withoutDiacritics.toLowerCase();
+
+        String slug = lowerCase.replaceAll("[^a-z0-9\\s-]", "").replaceAll("\\s+", "-");
+
+        slug = slug.replaceAll("-+", "-").replaceAll("^-|-$", "");
+
+        return slug;
     }
 
 }

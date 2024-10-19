@@ -3,16 +3,45 @@ import SectionHeader from './SectionHeader';
 import classNames from 'classnames/bind';
 import Slider from 'react-slick';
 import styles from '~/styles/PostList.module.scss';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Post from './Post';
+import { getNewsArticlesForUser } from '~/services/newsArticlesService';
+import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
+import queryString from 'query-string';
 
 const cx = classNames.bind(styles);
 function PostList() {
     const sliderRef = useRef(null);
     const navigate = useNavigate();
 
-    const [posts, setPosts] = useState([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    const [meta, setMeta] = useState(INITIAL_META);
+    const [filters, setFilters] = useState(INITIAL_FILTERS);
+
+    const [entityData, setEntityData] = useState(null);
+
+    const [isLoading, setIsLoading] = useState(true);
+    const [errorMessage, setErrorMessage] = useState(null);
+
+    useEffect(() => {
+        const fetchEntities = async () => {
+            setIsLoading(true);
+            setErrorMessage(null);
+            try {
+                const params = queryString.stringify(filters);
+                const response = await getNewsArticlesForUser(params);
+                const { meta, items } = response.data.data;
+                setEntityData(items);
+                setMeta(meta);
+            } catch (error) {
+                setErrorMessage(error.message);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchEntities();
+    }, [filters]);
 
     const settings = {
         dots: false,
@@ -51,11 +80,15 @@ function PostList() {
                 </div>
                 <div className="row">
                     <div className="col-12">
-                        <Slider ref={sliderRef} {...settings}>
-                            {posts.map((data, index) => (
-                                <Post className="mx-2 my-1" key={index} data={data} />
-                            ))}
-                        </Slider>
+                        {isLoading ? (
+                            <>Loading</>
+                        ) : (
+                            <Slider ref={sliderRef} {...settings}>
+                                {entityData.map((data, index) => (
+                                    <Post className="mx-2 my-1" key={index} data={data} />
+                                ))}
+                            </Slider>
+                        )}
                     </div>
                 </div>
             </div>

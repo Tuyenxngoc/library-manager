@@ -8,6 +8,7 @@ import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
 import com.example.librarymanager.domain.dto.request.NewsArticleRequestDto;
 import com.example.librarymanager.domain.dto.response.CommonResponseDto;
+import com.example.librarymanager.domain.dto.response.GetNewsArticleResponseDto;
 import com.example.librarymanager.domain.entity.NewsArticle;
 import com.example.librarymanager.domain.mapper.NewsArticleMapper;
 import com.example.librarymanager.domain.specification.EntitySpecification;
@@ -15,6 +16,7 @@ import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.NewsArticleRepository;
 import com.example.librarymanager.service.LogService;
 import com.example.librarymanager.service.NewsArticleService;
+import com.example.librarymanager.util.MaskingUtils;
 import com.example.librarymanager.util.PaginationUtil;
 import com.example.librarymanager.util.UploadFileUtil;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +60,8 @@ public class NewsArticleServiceImpl implements NewsArticleService {
             newsArticle.setImageUrl(imagePath);
         }
 
+        newsArticle.setCreatedDate(LocalDate.now());
+        newsArticle.setTitleSlug(MaskingUtils.toSlug(newsArticle.getTitle() + newsArticleRepository.count()));
         newsArticleRepository.save(newsArticle);
 
         logService.createLog(TAG, "Thêm", "Tạo bài viết mới: " + newsArticle.getTitle(), userId);
@@ -83,6 +90,7 @@ public class NewsArticleServiceImpl implements NewsArticleService {
         newsArticle.setNewsType(requestDto.getNewsType());
         newsArticle.setDescription(requestDto.getDescription());
         newsArticle.setContent(requestDto.getContent());
+        newsArticle.setTitleSlug(MaskingUtils.toSlug(newsArticle.getTitle() + newsArticleRepository.count()));
 
         newsArticleRepository.save(newsArticle);
 
@@ -139,5 +147,32 @@ public class NewsArticleServiceImpl implements NewsArticleService {
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, newsArticle.getActiveFlag());
+    }
+
+    @Override
+    public PaginationResponseDto<GetNewsArticleResponseDto> getNewsArticles(PaginationFullRequestDto requestDto) {
+        Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.NEWS_ARTICLE);
+
+        Page<NewsArticle> page = newsArticleRepository.findAll(
+                EntitySpecification.filterNewsArticles(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag()),
+                pageable);
+
+        List<GetNewsArticleResponseDto> items = page.getContent().stream()
+                .map(GetNewsArticleResponseDto::new)
+                .toList();
+
+        PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.NEWS_ARTICLE, page);
+
+        PaginationResponseDto<GetNewsArticleResponseDto> responseDto = new PaginationResponseDto<>();
+        responseDto.setItems(items);
+        responseDto.setMeta(pagingMeta);
+
+        return responseDto;
+    }
+
+    @Override
+    public NewsArticle getNewsArticleByTitleSlug(String titleSlug) {
+        return newsArticleRepository.findByTitleSlug(titleSlug)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.NewsArticle.ERR_NOT_FOUND_ID));
     }
 }

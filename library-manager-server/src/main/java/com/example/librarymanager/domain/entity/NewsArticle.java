@@ -3,6 +3,8 @@ package com.example.librarymanager.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @Builder
@@ -20,6 +22,9 @@ public class NewsArticle {
     @Column(name = "title", nullable = false)
     private String title;
 
+    @Column(name = "title_slug", unique = true, nullable = false)
+    private String titleSlug;
+
     @Column(name = "description")
     private String description;
 
@@ -28,6 +33,9 @@ public class NewsArticle {
 
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     private String content;
+
+    @Column(name = "created_date", nullable = false)
+    private LocalDate createdDate;
 
     @Column(name = "active_flag", nullable = false)
     private Boolean activeFlag = Boolean.TRUE;

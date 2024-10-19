@@ -50,6 +50,7 @@ import Reader from './pages/Reader/Reader';
 import LibraryVisit from './pages/LibraryVisit/LibraryVisit';
 import VisitorStatistics from './pages/LibraryVisit/VisitorStatistics';
 import ReaderViolations from './pages/Reader/ReaderViolations';
+import NewsArticleDetail from './pages/NewsArticles/NewsArticleDetail';
 
 function App() {
     return (
@@ -66,7 +67,8 @@ function App() {
                     <Route path="rules" element={<Rules />} />
                     <Route path="report" element={<Report />} />
                     <Route path="search" element={<Search />} />
-                    <Route path="book/:bookId" element={<BookDetail />} />
+                    <Route path="book/:id" element={<BookDetail />} />
+                    <Route path="news-articles/:id" element={<NewsArticleDetail />} />
 
                     <Route element={<RequireAuth />}>{/* Đường dẫn yêu cầu đăng nhập */}</Route>
                 </Route>

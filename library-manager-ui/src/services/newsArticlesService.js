@@ -1,11 +1,11 @@
 import { axiosPrivate } from '~/apis/configHttp';
 
 export const getNewsArticleById = (id) => {
-    return axiosPrivate.get(`news-articles/${id}`);
+    return axiosPrivate.get(`admin/news-articles/${id}`);
 };
 
 export const getNewsArticles = (params) => {
-    return axiosPrivate.get(`news-articles?${params}`);
+    return axiosPrivate.get(`admin/news-articles?${params}`);
 };
 
 export const updateNewsArticle = (id, values) => {
@@ -20,7 +20,7 @@ export const updateNewsArticle = (id, values) => {
         }
     }
 
-    return axiosPrivate.put(`news-articles/${id}`, formData, {
+    return axiosPrivate.put(`admin/news-articles/${id}`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
@@ -39,7 +39,7 @@ export const createNewsArticle = (values) => {
         }
     }
 
-    return axiosPrivate.post('news-articles', formData, {
+    return axiosPrivate.post('admin/news-articles', formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
@@ -47,9 +47,17 @@ export const createNewsArticle = (values) => {
 };
 
 export const deleteNewsArticle = (id) => {
-    return axiosPrivate.delete(`news-articles/${id}`);
+    return axiosPrivate.delete(`admin/news-articles/${id}`);
 };
 
 export const toggleActiveFlag = (id) => {
-    return axiosPrivate.patch(`news-articles/${id}/toggle-active`);
+    return axiosPrivate.patch(`admin/news-articles/${id}/toggle-active`);
+};
+
+export const getNewsArticlesForUser = (params) => {
+    return axiosPrivate.get(`news-articles?${params}`);
+};
+
+export const getNewsArticleByTitleSlugForUser = (titleSlug) => {
+    return axiosPrivate.get(`news-articles/${titleSlug}`);
 };

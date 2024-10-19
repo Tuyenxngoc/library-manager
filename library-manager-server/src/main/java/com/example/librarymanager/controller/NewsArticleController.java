@@ -86,4 +86,16 @@ public class NewsArticleController {
     ) {
         return VsResponseUtil.success(newsArticleService.toggleActiveStatus(id, userDetails.getUserId()));
     }
+
+    @Operation(summary = "API Get News Articles")
+    @GetMapping(UrlConstant.NewsArticle.GET_ALL_FOR_USER)
+    public ResponseEntity<?> getNewsArticles(@ParameterObject PaginationFullRequestDto requestDto) {
+        return VsResponseUtil.success(newsArticleService.getNewsArticles(requestDto));
+    }
+
+    @Operation(summary = "API Get News Article Detail")
+    @GetMapping(UrlConstant.NewsArticle.GET_BY_ID_FOR_USER)
+    public ResponseEntity<?> getNewsArticleDetail(@PathVariable String id) {
+        return VsResponseUtil.success(newsArticleService.getNewsArticleByTitleSlug(id));
+    }
 }

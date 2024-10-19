@@ -156,12 +156,16 @@ public class UrlConstant {
     public static class NewsArticle {
         private static final String PRE_FIX = "/news-articles";
 
-        public static final String CREATE = PRE_FIX;
-        public static final String GET_ALL = PRE_FIX;
-        public static final String GET_BY_ID = PRE_FIX + "/{id}";
-        public static final String UPDATE = PRE_FIX + "/{id}";
-        public static final String DELETE = PRE_FIX + "/{id}";
-        public static final String TOGGLE_ACTIVE = PRE_FIX + "/{id}/toggle-active";
+        public static final String CREATE = ADMIN_URL + PRE_FIX;
+        public static final String GET_ALL = ADMIN_URL + PRE_FIX;
+        public static final String GET_BY_ID = ADMIN_URL + PRE_FIX + "/{id}";
+        public static final String UPDATE = ADMIN_URL + PRE_FIX + "/{id}";
+        public static final String DELETE = ADMIN_URL + PRE_FIX + "/{id}";
+        public static final String TOGGLE_ACTIVE = ADMIN_URL + PRE_FIX + "/{id}/toggle-active";
+
+        public static final String GET_ALL_FOR_USER = PRE_FIX;
+        public static final String GET_BY_ID_FOR_USER = PRE_FIX + "/{id}";
+
     }
 
     public static class UserGroup {
