@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { FaRegCalendarAlt } from 'react-icons/fa';
 import { Parallax } from 'react-parallax';
 import { Button, Skeleton } from 'antd';
-import { backgrounds } from '~/assets';
+import images, { backgrounds } from '~/assets';
 import Breadcrumb from '~/components/Breadcrumb';
 import { getNewsArticleByTitleSlugForUser } from '~/services/newsArticlesService';
 import classNames from 'classnames/bind';
@@ -85,7 +85,7 @@ function NewsArticleDetail() {
                         ) : (
                             <>
                                 <figure className={cx('newsdetailimg')}>
-                                    <img src={entityData.imageUrl} alt="description" />
+                                    <img src={entityData.imageUrl || images.placeimg} alt="description" />
 
                                     <figcaption className={cx('author')}>
                                         <span className="bookwriter">Tác giả: Admin</span>

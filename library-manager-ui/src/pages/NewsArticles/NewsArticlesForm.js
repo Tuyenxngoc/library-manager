@@ -1,17 +1,19 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { Button, Image, message, Select, Space } from 'antd';
-import { handleError } from '~/utils/errorHandler';
-import { checkIdIsNumber } from '~/utils/helper';
-import { createNewsArticle, getNewsArticleById, updateNewsArticle } from '~/services/newsArticlesService';
-import FormInput from '~/components/FormInput';
-import { formats, modules } from '~/common/editorConfig';
+import { MdOutlineFileUpload } from 'react-icons/md';
+import { Button, Image, message, Select, Space, Upload } from 'antd';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import 'react-quill/dist/quill.core.css';
 import images from '~/assets';
+import { handleError } from '~/utils/errorHandler';
+import { checkIdIsNumber } from '~/utils/helper';
+import FormInput from '~/components/FormInput';
+import { formats, modules } from '~/common/editorConfig';
+import FormTextArea from '~/components/FormTextArea';
+import { createNewsArticle, getNewsArticleById, updateNewsArticle } from '~/services/newsArticlesService';
 
 const defaultValue = {
     title: '',
@@ -42,6 +44,23 @@ function NewsArticlesForm() {
     const { id } = useParams();
     const navigate = useNavigate();
     const [messageApi, contextHolder] = message.useMessage();
+
+    const [fileList, setFileList] = useState([]);
+    const [previousImage, setPreviousImage] = useState(images.placeimg);
+
+    const handleUploadChange = ({ file, fileList }) => {
+        setFileList(fileList);
+
+        const { originFileObj } = file;
+        if (!originFileObj) {
+            return;
+        }
+
+        // Tạo URL cho hình ảnh và cập nhật giá trị trong form
+        const url = URL.createObjectURL(originFileObj);
+        setPreviousImage(url);
+        formik.setFieldValue('image', originFileObj);
+    };
 
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
@@ -90,6 +109,8 @@ function NewsArticlesForm() {
                         imageUrl,
                         content,
                     });
+
+                    setPreviousImage(imageUrl);
                 })
                 .catch((error) => {
                     console.log(error);
@@ -105,7 +126,7 @@ function NewsArticlesForm() {
 
             <form onSubmit={formik.handleSubmit}>
                 <div className="row g-3">
-                    <div className="col-md-12">
+                    <div className="col-md-6">
                         <label htmlFor="newsType">
                             <span className="text-danger">*</span> Loại tin:
                         </label>
@@ -122,26 +143,31 @@ function NewsArticlesForm() {
                         <div className="text-danger">{formik.touched.newsType && formik.errors.newsType}</div>
                     </div>
 
-                    <FormInput id="title" label="Tiêu đề" className="col-md-12" formik={formik} required />
+                    <FormInput id="title" label="Tiêu đề" className="col-md-6" formik={formik} required />
 
-                    <FormInput id="description" label="Miêu tả" className="col-md-12" formik={formik} />
+                    <FormTextArea id="description" label="Miêu tả" className="col-md-6" formik={formik} />
 
-                    <div className="col-md-12">
-                        <Image width={200} src={formik.values.imageUrl} fallback={images.placeimg} />
+                    <div className="col-md-6 text-center">
+                        <Image width={200} src={previousImage} fallback={images.placeimg} />
 
-                        <label htmlFor="image" className="form-label">
-                            Chọn hình ảnh
-                        </label>
-                        <input
-                            type="file"
-                            id="image"
-                            name="image"
+                        <Upload
+                            className="d-block mt-2"
                             accept="image/*"
-                            onChange={(event) => {
-                                formik.setFieldValue('image', event.currentTarget.files[0]);
+                            fileList={fileList}
+                            maxCount={1}
+                            showUploadList={false}
+                            beforeUpload={(file) => {
+                                const isImage = file.type.startsWith('image/');
+                                if (!isImage) {
+                                    messageApi.error('Bạn chỉ có thể upload file hình ảnh!');
+                                }
+                                return isImage;
                             }}
-                            onBlur={() => formik.setFieldTouched('image', true)}
-                        />
+                            onChange={handleUploadChange}
+                            customRequest={() => false}
+                        >
+                            <Button icon={<MdOutlineFileUpload />}>Chọn hình ảnh</Button>
+                        </Upload>
                     </div>
 
                     <div className="col-md-12">

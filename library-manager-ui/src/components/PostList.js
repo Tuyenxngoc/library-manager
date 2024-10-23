@@ -1,22 +1,17 @@
-import SectionHeader from './SectionHeader';
-
-import classNames from 'classnames/bind';
-import Slider from 'react-slick';
-import styles from '~/styles/PostList.module.scss';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Slider from 'react-slick';
+import classNames from 'classnames/bind';
+import styles from '~/styles/PostList.module.scss';
 import Post from './Post';
+import SectionHeader from './SectionHeader';
 import { getNewsArticlesForUser } from '~/services/newsArticlesService';
-import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
-import queryString from 'query-string';
 
 const cx = classNames.bind(styles);
+
 function PostList() {
     const sliderRef = useRef(null);
     const navigate = useNavigate();
-
-    const [meta, setMeta] = useState(INITIAL_META);
-    const [filters, setFilters] = useState(INITIAL_FILTERS);
 
     const [entityData, setEntityData] = useState(null);
 
@@ -28,11 +23,9 @@ function PostList() {
             setIsLoading(true);
             setErrorMessage(null);
             try {
-                const params = queryString.stringify(filters);
-                const response = await getNewsArticlesForUser(params);
-                const { meta, items } = response.data.data;
+                const response = await getNewsArticlesForUser();
+                const { items } = response.data.data;
                 setEntityData(items);
-                setMeta(meta);
             } catch (error) {
                 setErrorMessage(error.message);
             } finally {
@@ -41,7 +34,7 @@ function PostList() {
         };
 
         fetchEntities();
-    }, [filters]);
+    }, []);
 
     const settings = {
         dots: false,
@@ -82,6 +75,8 @@ function PostList() {
                     <div className="col-12">
                         {isLoading ? (
                             <>Loading</>
+                        ) : errorMessage ? (
+                            <>{errorMessage}</>
                         ) : (
                             <Slider ref={sliderRef} {...settings}>
                                 {entityData.map((data, index) => (

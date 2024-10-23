@@ -153,9 +153,9 @@ public class ErrorMessage {
     }
 
     public static class ExportReceipt {
-        public static final String ERR_NOT_FOUND_ID = "exception.import.receipt.not.found.id";
-        public static final String ERR_DUPLICATE_NUMBER = "exception.import.receipt.duplicate.code";
-        public static final String ERR_HAS_LINKED_BOOKS = "exception.import.receipt.has.linked";
+        public static final String ERR_NOT_FOUND_ID = "exception.export.receipt.not.found.id";
+        public static final String ERR_DUPLICATE_NUMBER = "exception.export.receipt.duplicate.code";
+        public static final String ERR_HAS_LINKED_BOOKS = "exception.export.receipt.has.linked";
     }
 
     public static class NewsArticle {
