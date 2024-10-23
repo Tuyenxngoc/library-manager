@@ -49,6 +49,16 @@ public class ExportReceiptController {
         return VsResponseUtil.success(exportReceiptService.update(id, requestDto, userDetails.getUserId()));
     }
 
+    @Operation(summary = "API Delete Export Receipt")
+    @PreAuthorize("hasRole('ROLE_MANAGE_EXPORT_RECEIPT')")
+    @DeleteMapping(UrlConstant.ExportReceipt.DELETE)
+    public ResponseEntity<?> deleteExportReceipt(
+            @PathVariable Long id,
+            @CurrentUser CustomUserDetails userDetails
+    ) {
+        return VsResponseUtil.success(exportReceiptService.delete(id, userDetails.getUserId()));
+    }
+
     @Operation(summary = "API Get All Export Receipts")
     @PreAuthorize("hasRole('ROLE_MANAGE_EXPORT_RECEIPT')")
     @GetMapping(UrlConstant.ExportReceipt.GET_ALL)

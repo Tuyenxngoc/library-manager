@@ -11,6 +11,8 @@ public interface ExportReceiptService {
 
     CommonResponseDto update(Long id, ExportReceiptRequestDto requestDto, String userId);
 
+    CommonResponseDto delete(Long id, String userId);
+
     PaginationResponseDto<GetExportReceiptResponseDto> findAll(PaginationFullRequestDto requestDto);
 
     GetExportReceiptResponseDto findById(Long id);

@@ -1,6 +1,7 @@
 package com.example.librarymanager.service.impl;
 
 import com.example.librarymanager.constant.ErrorMessage;
+import com.example.librarymanager.constant.EventConstants;
 import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.constant.SuccessMessage;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
@@ -31,6 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -53,34 +55,36 @@ public class ExportReceiptServiceImpl implements ExportReceiptService {
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.ImportReceipt.ERR_NOT_FOUND_ID, id));
     }
 
+    private void getBook(ExportReceipt exportReceipt, Long bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.Book.ERR_NOT_FOUND_ID, bookId));
+        if (book.getBookBorrow() != null) {
+            throw new ConflictException(ErrorMessage.Book.ERR_HAS_LINKED, book.getBookCode());
+        }
+        if (book.getExportReceipt() != null) {
+            throw new ConflictException(ErrorMessage.Book.ERR_HAS_LINKED_EXPORT_RECEPTION, book.getBookCode());
+        }
+
+        book.setExportReceipt(exportReceipt);
+        exportReceipt.getBooks().add(book);
+    }
+
     @Override
     public CommonResponseDto save(ExportReceiptRequestDto requestDto, String userId) {
+        // Kiểm tra trùng số phiếu
         if (exportReceiptRepository.existsByReceiptNumber(requestDto.getReceiptNumber())) {
             throw new ConflictException(ErrorMessage.ExportReceipt.ERR_DUPLICATE_NUMBER, requestDto.getReceiptNumber());
         }
         ExportReceipt exportReceipt = exportReceiptMapper.toExportReceipt(requestDto);
 
-        //Kiểm tra dữ liệu sách
-        Set<Long> bookIds = requestDto.getBookIds();
-        Set<Book> books = new HashSet<>();
-        for (Long bookId : bookIds) {
-            Book book = bookRepository.findById(bookId)
-                    .orElseThrow(() -> new NotFoundException(ErrorMessage.Book.ERR_NOT_FOUND_ID, bookId));
-            if (book.getBookBorrow() != null) {
-                throw new ConflictException(ErrorMessage.ExportReceipt.ERR_HAS_LINKED_BOOKS, book.getBookCode());
-            }
-            books.add(book);
-        }
-
-        //Thêm vào phiếu xuất
-        for (Book book : books) {
-            book.setDeleteFlag(true);
-            exportReceipt.getBook().add(book);
+        // Thêm sách mới vào phiếu xuất
+        for (Long bookId : requestDto.getBookIds()) {
+            getBook(exportReceipt, bookId);
         }
 
         exportReceiptRepository.save(exportReceipt);
 
-        logService.createLog(TAG, "Thêm", "Tạo phiếu xuất mới: " + exportReceipt.getReceiptNumber(), userId);
+        logService.createLog(TAG, EventConstants.ADD, "Tạo phiếu xuất mới: " + exportReceipt.getReceiptNumber(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message);
@@ -90,20 +94,79 @@ public class ExportReceiptServiceImpl implements ExportReceiptService {
     public CommonResponseDto update(Long id, ExportReceiptRequestDto requestDto, String userId) {
         ExportReceipt exportReceipt = getEntity(id);
 
+        // Kiểm tra trùng số phiếu
         if (!Objects.equals(exportReceipt.getReceiptNumber(), requestDto.getReceiptNumber()) &&
                 exportReceiptRepository.existsByReceiptNumber(requestDto.getReceiptNumber())) {
             throw new ConflictException(ErrorMessage.ExportReceipt.ERR_DUPLICATE_NUMBER, requestDto.getReceiptNumber());
         }
 
+        // Cập nhật thông tin phiếu xuất
         exportReceipt.setReceiptNumber(requestDto.getReceiptNumber());
         exportReceipt.setExportDate(requestDto.getExportDate());
         exportReceipt.setExportReason(requestDto.getExportReason());
 
+        // Kiểm tra và cập nhật danh sách sách
+        Set<Long> newBookIds = requestDto.getBookIds();
+        Set<Book> currentBooks = exportReceipt.getBooks();
+
+        // Lấy danh sách ID sách hiện tại trong phiếu xuất
+        Set<Long> currentBookIds = currentBooks.stream()
+                .map(Book::getId)
+                .collect(Collectors.toSet());
+
+        // Tìm sách cần thêm mới
+        Set<Long> bookIdsToAdd = new HashSet<>(newBookIds);
+        bookIdsToAdd.removeAll(currentBookIds);
+
+        // Tìm sách cần xóa
+        Set<Long> bookIdsToRemove = new HashSet<>(currentBookIds);
+        bookIdsToRemove.removeAll(newBookIds);
+
+        // Thêm sách mới vào phiếu xuất
+        if (!bookIdsToAdd.isEmpty()) {
+            for (Long bookId : bookIdsToAdd) {
+                getBook(exportReceipt, bookId);
+            }
+        }
+
+        // Xóa sách không còn trong danh sách
+        if (!bookIdsToRemove.isEmpty()) {
+            Set<Book> booksToRemove = currentBooks.stream()
+                    .filter(book -> bookIdsToRemove.contains(book.getId()))
+                    .collect(Collectors.toSet());
+
+            for (Book book : booksToRemove) {
+                book.setExportReceipt(null);
+            }
+
+            bookRepository.saveAll(booksToRemove);
+
+            exportReceipt.getBooks().removeAll(booksToRemove);
+        }
+
         exportReceiptRepository.save(exportReceipt);
 
-        logService.createLog(TAG, "Sửa", "Sửa phiếu xuất: " + exportReceipt.getReceiptNumber(), userId);
+        logService.createLog(TAG, EventConstants.EDIT, "Sửa phiếu xuất: " + exportReceipt.getReceiptNumber(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
+        return new CommonResponseDto(message);
+    }
+
+    @Override
+    public CommonResponseDto delete(Long id, String userId) {
+        ExportReceipt exportReceipt = getEntity(id);
+
+        // Xóa sách liên kết với phiếu xuất
+        exportReceipt.getBooks().forEach(book -> {
+            book.setExportReceipt(null);
+            bookRepository.save(book);
+        });
+
+        exportReceiptRepository.delete(exportReceipt);
+
+        logService.createLog(TAG, EventConstants.DELETE, "Xóa phiếu xuất: " + exportReceipt.getReceiptNumber(), userId);
+
+        String message = messageSource.getMessage(SuccessMessage.DELETE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message);
     }
 

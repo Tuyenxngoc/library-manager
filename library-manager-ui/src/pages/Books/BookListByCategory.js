@@ -6,7 +6,10 @@ import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
 import { getBookByBookDefinitions } from '~/services/bookDefinitionService';
 import { getCategoryGroupsTree } from '~/services/categoryGroupService';
 
-const options = [{ value: 'title', label: 'Nhan đề' }];
+const options = [
+    { value: 'title', label: 'Nhan đề' },
+    { value: 'bookCode', label: 'Kí hiệu tên sách' },
+];
 
 function BookListByCategory() {
     const [meta, setMeta] = useState(INITIAL_META);
@@ -159,10 +162,11 @@ function BookListByCategory() {
         },
         {
             title: 'KHPL',
-            dataIndex: 'bookCode',
-            key: 'bookCode',
+            dataIndex: 'classificationSymbol',
+            key: 'classificationSymbol',
             sorter: true,
             showSorterTooltip: false,
+            render: (text, record) => <>{text ? text.name : ''}</>,
         },
         {
             title: 'Tác giả',

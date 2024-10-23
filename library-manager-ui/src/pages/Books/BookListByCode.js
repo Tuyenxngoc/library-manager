@@ -5,7 +5,10 @@ import queryString from 'query-string';
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
 import { getBooks } from '~/services/bookService';
 
-const options = [{ value: 'bookCode', label: 'Số ĐKCB' }];
+const options = [
+    { value: 'bookCode', label: 'Số ĐKCB' },
+    { value: 'title', label: 'Nhan đề' },
+];
 
 function BookListByCode() {
     const [meta, setMeta] = useState(INITIAL_META);

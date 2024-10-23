@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -36,6 +36,6 @@ public class ExportReceipt {
 
     @OneToMany(mappedBy = "exportReceipt", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<Book> book = new ArrayList<>();  // Sách đã xuất
+    private Set<Book> books = new HashSet<>();  // Sách đã xuất
 
 }

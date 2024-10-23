@@ -2,6 +2,7 @@ package com.example.librarymanager.domain.dto.response;
 
 import com.example.librarymanager.domain.entity.BookAuthor;
 import com.example.librarymanager.domain.entity.BookDefinition;
+import com.example.librarymanager.domain.entity.ClassificationSymbol;
 import com.example.librarymanager.domain.entity.Publisher;
 import lombok.Getter;
 
@@ -25,6 +26,8 @@ public class GetBookByBookDefinitionResponseDto {
     private final int borrowedBooks; // Số sách đang mượn
 
     private final int lostBooks; // Số sách đã mất
+
+    private final BaseEntityDto classificationSymbol;
 
     private final List<BaseEntityDto> authors = new ArrayList<>();
 
@@ -52,5 +55,9 @@ public class GetBookByBookDefinitionResponseDto {
         // Set publisher
         Publisher p = bookDefinition.getPublisher();
         this.publisher = p != null ? new BaseEntityDto(p.getId(), p.getName()) : null;
+
+        //Set classificationSymbol
+        ClassificationSymbol c = bookDefinition.getClassificationSymbol();
+        this.classificationSymbol = c != null ? new BaseEntityDto(c.getId(), c.getCode()) : null;
     }
 }

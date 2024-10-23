@@ -61,7 +61,7 @@ public class ImportReceiptServiceImpl implements ImportReceiptService {
     }
 
     private void handleBook(ImportReceiptRequestDto requestDto, ImportReceipt importReceipt) {
-        importReceipt.setBook(new ArrayList<>());
+        importReceipt.setBooks(new ArrayList<>());
 
         Map<BookDefinition, Integer> bookDefinitionMap = new HashMap<>();
         for (BookRequestDto bookRequestDto : requestDto.getBookRequestDtos()) {
@@ -88,7 +88,7 @@ public class ImportReceiptServiceImpl implements ImportReceiptService {
                 book.setImportReceipt(importReceipt);
 
                 //Lưu sách vào phiếu nhập
-                importReceipt.getBook().add(book);
+                importReceipt.getBooks().add(book);
             }
         }
     }
@@ -134,7 +134,7 @@ public class ImportReceiptServiceImpl implements ImportReceiptService {
         importReceipt.setImportReason(requestDto.getImportReason());
 
         //Xử lý danh sách sách trong phiếu nhập
-        List<Book> existingBooks = importReceipt.getBook();
+        List<Book> existingBooks = importReceipt.getBooks();
         for (Book book : existingBooks) {
             if (book.getBookBorrow() != null || book.getExportReceipt() != null) {
                 throw new BadRequestException(ErrorMessage.Book.ERR_HAS_LINKED, book.getBookCode());
@@ -163,7 +163,7 @@ public class ImportReceiptServiceImpl implements ImportReceiptService {
         ImportReceipt importReceipt = getEntity(id);
 
         //Kiểm tra sách đã phát sinh dữ liệu hay chưa
-        List<Book> books = importReceipt.getBook();
+        List<Book> books = importReceipt.getBooks();
         for (Book book : books) {
             if (book.getBookBorrow() != null || book.getExportReceipt() != null) {
                 throw new BadRequestException(ErrorMessage.Book.ERR_HAS_LINKED, book.getBookCode());

@@ -35,7 +35,7 @@ public class GetImportReceiptResponseDto {
 
         Map<Long, Integer> bookCountMap = new HashMap<>();
 
-        List<Book> books = importReceipt.getBook();
+        List<Book> books = importReceipt.getBooks();
         for (Book book : books) {
             Long bookDefinitionId = book.getBookDefinition().getId();
             if (bookCountMap.containsKey(bookDefinitionId)) {

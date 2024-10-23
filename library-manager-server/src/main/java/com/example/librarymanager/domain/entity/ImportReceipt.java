@@ -40,6 +40,6 @@ public class ImportReceipt {
 
     @OneToMany(mappedBy = "importReceipt", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<Book> book = new ArrayList<>();  // Sách đã nhập
+    private List<Book> books = new ArrayList<>();  // Sách đã nhập
 
 }
