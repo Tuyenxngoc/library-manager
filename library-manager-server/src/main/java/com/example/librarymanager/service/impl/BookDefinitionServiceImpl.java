@@ -14,7 +14,6 @@ import com.example.librarymanager.domain.dto.response.GetBookDefinitionResponseD
 import com.example.librarymanager.domain.dto.response.GetBookForUserResponseDto;
 import com.example.librarymanager.domain.entity.*;
 import com.example.librarymanager.domain.mapper.BookDefinitionMapper;
-import com.example.librarymanager.domain.specification.EntitySpecification;
 import com.example.librarymanager.exception.BadRequestException;
 import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.*;
@@ -28,6 +27,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,6 +38,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.example.librarymanager.domain.specification.EntitySpecification.*;
 
 @Slf4j
 @Service
@@ -321,9 +323,9 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
     public PaginationResponseDto<GetBookDefinitionResponseDto> findAll(PaginationFullRequestDto requestDto) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BOOK_DEFINITION);
 
-        Page<BookDefinition> page = bookDefinitionRepository.findAll(
-                EntitySpecification.filterBookDefinitions(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag(), null, null),
-                pageable);
+        Specification<BookDefinition> spec = Specification.where(baseFilterBookDefinitions(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag()));
+
+        Page<BookDefinition> page = bookDefinitionRepository.findAll(spec, pageable);
 
         List<GetBookDefinitionResponseDto> items = page.getContent().stream()
                 .map(GetBookDefinitionResponseDto::new)
@@ -368,9 +370,11 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
     public PaginationResponseDto<GetBookByBookDefinitionResponseDto> getBooks(PaginationFullRequestDto requestDto, Long categoryGroupId, Long categoryId) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BOOK_DEFINITION);
 
-        Page<BookDefinition> page = bookDefinitionRepository.findAll(
-                EntitySpecification.filterBookDefinitions(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag(), categoryGroupId, categoryId),
-                pageable);
+        Specification<BookDefinition> spec = Specification.where(baseFilterBookDefinitions(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag()))
+                .and(filterByCategoryId(categoryId))
+                .and(filterByCategoryGroupId(categoryGroupId));
+
+        Page<BookDefinition> page = bookDefinitionRepository.findAll(spec, pageable);
 
         List<GetBookByBookDefinitionResponseDto> items = page.getContent().stream()
                 .map(GetBookByBookDefinitionResponseDto::new)
@@ -389,9 +393,12 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
     public PaginationResponseDto<?> getBooksForUser(PaginationFullRequestDto requestDto, Long categoryGroupId, Long categoryId) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BOOK_DEFINITION);
 
-        Page<BookDefinition> page = bookDefinitionRepository.findAll(
-                EntitySpecification.filterBookDefinitions(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag(), categoryGroupId, categoryId),
-                pageable);
+        Specification<BookDefinition> spec = Specification.where(baseFilterBookDefinitions(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag()))
+                .and(filterByCategoryId(categoryId))
+                .and(filterByCategoryGroupId(categoryGroupId))
+                .and(filterByBooksCountGreaterThanZero());
+
+        Page<BookDefinition> page = bookDefinitionRepository.findAll(spec, pageable);
 
         List<GetBookForUserResponseDto> items = page.getContent().stream()
                 .map(GetBookForUserResponseDto::new)

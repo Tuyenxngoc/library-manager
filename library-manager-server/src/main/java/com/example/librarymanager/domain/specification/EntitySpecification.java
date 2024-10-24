@@ -135,7 +135,7 @@ public class EntitySpecification {
         };
     }
 
-    public static Specification<BookDefinition> filterBookDefinitions(String keyword, String searchBy, Boolean activeFlag, Long categoryGroupId, Long categoryId) {
+    public static Specification<BookDefinition> baseFilterBookDefinitions(String keyword, String searchBy, Boolean activeFlag) {
         return (root, query, builder) -> {
             query.distinct(true);
 
@@ -155,18 +155,40 @@ public class EntitySpecification {
                 predicate = builder.and(predicate, builder.equal(root.get(BookDefinition_.activeFlag), activeFlag));
             }
 
-            if (categoryId != null) {
-                Join<BookDefinition, Category> categoryJoin = root.join(BookDefinition_.category, JoinType.INNER);
-                predicate = builder.and(predicate, builder.equal(categoryJoin.get(Category_.id), categoryId));
-            }
+            return predicate;
+        };
+    }
 
+    public static Specification<BookDefinition> filterByCategoryGroupId(Long categoryGroupId) {
+        return (root, query, builder) -> {
             if (categoryGroupId != null) {
                 Join<BookDefinition, Category> categoryJoin = root.join(BookDefinition_.category, JoinType.INNER);
                 Join<Category, CategoryGroup> categoryGroupJoin = categoryJoin.join(Category_.categoryGroup, JoinType.INNER);
-                predicate = builder.and(predicate, builder.equal(categoryGroupJoin.get(CategoryGroup_.id), categoryGroupId));
+                return builder.equal(categoryGroupJoin.get(CategoryGroup_.id), categoryGroupId);
             }
+            return builder.conjunction();
+        };
+    }
 
-            return predicate;
+    public static Specification<BookDefinition> filterByBooksCountGreaterThanZero() {
+        return (root, query, builder) -> {
+            Join<BookDefinition, Book> bookJoin = root.join(BookDefinition_.books, JoinType.LEFT);
+
+            query.groupBy(root.get(BookDefinition_.id));
+
+            query.having(builder.greaterThan(builder.count(bookJoin), 0L));
+
+            return builder.conjunction();
+        };
+    }
+
+    public static Specification<BookDefinition> filterByCategoryId(Long categoryId) {
+        return (root, query, builder) -> {
+            if (categoryId != null) {
+                Join<BookDefinition, Category> categoryJoin = root.join(BookDefinition_.category, JoinType.INNER);
+                return builder.equal(categoryJoin.get(Category_.id), categoryId);
+            }
+            return builder.conjunction();
         };
     }
 
@@ -189,6 +211,11 @@ public class EntitySpecification {
                                     SpecificationsUtil.castToRequiredType(root.get(ClassificationSymbol_.level).getJavaType(), keyword)));
                 }
             }
+
+            if (activeFlag != null) {
+                predicate = builder.and(predicate, builder.equal(root.get(ClassificationSymbol_.activeFlag), activeFlag));
+            }
+
             return predicate;
         };
     }

@@ -1,13 +1,35 @@
+import { useEffect, useState } from 'react';
 import { Button } from 'antd';
-import { useState } from 'react';
 import { Parallax } from 'react-parallax';
 import { backgrounds } from '~/assets';
 import Breadcrumb from '~/components/Breadcrumb';
 import Post from '~/components/Post';
 import SectionHeader from '~/components/SectionHeader';
+import { getNewsArticlesForUser } from '~/services/newsArticlesService';
 
 function News() {
-    const [posts, setPosts] = useState([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]);
+    const [entityData, setEntityData] = useState(null);
+
+    const [isLoading, setIsLoading] = useState(true);
+    const [errorMessage, setErrorMessage] = useState(null);
+
+    useEffect(() => {
+        const fetchEntities = async () => {
+            setIsLoading(true);
+            setErrorMessage(null);
+            try {
+                const response = await getNewsArticlesForUser();
+                const { items } = response.data.data;
+                setEntityData(items);
+            } catch (error) {
+                setErrorMessage(error.message);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchEntities();
+    }, []);
 
     const items = [
         {
@@ -46,13 +68,19 @@ function News() {
                     </div>
                     <div className="col-9">
                         <SectionHeader title="Danh sách tin tức" subtitle="Tin tức và bài viết mới nhất" />
-                        <div className="row">
-                            {posts.map((data, index) => (
-                                <div className="col-12">
-                                    <Post className="mx-2 my-1" key={index} data={data} layout="horizontal" />
-                                </div>
-                            ))}
-                        </div>
+                        {isLoading ? (
+                            <>Loading</>
+                        ) : errorMessage ? (
+                            <>{errorMessage}</>
+                        ) : (
+                            <div className="row">
+                                {entityData.map((data, index) => (
+                                    <div className="col-12">
+                                        <Post className="mx-2 my-1" key={index} data={data} layout="horizontal" />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

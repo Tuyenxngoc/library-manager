@@ -7,6 +7,7 @@ const images = {
     twitter: require('./images/twitter.png'),
     logo: require('./images/logo.svg').default,
     placeimg: require('./images/placeimg.svg').default,
+    placeimgHorizontal: require('./images/placeimg_horizontal.svg').default,
 };
 
 export const slides = [

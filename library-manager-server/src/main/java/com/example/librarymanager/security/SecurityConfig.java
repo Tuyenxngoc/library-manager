@@ -84,7 +84,8 @@ public class SecurityConfig {
                         .requestMatchers(WHITE_LIST_URL).permitAll()
                         .requestMatchers(HttpMethod.GET,
                                 "api/v1/news-articles", "api/v1/news-articles/*",
-                                "api/v1/book-definitions/books"
+                                "api/v1/book-definitions/books",
+                                "api/v1/stats/library"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

@@ -1,4 +1,4 @@
-import { axiosPrivate } from '~/apis/configHttp';
+import httpRequest, { axiosPrivate } from '~/apis/configHttp';
 
 export const getNewsArticleById = (id) => {
     return axiosPrivate.get(`admin/news-articles/${id}`);
@@ -55,7 +55,7 @@ export const toggleActiveFlag = (id) => {
 };
 
 export const getNewsArticlesForUser = (params) => {
-    return axiosPrivate.get(`news-articles?${params}`);
+    return httpRequest.get(`news-articles?${params}`);
 };
 
 export const getNewsArticleByTitleSlugForUser = (titleSlug) => {

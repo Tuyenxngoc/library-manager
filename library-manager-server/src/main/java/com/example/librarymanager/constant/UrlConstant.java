@@ -213,4 +213,10 @@ public class UrlConstant {
         public static final String UPDATE = PRE_FIX + "/{id}";
         public static final String DELETE = PRE_FIX + "/{id}";
     }
+
+    public static class Stats {
+        private static final String PRE_FIX = "/stats";
+
+        public static final String GET_LIBRARY_STATISTICS = PRE_FIX + "/library";
+    }
 }
