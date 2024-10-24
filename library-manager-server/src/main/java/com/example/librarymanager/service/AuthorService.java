@@ -10,15 +10,15 @@ public interface AuthorService {
 
     void initAuthorsFromCsv(String authorsCsvPath);
 
-    CommonResponseDto save(AuthorRequestDto requestDto);
+    CommonResponseDto save(AuthorRequestDto requestDto, String userId);
 
-    CommonResponseDto update(Long id, AuthorRequestDto requestDto);
+    CommonResponseDto update(Long id, AuthorRequestDto requestDto, String userId);
 
-    CommonResponseDto delete(Long id);
+    CommonResponseDto delete(Long id, String userId);
 
     PaginationResponseDto<Author> findAll(PaginationFullRequestDto requestDto);
 
     Author findById(Long id);
 
-    CommonResponseDto toggleActiveStatus(Long id);
+    CommonResponseDto toggleActiveStatus(Long id, String userId);
 }

@@ -40,7 +40,7 @@ public class PdfServiceImpl implements PdfService {
     }
 
     @Override
-    public byte[] createPdf(CreateReaderCardsRequestDto requestDto, List<Reader> readers) {
+    public byte[] createReaderCardPdf(CreateReaderCardsRequestDto requestDto, List<Reader> readers) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Document document = new Document(PageSize.A4, 10, 10, 10, 10);
 

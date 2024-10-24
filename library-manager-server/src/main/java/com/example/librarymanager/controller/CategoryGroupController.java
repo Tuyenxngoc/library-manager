@@ -1,10 +1,12 @@
 package com.example.librarymanager.controller;
 
+import com.example.librarymanager.annotation.CurrentUser;
 import com.example.librarymanager.annotation.RestApiV1;
 import com.example.librarymanager.base.VsResponseUtil;
 import com.example.librarymanager.constant.UrlConstant;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.request.CategoryGroupRequestDto;
+import com.example.librarymanager.security.CustomUserDetails;
 import com.example.librarymanager.service.CategoryGroupService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,8 +31,11 @@ public class CategoryGroupController {
     @Operation(summary = "API Create Category Group")
     @PreAuthorize("hasRole('ROLE_MANAGE_CATEGORY_GROUP')")
     @PostMapping(UrlConstant.CategoryGroup.CREATE)
-    public ResponseEntity<?> createCategoryGroup(@Valid @RequestBody CategoryGroupRequestDto requestDto) {
-        return VsResponseUtil.success(HttpStatus.CREATED, categoryGroupService.save(requestDto));
+    public ResponseEntity<?> createCategoryGroup(
+            @Valid @RequestBody CategoryGroupRequestDto requestDto,
+            @CurrentUser CustomUserDetails userDetails
+    ) {
+        return VsResponseUtil.success(HttpStatus.CREATED, categoryGroupService.save(requestDto, userDetails.getUserId()));
     }
 
     @Operation(summary = "API Update Category Group")
@@ -38,16 +43,20 @@ public class CategoryGroupController {
     @PutMapping(UrlConstant.CategoryGroup.UPDATE)
     public ResponseEntity<?> updateCategoryGroup(
             @PathVariable Long id,
-            @Valid @RequestBody CategoryGroupRequestDto requestDto
+            @Valid @RequestBody CategoryGroupRequestDto requestDto,
+            @CurrentUser CustomUserDetails userDetails
     ) {
-        return VsResponseUtil.success(categoryGroupService.update(id, requestDto));
+        return VsResponseUtil.success(categoryGroupService.update(id, requestDto, userDetails.getUserId()));
     }
 
     @Operation(summary = "API Delete Category Group")
     @PreAuthorize("hasRole('ROLE_MANAGE_CATEGORY_GROUP')")
     @DeleteMapping(UrlConstant.CategoryGroup.DELETE)
-    public ResponseEntity<?> deleteCategoryGroup(@PathVariable Long id) {
-        return VsResponseUtil.success(categoryGroupService.delete(id));
+    public ResponseEntity<?> deleteCategoryGroup(
+            @PathVariable Long id,
+            @CurrentUser CustomUserDetails userDetails
+    ) {
+        return VsResponseUtil.success(categoryGroupService.delete(id, userDetails.getUserId()));
     }
 
     @Operation(summary = "API Get Category Groups")
@@ -74,8 +83,11 @@ public class CategoryGroupController {
     @Operation(summary = "API Toggle Active Status of Category Group")
     @PreAuthorize("hasRole('ROLE_MANAGE_CATEGORY_GROUP')")
     @PatchMapping(UrlConstant.CategoryGroup.TOGGLE_ACTIVE)
-    public ResponseEntity<?> toggleActiveStatus(@PathVariable Long id) {
-        return VsResponseUtil.success(categoryGroupService.toggleActiveStatus(id));
+    public ResponseEntity<?> toggleActiveStatus(
+            @PathVariable Long id,
+            @CurrentUser CustomUserDetails userDetails
+    ) {
+        return VsResponseUtil.success(categoryGroupService.toggleActiveStatus(id, userDetails.getUserId()));
     }
 
 }

@@ -6,5 +6,5 @@ import com.example.librarymanager.domain.entity.Reader;
 import java.util.List;
 
 public interface PdfService {
-    byte[] createPdf(CreateReaderCardsRequestDto requestDto, List<Reader> readers);
+    byte[] createReaderCardPdf(CreateReaderCardsRequestDto requestDto, List<Reader> readers);
 }

@@ -10,15 +10,15 @@ import com.example.librarymanager.domain.entity.Category;
 public interface CategoryService {
     void initCategoriesFromCsv(String categoriesCsvPath);
 
-    Category findById(Long id);
+    CommonResponseDto save(CategoryRequestDto requestDto, String userId);
+
+    CommonResponseDto update(Long id, CategoryRequestDto requestDto, String userId);
+
+    CommonResponseDto delete(Long id, String userId);
 
     PaginationResponseDto<GetCategoryResponseDto> findAll(PaginationFullRequestDto requestDto);
 
-    CommonResponseDto save(CategoryRequestDto requestDto);
+    Category findById(Long id);
 
-    CommonResponseDto delete(Long id);
-
-    CommonResponseDto update(Long id, CategoryRequestDto requestDto);
-
-    CommonResponseDto toggleActiveStatus(Long id);
+    CommonResponseDto toggleActiveStatus(Long id, String userId);
 }

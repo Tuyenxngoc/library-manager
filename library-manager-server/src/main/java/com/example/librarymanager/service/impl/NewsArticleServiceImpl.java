@@ -1,6 +1,7 @@
 package com.example.librarymanager.service.impl;
 
 import com.example.librarymanager.constant.ErrorMessage;
+import com.example.librarymanager.constant.EventConstants;
 import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.constant.SuccessMessage;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
@@ -64,7 +65,7 @@ public class NewsArticleServiceImpl implements NewsArticleService {
         newsArticle.setTitleSlug(MaskingUtils.toSlug(newsArticle.getTitle() + newsArticleRepository.count()));
         newsArticleRepository.save(newsArticle);
 
-        logService.createLog(TAG, "Thêm", "Tạo bài viết mới: " + newsArticle.getTitle(), userId);
+        logService.createLog(TAG, EventConstants.ADD, "Tạo bài viết mới: " + newsArticle.getTitle(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, newsArticle);
@@ -94,7 +95,7 @@ public class NewsArticleServiceImpl implements NewsArticleService {
 
         newsArticleRepository.save(newsArticle);
 
-        logService.createLog(TAG, "Sửa", "Cập nhật bài viết id: " + newsArticle.getId() + ", tiêu đề mới: " + newsArticle.getTitle(), userId);
+        logService.createLog(TAG, EventConstants.EDIT, "Cập nhật bài viết id: " + newsArticle.getId() + ", tiêu đề mới: " + newsArticle.getTitle(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, newsArticle);
@@ -106,7 +107,7 @@ public class NewsArticleServiceImpl implements NewsArticleService {
 
         newsArticleRepository.delete(newsArticle);
 
-        logService.createLog(TAG, "Xóa", "Xóa bài viết: " + newsArticle.getTitle(), userId);
+        logService.createLog(TAG, EventConstants.DELETE, "Xóa bài viết: " + newsArticle.getTitle(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.DELETE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message);
@@ -143,7 +144,7 @@ public class NewsArticleServiceImpl implements NewsArticleService {
 
         newsArticleRepository.save(newsArticle);
 
-        logService.createLog(TAG, "Sửa", "Thay đổi trạng thái bài viết: " + newsArticle.getTitle(), userId);
+        logService.createLog(TAG, EventConstants.EDIT, "Thay đổi trạng thái bài viết: " + newsArticle.getTitle(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, newsArticle.getActiveFlag());

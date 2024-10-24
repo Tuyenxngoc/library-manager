@@ -1,9 +1,6 @@
 package com.example.librarymanager.service.impl;
 
-import com.example.librarymanager.constant.ErrorMessage;
-import com.example.librarymanager.constant.Gender;
-import com.example.librarymanager.constant.SortByDataConstant;
-import com.example.librarymanager.constant.SuccessMessage;
+import com.example.librarymanager.constant.*;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
@@ -16,6 +13,7 @@ import com.example.librarymanager.exception.ConflictException;
 import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.AuthorRepository;
 import com.example.librarymanager.service.AuthorService;
+import com.example.librarymanager.service.LogService;
 import com.example.librarymanager.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +33,10 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class AuthorServiceImpl implements AuthorService {
+
+    private static final String TAG = "Quản lý tác giả";
+
+    private final LogService logService;
 
     private final AuthorRepository authorRepository;
 
@@ -78,7 +80,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public CommonResponseDto save(AuthorRequestDto requestDto) {
+    public CommonResponseDto save(AuthorRequestDto requestDto, String userId) {
         Author author = authorMapper.toAuthor(requestDto);
 
         if (authorRepository.existsByCode(author.getCode())) {
@@ -88,12 +90,14 @@ public class AuthorServiceImpl implements AuthorService {
         author.setActiveFlag(true);
         authorRepository.save(author);
 
+        logService.createLog(TAG, EventConstants.ADD, "Thêm tác giả mới Id: " + author.getId(), userId);
+
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, author);
     }
 
     @Override
-    public CommonResponseDto update(Long id, AuthorRequestDto requestDto) {
+    public CommonResponseDto update(Long id, AuthorRequestDto requestDto, String userId) {
         Author author = findById(id);
 
         if (!Objects.equals(author.getCode(), requestDto.getCode())
@@ -114,12 +118,14 @@ public class AuthorServiceImpl implements AuthorService {
 
         authorRepository.save(author);
 
+        logService.createLog(TAG, EventConstants.EDIT, "Cập nhật tác giả Id: " + author.getId(), userId);
+
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, author);
     }
 
     @Override
-    public CommonResponseDto delete(Long id) {
+    public CommonResponseDto delete(Long id, String userId) {
         Author author = findById(id);
 
         if (!author.getBookAuthors().isEmpty()) {
@@ -127,6 +133,8 @@ public class AuthorServiceImpl implements AuthorService {
         }
 
         authorRepository.delete(author);
+
+        logService.createLog(TAG, EventConstants.DELETE, "Xóa tác giả Id: " + author.getId(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.DELETE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message);
@@ -156,12 +164,14 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public CommonResponseDto toggleActiveStatus(Long id) {
+    public CommonResponseDto toggleActiveStatus(Long id, String userId) {
         Author author = findById(id);
 
         author.setActiveFlag(!author.getActiveFlag());
 
         authorRepository.save(author);
+
+        logService.createLog(TAG, EventConstants.EDIT, "Thay đổi trạng thái tác giả Id: " + author.getId() + ", trạng thái: " + author.getActiveFlag(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, author.getActiveFlag());

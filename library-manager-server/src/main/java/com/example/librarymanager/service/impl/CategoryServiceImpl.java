@@ -1,6 +1,7 @@
 package com.example.librarymanager.service.impl;
 
 import com.example.librarymanager.constant.ErrorMessage;
+import com.example.librarymanager.constant.EventConstants;
 import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.constant.SuccessMessage;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
@@ -19,6 +20,7 @@ import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.CategoryGroupRepository;
 import com.example.librarymanager.repository.CategoryRepository;
 import com.example.librarymanager.service.CategoryService;
+import com.example.librarymanager.service.LogService;
 import com.example.librarymanager.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +40,10 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
+
+    private static final String TAG = "Quản lý danh mục";
+
+    private final LogService logService;
 
     private final CategoryRepository categoryRepository;
 
@@ -79,9 +85,75 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category findById(Long id) {
-        return categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.Category.ERR_NOT_FOUND_ID, id));
+    public CommonResponseDto save(CategoryRequestDto requestDto, String userId) {
+        CategoryGroup categoryGroup = categoryGroupRepository.findByIdAndActiveFlagIsTrue(requestDto.getParentId())
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.CategoryGroup.ERR_NOT_FOUND_ID, requestDto.getParentId()));
+
+        if (categoryRepository.existsByCategoryName(requestDto.getCategoryName())) {
+            throw new ConflictException(ErrorMessage.Category.ERR_DUPLICATE_NAME);
+        }
+
+        if (categoryRepository.existsByCategoryCode(requestDto.getCategoryCode())) {
+            throw new ConflictException(ErrorMessage.Category.ERR_DUPLICATE_CODE);
+        }
+
+        Category category = categoryMapper.toCategory(requestDto);
+        category.setCategoryGroup(categoryGroup);
+
+        category.setActiveFlag(true);
+        categoryRepository.save(category);
+
+        logService.createLog(TAG, EventConstants.ADD, "Thêm danh mục mới Id: " + categoryGroup.getId(), userId);
+
+        String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
+        return new CommonResponseDto(message, new GetCategoryResponseDto(category));
+    }
+
+    @Override
+    public CommonResponseDto update(Long id, CategoryRequestDto requestDto, String userId) {
+        Category category = findById(id);
+
+        if (!Objects.equals(category.getCategoryName(), requestDto.getCategoryName())
+                && categoryRepository.existsByCategoryName(requestDto.getCategoryName())) {
+            throw new ConflictException(ErrorMessage.Category.ERR_DUPLICATE_NAME);
+        }
+
+        if (!Objects.equals(category.getCategoryCode(), requestDto.getCategoryCode())
+                && categoryRepository.existsByCategoryCode(requestDto.getCategoryCode())) {
+            throw new ConflictException(ErrorMessage.Category.ERR_DUPLICATE_CODE);
+        }
+
+        if (!Objects.equals(category.getCategoryGroup().getId(), requestDto.getParentId())) {
+            CategoryGroup categoryGroup = categoryGroupRepository.findByIdAndActiveFlagIsTrue(requestDto.getParentId())
+                    .orElseThrow(() -> new NotFoundException(ErrorMessage.CategoryGroup.ERR_NOT_FOUND_ID, requestDto.getParentId()));
+            category.setCategoryGroup(categoryGroup);
+        }
+
+        category.setCategoryName(requestDto.getCategoryName());
+        category.setCategoryCode(requestDto.getCategoryCode());
+
+        categoryRepository.save(category);
+
+        logService.createLog(TAG, EventConstants.EDIT, "Cập nhật danh mục Id: " + category.getId(), userId);
+
+        String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
+        return new CommonResponseDto(message, new GetCategoryResponseDto(category));
+    }
+
+    @Override
+    public CommonResponseDto delete(Long id, String userId) {
+        Category category = findById(id);
+
+        if (!category.getBookDefinitions().isEmpty()) {
+            throw new BadRequestException(ErrorMessage.Category.ERR_HAS_LINKED_BOOKS);
+        }
+
+        categoryRepository.delete(category);
+
+        logService.createLog(TAG, EventConstants.DELETE, "Xóa danh mục Id: " + category.getId(), userId);
+
+        String message = messageSource.getMessage(SuccessMessage.DELETE, null, LocaleContextHolder.getLocale());
+        return new CommonResponseDto(message, true);
     }
 
     @Override
@@ -106,78 +178,20 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CommonResponseDto save(CategoryRequestDto requestDto) {
-        CategoryGroup categoryGroup = categoryGroupRepository.findByIdAndActiveFlagIsTrue(requestDto.getParentId())
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.CategoryGroup.ERR_NOT_FOUND_ID, requestDto.getParentId()));
-
-        if (categoryRepository.existsByCategoryName(requestDto.getCategoryName())) {
-            throw new ConflictException(ErrorMessage.Category.ERR_DUPLICATE_NAME);
-        }
-
-        if (categoryRepository.existsByCategoryCode(requestDto.getCategoryCode())) {
-            throw new ConflictException(ErrorMessage.Category.ERR_DUPLICATE_CODE);
-        }
-
-        Category category = categoryMapper.toCategory(requestDto);
-        category.setCategoryGroup(categoryGroup);
-
-        category.setActiveFlag(true);
-        categoryRepository.save(category);
-
-        String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
-        return new CommonResponseDto(message, new GetCategoryResponseDto(category));
+    public Category findById(Long id) {
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.Category.ERR_NOT_FOUND_ID, id));
     }
 
     @Override
-    public CommonResponseDto delete(Long id) {
-        Category category = findById(id);
-
-        if (!category.getBookDefinitions().isEmpty()) {
-            throw new BadRequestException(ErrorMessage.Category.ERR_HAS_LINKED_BOOKS);
-        }
-
-        categoryRepository.delete(category);
-
-        String message = messageSource.getMessage(SuccessMessage.DELETE, null, LocaleContextHolder.getLocale());
-        return new CommonResponseDto(message, true);
-    }
-
-    @Override
-    public CommonResponseDto update(Long id, CategoryRequestDto requestDto) {
-        Category category = findById(id);
-
-        if (!Objects.equals(category.getCategoryName(), requestDto.getCategoryName())
-                && categoryRepository.existsByCategoryName(requestDto.getCategoryName())) {
-            throw new ConflictException(ErrorMessage.Category.ERR_DUPLICATE_NAME);
-        }
-
-        if (!Objects.equals(category.getCategoryCode(), requestDto.getCategoryCode())
-                && categoryRepository.existsByCategoryCode(requestDto.getCategoryCode())) {
-            throw new ConflictException(ErrorMessage.Category.ERR_DUPLICATE_CODE);
-        }
-
-        if (!Objects.equals(category.getCategoryGroup().getId(), requestDto.getParentId())) {
-            CategoryGroup categoryGroup = categoryGroupRepository.findByIdAndActiveFlagIsTrue(requestDto.getParentId())
-                    .orElseThrow(() -> new NotFoundException(ErrorMessage.CategoryGroup.ERR_NOT_FOUND_ID, requestDto.getParentId()));
-            category.setCategoryGroup(categoryGroup);
-        }
-
-        category.setCategoryName(requestDto.getCategoryName());
-        category.setCategoryCode(requestDto.getCategoryCode());
-
-        categoryRepository.save(category);
-
-        String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
-        return new CommonResponseDto(message, new GetCategoryResponseDto(category));
-    }
-
-    @Override
-    public CommonResponseDto toggleActiveStatus(Long id) {
+    public CommonResponseDto toggleActiveStatus(Long id, String userId) {
         Category category = findById(id);
 
         category.setActiveFlag(!category.getActiveFlag());
 
         categoryRepository.save(category);
+
+        logService.createLog(TAG, EventConstants.EDIT, "Thay đổi trạng thái danh mục Id: " + category.getId() + ", trạng thái: " + category.getActiveFlag(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, category.getActiveFlag());

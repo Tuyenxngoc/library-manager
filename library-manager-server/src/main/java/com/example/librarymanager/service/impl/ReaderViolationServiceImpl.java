@@ -2,6 +2,7 @@ package com.example.librarymanager.service.impl;
 
 import com.example.librarymanager.constant.CardStatus;
 import com.example.librarymanager.constant.ErrorMessage;
+import com.example.librarymanager.constant.EventConstants;
 import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
@@ -51,7 +52,7 @@ public class ReaderViolationServiceImpl implements ReaderViolationService {
 
         readerViolationRepository.save(violation);
 
-        logService.createLog(TAG, "Thêm", "Tạo vi phạm mới cho bạn đọc: " + violation.getViolationDetails(), userId);
+        logService.createLog(TAG, EventConstants.ADD, "Tạo vi phạm mới cho bạn đọc: " + violation.getViolationDetails(), userId);
 
         return new CommonResponseDto("Vi phạm đã được thêm thành công.", new GetReaderViolationResponseDto(violation));
     }
@@ -85,7 +86,7 @@ public class ReaderViolationServiceImpl implements ReaderViolationService {
 
         readerViolationRepository.save(violation);
 
-        logService.createLog(TAG, "Sửa", "Cập nhật vi phạm id: " + violation.getId(), userId);
+        logService.createLog(TAG, EventConstants.EDIT, "Cập nhật vi phạm id: " + violation.getId(), userId);
 
         return new CommonResponseDto("Vi phạm đã được cập nhật thành công.", new GetReaderViolationResponseDto(violation));
     }
@@ -96,7 +97,7 @@ public class ReaderViolationServiceImpl implements ReaderViolationService {
 
         readerViolationRepository.delete(violation);
 
-        logService.createLog(TAG, "Xóa", "Xóa vi phạm id: " + violation.getId(), userId);
+        logService.createLog(TAG, EventConstants.DELETE, "Xóa vi phạm id: " + violation.getId(), userId);
 
         return new CommonResponseDto("Vi phạm đã được xóa thành công.");
     }

@@ -1,6 +1,7 @@
 package com.example.librarymanager.service.impl;
 
 import com.example.librarymanager.constant.ErrorMessage;
+import com.example.librarymanager.constant.EventConstants;
 import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.constant.SuccessMessage;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
@@ -84,7 +85,7 @@ public class BookSetServiceImpl implements BookSetService {
         bookSet.setActiveFlag(true);
         bookSetRepository.save(bookSet);
 
-        logService.createLog(TAG, "Thêm", "Tạo bộ sách mới: " + bookSet.getName(), userId);
+        logService.createLog(TAG, EventConstants.ADD, "Tạo bộ sách mới: " + bookSet.getName(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, new GetBookSetResponseDto(bookSet));
@@ -102,7 +103,7 @@ public class BookSetServiceImpl implements BookSetService {
 
         bookSetRepository.save(bookSet);
 
-        logService.createLog(TAG, "Sửa", "Cập nhật bộ sách id: " + bookSet.getId() + ", tên mới: " + bookSet.getName(), userId);
+        logService.createLog(TAG, EventConstants.EDIT, "Cập nhật bộ sách id: " + bookSet.getId() + ", tên mới: " + bookSet.getName(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, new GetBookSetResponseDto(bookSet));
@@ -118,7 +119,7 @@ public class BookSetServiceImpl implements BookSetService {
 
         bookSetRepository.delete(bookSet);
 
-        logService.createLog(TAG, "Xóa", "Xóa bộ sách: " + bookSet.getName(), userId);
+        logService.createLog(TAG, EventConstants.DELETE, "Xóa bộ sách: " + bookSet.getName(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.DELETE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message);
@@ -159,7 +160,7 @@ public class BookSetServiceImpl implements BookSetService {
 
         bookSetRepository.save(bookSet);
 
-        logService.createLog(TAG, "Sửa", "Thay đổi trạng thái bộ sách: " + bookSet.getName(), userId);
+        logService.createLog(TAG, EventConstants.EDIT, "Thay đổi trạng thái bộ sách: " + bookSet.getName(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, bookSet.getActiveFlag());

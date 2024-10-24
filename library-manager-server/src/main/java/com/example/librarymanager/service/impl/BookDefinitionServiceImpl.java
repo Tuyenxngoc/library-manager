@@ -1,6 +1,7 @@
 package com.example.librarymanager.service.impl;
 
 import com.example.librarymanager.constant.ErrorMessage;
+import com.example.librarymanager.constant.EventConstants;
 import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.constant.SuccessMessage;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
@@ -162,7 +163,7 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
         bookDefinition.setActiveFlag(true);
         bookDefinitionRepository.save(bookDefinition);
 
-        logService.createLog(TAG, "Thêm", "Thêm biên mục mới: " + bookDefinition.getTitle(), userId);
+        logService.createLog(TAG, EventConstants.ADD, "Thêm biên mục mới: " + bookDefinition.getTitle(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message);
@@ -290,7 +291,7 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
         bookDefinitionRepository.save(bookDefinition);
 
         //Ghi log
-        logService.createLog(TAG, "Sửa", "Cập nhật biên mục id: " + bookDefinition.getId(), userId);
+        logService.createLog(TAG, EventConstants.EDIT, "Cập nhật biên mục id: " + bookDefinition.getId(), userId);
 
         // Trả về kết quả sau khi cập nhật thành công
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
@@ -309,7 +310,7 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
 
         bookDefinitionRepository.delete(bookDefinition);
 
-        logService.createLog(TAG, "Xóa", "Xóa biên mục: " + bookDefinition.getTitle(), userId);
+        logService.createLog(TAG, EventConstants.DELETE, "Xóa biên mục: " + bookDefinition.getTitle(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.DELETE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message);
@@ -356,7 +357,7 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
 
         bookDefinitionRepository.save(bookDefinition);
 
-        logService.createLog(TAG, "Sửa", "Thay đổi trạng thái biên mục: " + bookDefinition.getActiveFlag(), userId);
+        logService.createLog(TAG, EventConstants.EDIT, "Thay đổi trạng thái biên mục: " + bookDefinition.getActiveFlag(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, bookDefinition.getActiveFlag());

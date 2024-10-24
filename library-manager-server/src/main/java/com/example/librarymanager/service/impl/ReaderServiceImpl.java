@@ -1,9 +1,6 @@
 package com.example.librarymanager.service.impl;
 
-import com.example.librarymanager.constant.CommonConstant;
-import com.example.librarymanager.constant.ErrorMessage;
-import com.example.librarymanager.constant.SortByDataConstant;
-import com.example.librarymanager.constant.SuccessMessage;
+import com.example.librarymanager.constant.*;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
@@ -104,7 +101,7 @@ public class ReaderServiceImpl implements ReaderService {
 
         readerRepository.save(reader);
 
-        logService.createLog(TAG, "Thêm", "Thêm thẻ bạn đọc mới: " + reader.getCardNumber(), userId);
+        logService.createLog(TAG, EventConstants.ADD, "Thêm thẻ bạn đọc mới: " + reader.getCardNumber(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, new GetReaderResponseDto(reader));
@@ -149,7 +146,7 @@ public class ReaderServiceImpl implements ReaderService {
 
         readerRepository.save(reader);
 
-        logService.createLog(TAG, "Sửa", "Sửa thẻ bạn đọc: " + reader.getCardNumber(), userId);
+        logService.createLog(TAG, EventConstants.EDIT, "Sửa thẻ bạn đọc: " + reader.getCardNumber(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, new GetReaderResponseDto(reader));
@@ -171,7 +168,7 @@ public class ReaderServiceImpl implements ReaderService {
 
         readerRepository.delete(reader);
 
-        logService.createLog(TAG, "Xóa", "Xóa thẻ bạn đọc: " + reader.getCardNumber(), userId);
+        logService.createLog(TAG, EventConstants.DELETE, "Xóa thẻ bạn đọc: " + reader.getCardNumber(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.DELETE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message);
@@ -216,7 +213,7 @@ public class ReaderServiceImpl implements ReaderService {
         if (readers.isEmpty()) {
             throw new BadRequestException(ErrorMessage.Reader.ERR_NOT_FOUND_ID, 1);
         }
-        return pdfService.createPdf(requestDto, readers);
+        return pdfService.createReaderCardPdf(requestDto, readers);
     }
 
 }

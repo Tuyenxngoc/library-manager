@@ -1,9 +1,6 @@
 package com.example.librarymanager.service.impl;
 
-import com.example.librarymanager.constant.ErrorMessage;
-import com.example.librarymanager.constant.RoleConstant;
-import com.example.librarymanager.constant.SortByDataConstant;
-import com.example.librarymanager.constant.SuccessMessage;
+import com.example.librarymanager.constant.*;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
@@ -100,7 +97,7 @@ public class UserGroupServiceImpl implements UserGroupService {
         userGroup.setActiveFlag(true);
         userGroupRepository.save(userGroup);
 
-        logService.createLog(TAG, "Thêm", "Tạo nhóm người dùng mới: " + userGroup.getName(), userId);
+        logService.createLog(TAG, EventConstants.ADD, "Tạo nhóm người dùng mới: " + userGroup.getName(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, new GetUserGroupResponseDto(userGroup));
@@ -153,7 +150,7 @@ public class UserGroupServiceImpl implements UserGroupService {
         userGroup.setNotes(requestDto.getNotes());
         userGroupRepository.save(userGroup);
 
-        logService.createLog(TAG, "Sửa", "Cập nhật nhóm người dùng id: " + userGroup.getId() + ", tên mới: " + userGroup.getName(), userId);
+        logService.createLog(TAG, EventConstants.EDIT, "Cập nhật nhóm người dùng id: " + userGroup.getId() + ", tên mới: " + userGroup.getName(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, new GetUserGroupResponseDto(userGroup));
@@ -170,7 +167,7 @@ public class UserGroupServiceImpl implements UserGroupService {
 
         userGroupRepository.delete(userGroup);
 
-        logService.createLog(TAG, "Xóa", "Xóa nhóm người dùng: " + userGroup.getName(), userId);
+        logService.createLog(TAG, EventConstants.DELETE, "Xóa nhóm người dùng: " + userGroup.getName(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.DELETE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message);
@@ -210,7 +207,7 @@ public class UserGroupServiceImpl implements UserGroupService {
         userGroup.setActiveFlag(!userGroup.getActiveFlag());
         userGroupRepository.save(userGroup);
 
-        logService.createLog(TAG, "Sửa", "Thay đổi trạng thái nhóm người dùng: " + userGroup.getName(), userId);
+        logService.createLog(TAG, EventConstants.EDIT, "Thay đổi trạng thái nhóm người dùng: " + userGroup.getName(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, userGroup.getActiveFlag());

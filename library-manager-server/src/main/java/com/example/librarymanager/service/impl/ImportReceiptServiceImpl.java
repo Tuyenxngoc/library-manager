@@ -1,6 +1,7 @@
 package com.example.librarymanager.service.impl;
 
 import com.example.librarymanager.constant.ErrorMessage;
+import com.example.librarymanager.constant.EventConstants;
 import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.constant.SuccessMessage;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
@@ -109,7 +110,7 @@ public class ImportReceiptServiceImpl implements ImportReceiptService {
         //Lưu phiếu nhập vào cơ sở dữ liệu
         importReceiptRepository.save(importReceipt);
 
-        logService.createLog(TAG, "Thêm", "Tạo phiếu nhập mới: " + importReceipt.getReceiptNumber(), userId);
+        logService.createLog(TAG, EventConstants.ADD, "Tạo phiếu nhập mới: " + importReceipt.getReceiptNumber(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, new GetImportReceiptResponseDto(importReceipt));
@@ -172,7 +173,7 @@ public class ImportReceiptServiceImpl implements ImportReceiptService {
 
         importReceiptRepository.delete(importReceipt);
 
-        logService.createLog(TAG, "Xóa", "Xóa phiếu nhập: " + importReceipt.getReceiptNumber(), userId);
+        logService.createLog(TAG, EventConstants.DELETE, "Xóa phiếu nhập: " + importReceipt.getReceiptNumber(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.DELETE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message);

@@ -1,6 +1,7 @@
 package com.example.librarymanager.service.impl;
 
 import com.example.librarymanager.constant.ErrorMessage;
+import com.example.librarymanager.constant.EventConstants;
 import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.constant.SuccessMessage;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
@@ -17,6 +18,7 @@ import com.example.librarymanager.exception.ConflictException;
 import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.CategoryGroupRepository;
 import com.example.librarymanager.service.CategoryGroupService;
+import com.example.librarymanager.service.LogService;
 import com.example.librarymanager.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +38,10 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CategoryGroupServiceImpl implements CategoryGroupService {
+
+    private static final String TAG = "Quản lý nhóm danh mục";
+
+    private final LogService logService;
 
     private final CategoryGroupRepository categoryGroupRepository;
 
@@ -69,7 +75,7 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
     }
 
     @Override
-    public CommonResponseDto save(CategoryGroupRequestDto requestDto) {
+    public CommonResponseDto save(CategoryGroupRequestDto requestDto, String userId) {
         if (categoryGroupRepository.existsByGroupName(requestDto.getGroupName())) {
             throw new ConflictException(ErrorMessage.CategoryGroup.ERR_DUPLICATE_GROUP_NAME);
         }
@@ -79,12 +85,14 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
         categoryGroup.setActiveFlag(true);
         categoryGroupRepository.save(categoryGroup);
 
+        logService.createLog(TAG, EventConstants.ADD, "Thêm nhóm danh mục mới Id: " + categoryGroup.getId(), userId);
+
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, categoryGroup);
     }
 
     @Override
-    public CommonResponseDto update(Long id, CategoryGroupRequestDto requestDto) {
+    public CommonResponseDto update(Long id, CategoryGroupRequestDto requestDto, String userId) {
         if (categoryGroupRepository.existsByGroupName(requestDto.getGroupName())) {
             throw new ConflictException(ErrorMessage.CategoryGroup.ERR_DUPLICATE_GROUP_NAME);
         }
@@ -95,12 +103,14 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
 
         categoryGroupRepository.save(categoryGroup);
 
+        logService.createLog(TAG, EventConstants.EDIT, "Cập nhật nhóm danh mục Id: " + categoryGroup.getId(), userId);
+
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, categoryGroup);
     }
 
     @Override
-    public CommonResponseDto delete(Long id) {
+    public CommonResponseDto delete(Long id, String userId) {
         CategoryGroup categoryGroup = findById(id);
 
         if (!categoryGroup.getCategories().isEmpty()) {
@@ -108,6 +118,8 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
         }
 
         categoryGroupRepository.delete(categoryGroup);
+
+        logService.createLog(TAG, EventConstants.DELETE, "Xóa nhóm danh mục Id: " + categoryGroup.getId(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.DELETE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, true);
@@ -137,12 +149,14 @@ public class CategoryGroupServiceImpl implements CategoryGroupService {
     }
 
     @Override
-    public CommonResponseDto toggleActiveStatus(Long id) {
+    public CommonResponseDto toggleActiveStatus(Long id, String userId) {
         CategoryGroup categoryGroup = findById(id);
 
         categoryGroup.setActiveFlag(!categoryGroup.getActiveFlag());
 
         categoryGroupRepository.save(categoryGroup);
+
+        logService.createLog(TAG, EventConstants.EDIT, "Thay đổi trạng thái nhóm danh mục Id: " + categoryGroup.getId() + ", trạng thái: " + categoryGroup.getActiveFlag(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, categoryGroup.getActiveFlag());

@@ -1,10 +1,7 @@
 package com.example.librarymanager.service.impl;
 
 import com.example.librarymanager.config.properties.AdminInfo;
-import com.example.librarymanager.constant.AccountStatus;
-import com.example.librarymanager.constant.ErrorMessage;
-import com.example.librarymanager.constant.SortByDataConstant;
-import com.example.librarymanager.constant.SuccessMessage;
+import com.example.librarymanager.constant.*;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
@@ -127,7 +124,7 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
 
-        logService.createLog(TAG, "Thêm", "Tạo người dùng mới: " + user.getUsername(), userId);
+        logService.createLog(TAG, EventConstants.ADD, "Tạo người dùng mới: " + user.getUsername(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, new GetUserResponseDto(user));
@@ -169,7 +166,7 @@ public class UserServiceImpl implements UserService {
         // Lưu thay đổi
         userRepository.save(user);
 
-        logService.createLog(TAG, "Sửa", "Cập nhật người dùng id: " + user.getId() + ", tên mới: " + user.getUsername(), userId);
+        logService.createLog(TAG, EventConstants.EDIT, "Cập nhật người dùng id: " + user.getId() + ", tên mới: " + user.getUsername(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, new GetUserResponseDto(user));
@@ -191,7 +188,7 @@ public class UserServiceImpl implements UserService {
         // Xóa người dùng
         userRepository.delete(user);
 
-        logService.createLog(TAG, "Xóa", "Xóa người dùng: " + user.getUsername(), userId);
+        logService.createLog(TAG, EventConstants.DELETE, "Xóa người dùng: " + user.getUsername(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.DELETE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message);

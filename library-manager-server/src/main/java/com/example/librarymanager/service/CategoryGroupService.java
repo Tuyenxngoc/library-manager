@@ -12,17 +12,17 @@ import java.util.List;
 public interface CategoryGroupService {
     void initCategoryGroupsFromCsv(String categoryGroupsCsvPath);
 
-    CommonResponseDto save(CategoryGroupRequestDto requestDto);
+    CommonResponseDto save(CategoryGroupRequestDto requestDto, String userId);
 
-    CommonResponseDto update(Long id, CategoryGroupRequestDto requestDto);
+    CommonResponseDto update(Long id, CategoryGroupRequestDto requestDto, String userId);
 
-    CommonResponseDto delete(Long id);
+    CommonResponseDto delete(Long id, String userId);
 
     PaginationResponseDto<CategoryGroup> findAll(PaginationFullRequestDto requestDto);
 
     CategoryGroup findById(Long id);
 
-    CommonResponseDto toggleActiveStatus(Long id);
+    CommonResponseDto toggleActiveStatus(Long id, String userId);
 
     List<CategoryGroupTree> findTree();
 }
