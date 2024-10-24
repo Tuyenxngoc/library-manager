@@ -11,6 +11,7 @@ import com.example.librarymanager.domain.dto.request.BookDefinitionRequestDto;
 import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.dto.response.GetBookByBookDefinitionResponseDto;
 import com.example.librarymanager.domain.dto.response.GetBookDefinitionResponseDto;
+import com.example.librarymanager.domain.dto.response.GetBookForUserResponseDto;
 import com.example.librarymanager.domain.entity.*;
 import com.example.librarymanager.domain.mapper.BookDefinitionMapper;
 import com.example.librarymanager.domain.specification.EntitySpecification;
@@ -378,6 +379,27 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
         PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.BOOK_DEFINITION, page);
 
         PaginationResponseDto<GetBookByBookDefinitionResponseDto> responseDto = new PaginationResponseDto<>();
+        responseDto.setItems(items);
+        responseDto.setMeta(pagingMeta);
+
+        return responseDto;
+    }
+
+    @Override
+    public PaginationResponseDto<?> getBooksForUser(PaginationFullRequestDto requestDto, Long categoryGroupId, Long categoryId) {
+        Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BOOK_DEFINITION);
+
+        Page<BookDefinition> page = bookDefinitionRepository.findAll(
+                EntitySpecification.filterBookDefinitions(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag(), categoryGroupId, categoryId),
+                pageable);
+
+        List<GetBookForUserResponseDto> items = page.getContent().stream()
+                .map(GetBookForUserResponseDto::new)
+                .toList();
+
+        PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.BOOK_DEFINITION, page);
+
+        PaginationResponseDto<GetBookForUserResponseDto> responseDto = new PaginationResponseDto<>();
         responseDto.setItems(items);
         responseDto.setMeta(pagingMeta);
 

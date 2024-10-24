@@ -4,6 +4,8 @@ import com.example.librarymanager.domain.entity.ExportReceipt;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class GetExportReceiptResponseDto {
@@ -15,6 +17,8 @@ public class GetExportReceiptResponseDto {
     private final LocalDate exportDate;
 
     private final String exportReason;
+
+    private final List<Long> bookIds = new ArrayList<>();
 
     public GetExportReceiptResponseDto(ExportReceipt exportReceipt) {
         this.id = exportReceipt.getId();

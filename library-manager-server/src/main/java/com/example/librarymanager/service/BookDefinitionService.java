@@ -24,4 +24,6 @@ public interface BookDefinitionService {
     CommonResponseDto toggleActiveStatus(Long id, String userId);
 
     PaginationResponseDto<GetBookByBookDefinitionResponseDto> getBooks(PaginationFullRequestDto requestDto, Long categoryGroupId, Long categoryId);
+
+    PaginationResponseDto<?> getBooksForUser(PaginationFullRequestDto requestDto, Long categoryGroupId, Long categoryId);
 }

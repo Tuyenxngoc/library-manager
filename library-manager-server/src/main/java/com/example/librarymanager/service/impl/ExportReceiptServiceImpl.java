@@ -161,6 +161,7 @@ public class ExportReceiptServiceImpl implements ExportReceiptService {
             book.setExportReceipt(null);
             bookRepository.save(book);
         });
+        exportReceipt.getBooks().clear();
 
         exportReceiptRepository.delete(exportReceipt);
 
@@ -194,6 +195,12 @@ public class ExportReceiptServiceImpl implements ExportReceiptService {
     @Override
     public GetExportReceiptResponseDto findById(Long id) {
         ExportReceipt exportReceipt = getEntity(id);
-        return new GetExportReceiptResponseDto(exportReceipt);
+        GetExportReceiptResponseDto responseDto = new GetExportReceiptResponseDto(exportReceipt);
+
+        for (Book book : exportReceipt.getBooks()) {
+            responseDto.getBookIds().add(book.getId());
+        }
+
+        return responseDto;
     }
 }

@@ -94,7 +94,7 @@ function BookListByCode() {
             key: 'bookDefinition',
             sorter: true,
             showSorterTooltip: false,
-            render: (text, record) => <span>{text.bookCode}</span>,
+            render: (text, record) => <span>{text.classificationSymbol ? text.classificationSymbol.name : ''}</span>,
         },
         {
             title: 'Tác giả',

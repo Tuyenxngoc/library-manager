@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Layout, Menu, theme } from 'antd';
+import { Flex, Layout, Menu, theme } from 'antd';
 import { AiFillDashboard } from 'react-icons/ai';
 import { IoMdSettings } from 'react-icons/io';
 import { FaUsers, FaUser, FaHistory, FaChartBar, FaRecycle, FaBook } from 'react-icons/fa';
@@ -121,7 +121,7 @@ function AdminLayout() {
     } = theme.useToken();
 
     const {
-        user: { roleNames },
+        user: { name, roleNames },
     } = useAuth();
 
     const navigate = useNavigate();
@@ -187,7 +187,14 @@ function AdminLayout() {
                         background: colorBgContainer,
                     }}
                     className="shadow-sm"
-                />
+                >
+                    <Flex justify="space-between" align="center" style={{ margin: '0 16px' }}>
+                        <div></div>
+                        <div>
+                            Xin chào <b>{name}</b>
+                        </div>
+                    </Flex>
+                </Header>
                 {/* Content */}
                 <Content style={{ margin: '16px' }}>
                     <div

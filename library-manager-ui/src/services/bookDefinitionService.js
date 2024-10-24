@@ -1,15 +1,19 @@
-import { axiosPrivate } from '~/apis/configHttp';
+import httpRequest, { axiosPrivate } from '~/apis/configHttp';
 
 export const getBookDefinitionById = (id) => {
-    return axiosPrivate.get(`book-definitions/${id}`);
+    return axiosPrivate.get(`admin/book-definitions/${id}`);
 };
 
 export const getBookDefinitions = (params) => {
-    return axiosPrivate.get(`book-definitions?${params}`);
+    return axiosPrivate.get(`admin/book-definitions?${params}`);
 };
 
 export const getBookByBookDefinitions = (params) => {
-    return axiosPrivate.get(`book-definitions/books?${params}`);
+    return axiosPrivate.get(`admin/book-definitions/books?${params}`);
+};
+
+export const getBookByBookDefinitionsForUser = (params) => {
+    return httpRequest.get(`book-definitions/books?${params}`);
 };
 
 export const updateBookDefinition = (id, values) => {
@@ -24,7 +28,7 @@ export const updateBookDefinition = (id, values) => {
         }
     }
 
-    return axiosPrivate.put(`book-definitions/${id}`, formData, {
+    return axiosPrivate.put(`admin/book-definitions/${id}`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
@@ -51,9 +55,9 @@ export const createBookDefinition = (values) => {
 };
 
 export const deleteBookDefinition = (id) => {
-    return axiosPrivate.delete(`book-definitions/${id}`);
+    return axiosPrivate.delete(`admin/book-definitions/${id}`);
 };
 
 export const toggleActiveFlag = (id) => {
-    return axiosPrivate.patch(`book-definitions/${id}/toggle-active`);
+    return axiosPrivate.patch(`admin/book-definitions/${id}/toggle-active`);
 };

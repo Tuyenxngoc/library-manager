@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Slider from 'react-slick';
@@ -7,10 +7,10 @@ import 'slick-carousel/slick/slick-theme.css';
 
 import Product from './Product';
 import SectionHeader from './SectionHeader';
-import jsonData from '../data/products.json';
 
 import classNames from 'classnames/bind';
 import styles from '~/styles/ProductList.module.scss';
+import { getBookByBookDefinitionsForUser } from '~/services/bookDefinitionService';
 
 const cx = classNames.bind(styles);
 
@@ -18,16 +18,10 @@ function ProductList() {
     const sliderRef = useRef(null);
     const navigate = useNavigate();
 
-    const [products, setProducts] = useState(jsonData);
+    const [entityData, setEntityData] = useState(null);
 
-    const settings = {
-        dots: false,
-        infinite: true,
-        speed: 500,
-        slidesToShow: 5,
-        slidesToScroll: 1,
-        swipeToSlide: true,
-    };
+    const [isLoading, setIsLoading] = useState(true);
+    const [errorMessage, setErrorMessage] = useState(null);
 
     const goToNextSlide = () => {
         sliderRef.current.slickNext();
@@ -40,6 +34,33 @@ function ProductList() {
     const handleViewAll = () => {
         navigate('/all-products');
     };
+
+    const settings = {
+        dots: false,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 5,
+        slidesToScroll: 1,
+        swipeToSlide: true,
+    };
+
+    useEffect(() => {
+        const fetchEntities = async () => {
+            setIsLoading(true);
+            setErrorMessage(null);
+            try {
+                const response = await getBookByBookDefinitionsForUser();
+                const { items } = response.data.data;
+                setEntityData(items);
+            } catch (error) {
+                setErrorMessage(error.message);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchEntities();
+    }, []);
 
     return (
         <section className={cx('wrapper', 'sectionspace')}>
@@ -57,11 +78,17 @@ function ProductList() {
                 </div>
                 <div className="row">
                     <div className="col-12">
-                        <Slider ref={sliderRef} {...settings}>
-                            {products.map((data, index) => (
-                                <Product className="mx-2 my-1" key={index} data={data} />
-                            ))}
-                        </Slider>
+                        {isLoading ? (
+                            <>Loading</>
+                        ) : errorMessage ? (
+                            <>{errorMessage}</>
+                        ) : (
+                            <Slider ref={sliderRef} {...settings}>
+                                {entityData.map((data, index) => (
+                                    <Product className="mx-2 my-1" key={index} data={data} />
+                                ))}
+                            </Slider>
+                        )}
                     </div>
                 </div>
             </div>

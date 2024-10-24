@@ -38,10 +38,13 @@ public class GetBookByBookDefinitionResponseDto {
         this.title = bookDefinition.getTitle();
         this.bookCode = bookDefinition.getBookCode();
         this.publishingYear = bookDefinition.getPublishingYear();
-        this.totalBooks = bookDefinition.getBooks().size();
         this.availableBooks = 0;
         this.borrowedBooks = 0;
         this.lostBooks = 0;
+
+        this.totalBooks = (int) bookDefinition.getBooks().stream()
+                .filter(book -> book.getExportReceipt() == null)
+                .count();
 
         // Set authors
         List<BookAuthor> au = bookDefinition.getBookAuthors();

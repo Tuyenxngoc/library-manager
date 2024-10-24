@@ -266,6 +266,8 @@ public class EntitySpecification {
 
             Predicate predicate = builder.conjunction();
 
+            predicate = builder.and(predicate, builder.isNull(root.get(Book_.exportReceipt)));
+
             if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(searchBy)) {
                 switch (searchBy) {
                     case Book_.ID -> predicate = builder.and(predicate, builder.equal(root.get(Book_.ID),

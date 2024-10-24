@@ -97,13 +97,15 @@ public class UrlConstant {
     public static class BookDefinition {
         private static final String PRE_FIX = "/book-definitions";
 
-        public static final String CREATE = PRE_FIX;
-        public static final String GET_ALL = PRE_FIX;
-        public static final String GET_BY_ID = PRE_FIX + "/{id}";
-        public static final String UPDATE = PRE_FIX + "/{id}";
-        public static final String DELETE = PRE_FIX + "/{id}";
-        public static final String TOGGLE_ACTIVE = PRE_FIX + "/{id}/toggle-active";
-        public static final String GET_BOOKS = PRE_FIX + "/books";
+        public static final String CREATE = ADMIN_URL + PRE_FIX;
+        public static final String GET_ALL = ADMIN_URL + PRE_FIX;
+        public static final String GET_BY_ID = ADMIN_URL + PRE_FIX + "/{id}";
+        public static final String UPDATE = ADMIN_URL + PRE_FIX + "/{id}";
+        public static final String DELETE = ADMIN_URL + PRE_FIX + "/{id}";
+        public static final String TOGGLE_ACTIVE = ADMIN_URL + PRE_FIX + "/{id}/toggle-active";
+        public static final String GET_BOOKS = ADMIN_URL + PRE_FIX + "/books";
+
+        public static final String GET_BOOKS_FOR_USER = PRE_FIX + "/books";
     }
 
     public static class ClassificationSymbol {

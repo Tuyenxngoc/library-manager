@@ -13,6 +13,7 @@ import { handleError } from '~/utils/errorHandler';
 import { checkIdIsNumber } from '~/utils/helper';
 import { createExportReceipt, getExportReceiptById, updateExportReceipt } from '~/services/exportReceiptService';
 import { getBooks } from '~/services/bookService';
+import FormTextArea from '~/components/FormTextArea';
 
 const defaultValue = {
     receiptNumber: '',
@@ -122,13 +123,13 @@ function OutwardBookForm() {
             // Nếu có id, lấy thông tin phiếu xuất
             getExportReceiptById(id)
                 .then((response) => {
-                    const { receiptNumber, exportDate, exportReason } = response.data.data;
+                    const { receiptNumber, exportDate, exportReason, bookIds } = response.data.data;
 
                     formik.setValues({
                         receiptNumber,
                         exportDate: exportDate ? dayjs(exportDate) : null,
                         exportReason,
-                        bookIds: [],
+                        bookIds: bookIds,
                     });
                 })
                 .catch((error) => {
@@ -181,7 +182,7 @@ function OutwardBookForm() {
                         <div className="text-danger">{formik.touched.exportDate && formik.errors.exportDate}</div>
                     </div>
 
-                    <FormInput id="exportReason" label="Lý do xuất" className="col-md-12" formik={formik} />
+                    <FormTextArea id="exportReason" label="Lý do xuất" className="col-md-12" formik={formik} />
 
                     <div className="col-md-9">
                         <Select
@@ -206,7 +207,7 @@ function OutwardBookForm() {
                                     <Space className="py-2 px-1 pt-0">
                                         <a
                                             className="d-flex align-items-center"
-                                            href="/admin/books/inward"
+                                            href="/admin/book-definitions/new"
                                             target="_blank"
                                         >
                                             <FaPlus />

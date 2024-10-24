@@ -82,7 +82,10 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(registry -> registry
                         .requestMatchers(WHITE_LIST_URL).permitAll()
-                        .requestMatchers(HttpMethod.GET, "api/v1/news-articles", "api/v1/news-articles/*").permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "api/v1/news-articles", "api/v1/news-articles/*",
+                                "api/v1/book-definitions/books"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
