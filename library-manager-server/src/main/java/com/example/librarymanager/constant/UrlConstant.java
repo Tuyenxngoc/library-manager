@@ -106,6 +106,7 @@ public class UrlConstant {
         public static final String GET_BOOKS = ADMIN_URL + PRE_FIX + "/books";
 
         public static final String GET_BOOKS_FOR_USER = PRE_FIX + "/books";
+        public static final String GET_BOOK_DETAIL_FOR_USER = PRE_FIX + "/books/{id}";
     }
 
     public static class ClassificationSymbol {

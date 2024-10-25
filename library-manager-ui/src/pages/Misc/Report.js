@@ -40,7 +40,10 @@ function Report() {
             <div className="container sectionspace">
                 <div className="row">
                     <div className="col-12 mb-4">
-                        <SectionHeader title="Liên hệ với chúng tôi" subtitle="Thông tin phản hồi" />
+                        <SectionHeader
+                            title={<h2 className="mb-0">Liên hệ với chúng tôi</h2>}
+                            subtitle="Thông tin phản hồi"
+                        />
                     </div>
                 </div>
 

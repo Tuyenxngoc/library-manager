@@ -37,7 +37,7 @@ function About() {
             <div className="container sectionspace">
                 <div className="row">
                     <div className="col-12 mb-4">
-                        <SectionHeader title="Về chúng tôi" subtitle="Xin chào!" />
+                        <SectionHeader title={<h2 className="mb-0">Về chúng tôi</h2>} subtitle="Xin chào!" />
                     </div>
                     <div className="col-12">
                         <div className="locationmap map">

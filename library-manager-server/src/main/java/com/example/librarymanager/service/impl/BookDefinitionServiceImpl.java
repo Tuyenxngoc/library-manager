@@ -8,10 +8,7 @@ import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
 import com.example.librarymanager.domain.dto.request.BookDefinitionRequestDto;
-import com.example.librarymanager.domain.dto.response.CommonResponseDto;
-import com.example.librarymanager.domain.dto.response.GetBookByBookDefinitionResponseDto;
-import com.example.librarymanager.domain.dto.response.GetBookDefinitionResponseDto;
-import com.example.librarymanager.domain.dto.response.GetBookForUserResponseDto;
+import com.example.librarymanager.domain.dto.response.*;
 import com.example.librarymanager.domain.entity.*;
 import com.example.librarymanager.domain.mapper.BookDefinitionMapper;
 import com.example.librarymanager.exception.BadRequestException;
@@ -390,7 +387,7 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
     }
 
     @Override
-    public PaginationResponseDto<?> getBooksForUser(PaginationFullRequestDto requestDto, Long categoryGroupId, Long categoryId) {
+    public PaginationResponseDto<GetBookForUserResponseDto> getBooksForUser(PaginationFullRequestDto requestDto, Long categoryGroupId, Long categoryId) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BOOK_DEFINITION);
 
         Specification<BookDefinition> spec = Specification.where(baseFilterBookDefinitions(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag()))
@@ -411,6 +408,16 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
         responseDto.setMeta(pagingMeta);
 
         return responseDto;
+    }
+
+    @Override
+    public GetBookDetailForUserResponseDto getBookDetailForUser(Long id) {
+        BookDefinition bookDefinition = findEntityById(id);
+        if (bookDefinition.getBooks().isEmpty()) {
+            throw new NotFoundException(ErrorMessage.BookDefinition.ERR_NOT_FOUND_ID, id);
+        }
+
+        return new GetBookDetailForUserResponseDto(bookDefinition);
     }
 
 }

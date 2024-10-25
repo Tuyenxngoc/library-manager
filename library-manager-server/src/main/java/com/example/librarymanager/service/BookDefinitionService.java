@@ -3,9 +3,7 @@ package com.example.librarymanager.service;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.request.BookDefinitionRequestDto;
-import com.example.librarymanager.domain.dto.response.CommonResponseDto;
-import com.example.librarymanager.domain.dto.response.GetBookByBookDefinitionResponseDto;
-import com.example.librarymanager.domain.dto.response.GetBookDefinitionResponseDto;
+import com.example.librarymanager.domain.dto.response.*;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface BookDefinitionService {
@@ -25,5 +23,7 @@ public interface BookDefinitionService {
 
     PaginationResponseDto<GetBookByBookDefinitionResponseDto> getBooks(PaginationFullRequestDto requestDto, Long categoryGroupId, Long categoryId);
 
-    PaginationResponseDto<?> getBooksForUser(PaginationFullRequestDto requestDto, Long categoryGroupId, Long categoryId);
+    PaginationResponseDto<GetBookForUserResponseDto> getBooksForUser(PaginationFullRequestDto requestDto, Long categoryGroupId, Long categoryId);
+
+    GetBookDetailForUserResponseDto getBookDetailForUser(Long id);
 }

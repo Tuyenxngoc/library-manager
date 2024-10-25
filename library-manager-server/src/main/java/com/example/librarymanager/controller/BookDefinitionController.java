@@ -107,4 +107,10 @@ public class BookDefinitionController {
     ) {
         return VsResponseUtil.success(bookDefinitionService.getBooksForUser(requestDto, categoryGroupId, categoryId));
     }
+
+    @Operation(summary = "API Get Book Detail For User")
+    @GetMapping(UrlConstant.BookDefinition.GET_BOOK_DETAIL_FOR_USER)
+    public ResponseEntity<?> getBookDetailForUser(@PathVariable Long id) {
+        return VsResponseUtil.success(bookDefinitionService.getBookDetailForUser(id));
+    }
 }

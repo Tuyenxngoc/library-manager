@@ -85,6 +85,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET,
                                 "api/v1/news-articles", "api/v1/news-articles/*",
                                 "api/v1/book-definitions/books",
+                                "api/v1/book-definitions/books/*",
                                 "api/v1/stats/library"
                         ).permitAll()
                         .anyRequest().authenticated()

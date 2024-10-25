@@ -37,7 +37,7 @@ function HolidaySchedule() {
             <div className="container sectionspace">
                 <div className="row">
                     <div className="col-12 mb-4">
-                        <SectionHeader title="Lịch nghỉ lễ" subtitle="Lịch nghỉ" />
+                        <SectionHeader title={<h2 className="mb-0">Lịch nghỉ lễ</h2>} subtitle="Lịch nghỉ" />
                     </div>
                     <div className="col-12">
                         <table

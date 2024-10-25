@@ -81,12 +81,12 @@ function Search() {
                         <Collapse items={collapseItems} defaultActiveKey={['1']} />
                     </div>
                     <div className="col-9">
-                        <SectionHeader title="Tìm kiếm nâng cao" subtitle="Tìm kiếm" />
+                        <SectionHeader title={<h2 className="mb-0">Tìm kiếm nâng cao</h2>} subtitle="Tìm kiếm" />
                         <Tabs className="mt-4" defaultActiveKey="1" size="large" items={searchTabs} />
                     </div>
                 </div>
                 <div className="row">
-                    <SectionHeader title="Thư viện sách" subtitle="Tìm kiếm nâng cao" />
+                    <SectionHeader title={<h2 className="mb-0">Thư viện sách</h2>} subtitle="Tìm kiếm nâng cao" />
                 </div>
             </div>
         </>

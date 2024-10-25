@@ -42,7 +42,7 @@ function Rules() {
             <div className="container sectionspace">
                 <div className="row">
                     <div className="col-12 mb-4">
-                        <SectionHeader title="Nội quy của thư viện" subtitle="Nội quy" />
+                        <SectionHeader title={<h2 className="mb-0">Nội quy của thư viện</h2>} subtitle="Nội quy" />
                     </div>
                     <div className="col-12">
                         <div className={cx('rules')}>

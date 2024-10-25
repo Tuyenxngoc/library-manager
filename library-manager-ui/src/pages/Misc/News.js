@@ -67,7 +67,10 @@ function News() {
                         <Button block>Phân loại tin tức</Button>
                     </div>
                     <div className="col-9">
-                        <SectionHeader title="Danh sách tin tức" subtitle="Tin tức và bài viết mới nhất" />
+                        <SectionHeader
+                            title={<h2 className="mb-0">Danh sách tin tức</h2>}
+                            subtitle="Tin tức và bài viết mới nhất"
+                        />
                         {isLoading ? (
                             <>Loading</>
                         ) : errorMessage ? (

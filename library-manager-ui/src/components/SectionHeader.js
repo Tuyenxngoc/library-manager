@@ -15,7 +15,7 @@ function SectionHeader({ title, subtitle, onViewAll, onPrev, onNext }) {
         <div className={cx('wrapper')}>
             <div className={cx('title')}>
                 {subtitle && <span>{subtitle}</span>}
-                <h2 className="mb-0">{title}</h2>
+                {title}
             </div>
 
             {showButtons && (

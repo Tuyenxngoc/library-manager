@@ -64,7 +64,7 @@ function PostList() {
                     <div className="col-12">
                         <SectionHeader
                             subtitle="Tin tức & bài viết mới nhất"
-                            title="Tin nổi bật trong ngày"
+                            title={<h2 className="mb-0">Tin nổi bật trong ngày</h2>}
                             onPrev={goToPrevSlide}
                             onNext={goToNextSlide}
                             onViewAll={handleViewAll}

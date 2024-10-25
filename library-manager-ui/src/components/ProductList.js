@@ -69,7 +69,7 @@ function ProductList() {
                     <div className="col-12">
                         <SectionHeader
                             subtitle="Lựa chọn của mọi người"
-                            title="Sách được mượn nhiều nhất"
+                            title={<h2 className="mb-0">Sách được mượn nhiều nhất</h2>}
                             onPrev={goToPrevSlide}
                             onNext={goToNextSlide}
                             onViewAll={handleViewAll}

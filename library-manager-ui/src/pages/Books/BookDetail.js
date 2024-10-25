@@ -1,18 +1,44 @@
 import { Button } from 'antd';
 import { Parallax } from 'react-parallax';
-import { Link } from 'react-router-dom';
-import { backgrounds } from '~/assets';
+import { Link, useParams } from 'react-router-dom';
+import images, { backgrounds } from '~/assets';
 import Breadcrumb from '~/components/Breadcrumb';
-import Product from '~/components/Product';
 import SectionHeader from '~/components/SectionHeader';
 
 import classNames from 'classnames/bind';
 import styles from '~/styles/BookDetail.module.scss';
 import SocialIcons from '~/components/SocialIcons';
+import { useEffect, useState } from 'react';
+import { getBookDetailForUser } from '~/services/bookDefinitionService';
 
 const cx = classNames.bind(styles);
 
 function BookDetail() {
+    const { id } = useParams();
+
+    const [entityData, setEntityData] = useState(null);
+
+    const [isLoading, setIsLoading] = useState(true);
+    const [errorMessage, setErrorMessage] = useState(null);
+
+    useEffect(() => {
+        const fetchEntities = async () => {
+            setIsLoading(true);
+            setErrorMessage(null);
+            try {
+                const response = await getBookDetailForUser(id);
+                const { data } = response.data;
+                setEntityData(data);
+            } catch (error) {
+                setErrorMessage(error.message);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchEntities();
+    }, [id]);
+
     const items = [
         {
             label: 'Trang chủ',
@@ -53,75 +79,88 @@ function BookDetail() {
                         <Button block>Sách được mượn nhiều nhất</Button>
                     </div>
                     <div className="col-9">
-                        <div className="row">
-                            <div className="col-4">
-                                <Product
-                                    data={{
-                                        id: 1,
-                                        imageUrl:
-                                            'https://product.hstatic.net/200000343865/product/sap-lon_3a4cfc5f21e04c108c48f266fef21902_large.jpg',
-                                        title: 'Sach di dong',
-                                    }}
-                                />
-                            </div>
-                            <div className="col-8">
-                                <div className={cx('productcontent')}>
-                                    <ul className={cx('bookscategories')}>
-                                        <li>Số lượng sách còn trong thư viện: 1</li>
-                                    </ul>
-
-                                    <div className={cx('booktitle')}>
-                                        <h3>Tiếng Việt 2 tập 2</h3>
+                        {isLoading ? (
+                            <>Loading</>
+                        ) : errorMessage ? (
+                            <>{errorMessage}</>
+                        ) : (
+                            <div className={cx('content')}>
+                                <div className="row">
+                                    <div className="col-3">
+                                        <img
+                                            className={cx('image')}
+                                            src={entityData.imageUrl || images.placeimg}
+                                            alt=""
+                                        />
+                                        <Button type="primary" block>
+                                            Đăng ký mượn
+                                        </Button>
                                     </div>
+                                    <div className="col-9">
+                                        <ul className={cx('category')}>
+                                            <li>Số lượng sách còn trong thư viện: 1</li>
+                                        </ul>
 
-                                    <span className={cx('bookwriter')}>
-                                        Tác giả: <Link to="/">Nguyễn Thị Ly Kha</Link>
-                                    </span>
+                                        <div className={cx('title')}>
+                                            <h3>{entityData.title}</h3>
+                                        </div>
 
-                                    <div className={cx('share')}>
-                                        <span>Share:</span>
-                                        <SocialIcons />
+                                        <span className={cx('writer')}>
+                                            Tác giả:&nbsp;
+                                            {entityData.authors && entityData.authors.length > 0
+                                                ? entityData.authors.map((author, index) => (
+                                                      <Link key={index} to={`/author/${author.id}`}>
+                                                          {author.name}
+                                                      </Link>
+                                                  ))
+                                                : 'Không xác định'}
+                                        </span>
+
+                                        <div className={cx('share')}>
+                                            <span>Share:</span>
+                                            <SocialIcons />
+                                        </div>
+
+                                        <div className={cx('description')}>
+                                            <p>Chưa có mô tả cho cuốn sách này</p>
+                                        </div>
+
+                                        <SectionHeader title={<h5 className="mb-0">Chi tiết sách</h5>} />
+
+                                        <ul className={cx('info')}>
+                                            <li>
+                                                <span>Định dạng:</span>
+                                                <span>PDF</span>
+                                            </li>
+                                            <li>
+                                                <span>Số trang:</span>
+                                                <span>{entityData.pageCount || 'N/A'}</span>
+                                            </li>
+                                            <li>
+                                                <span>Kích thước:</span>
+                                                <span>{entityData.bookSize ? entityData.bookSize + 'cmm' : 'N/A'}</span>
+                                            </li>
+                                            <li>
+                                                <span>Năm xuất bản:</span>
+                                                <span>{entityData.publishingYear || 'N/A'}</span>
+                                            </li>
+                                            <li>
+                                                <span>Nhà xuất bản:</span>
+                                                <span>{entityData.publisher ? entityData.publisher.name : 'N/A'}</span>
+                                            </li>
+                                            <li>
+                                                <span>Ngôn ngữ:</span>
+                                                <span>{entityData.language || 'N/A'}</span>
+                                            </li>
+                                            <li>
+                                                <span>ISBN:</span>
+                                                <span>{entityData.isbn || 'N/A'}</span>
+                                            </li>
+                                        </ul>
                                     </div>
-
-                                    <div className={cx('description')}>
-                                        <p>Chưa có mô tả cho cuốn sách này</p>
-                                    </div>
-
-                                    <SectionHeader title="Chi tiết sách" />
-
-                                    <ul className={cx('productinfo')}>
-                                        <li>
-                                            <span>Định dạng:</span>
-                                            <span>PDF</span>
-                                        </li>
-                                        <li>
-                                            <span>Số trang:</span>
-                                            <span>148</span>
-                                        </li>
-                                        <li>
-                                            <span>Kích thước:</span>
-                                            <span>19x26.5cmm</span>
-                                        </li>
-                                        <li>
-                                            <span>Năm xuất bản:</span>
-                                            <span>2021</span>
-                                        </li>
-                                        <li>
-                                            <span>Nhà xuất bản:</span>
-                                            <span>Giáo dục</span>
-                                        </li>
-                                        <li>
-                                            <span>Ngôn ngữ:</span>
-                                            <span>Tiếng Trung</span>
-                                        </li>
-                                        <li>
-                                            <span>ISBN:</span>
-                                            <span></span>
-                                        </li>
-                                    </ul>
                                 </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 </div>
             </div>

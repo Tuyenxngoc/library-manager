@@ -16,6 +16,10 @@ export const getBookByBookDefinitionsForUser = (params) => {
     return httpRequest.get(`book-definitions/books?${params}`);
 };
 
+export const getBookDetailForUser = (id) => {
+    return httpRequest.get(`book-definitions/books/${id}`);
+};
+
 export const updateBookDefinition = (id, values) => {
     const formData = new FormData();
 
