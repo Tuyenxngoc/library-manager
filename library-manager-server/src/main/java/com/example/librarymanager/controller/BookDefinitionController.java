@@ -4,7 +4,9 @@ import com.example.librarymanager.annotation.CurrentUser;
 import com.example.librarymanager.annotation.RestApiV1;
 import com.example.librarymanager.base.VsResponseUtil;
 import com.example.librarymanager.constant.UrlConstant;
+import com.example.librarymanager.domain.dto.filter.Filter;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
+import com.example.librarymanager.domain.dto.pagination.PaginationSortRequestDto;
 import com.example.librarymanager.domain.dto.request.BookDefinitionRequestDto;
 import com.example.librarymanager.security.CustomUserDetails;
 import com.example.librarymanager.service.BookDefinitionService;
@@ -21,6 +23,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestApiV1
 @RequiredArgsConstructor
@@ -112,5 +116,14 @@ public class BookDefinitionController {
     @GetMapping(UrlConstant.BookDefinition.GET_BOOK_DETAIL_FOR_USER)
     public ResponseEntity<?> getBookDetailForUser(@PathVariable Long id) {
         return VsResponseUtil.success(bookDefinitionService.getBookDetailForUser(id));
+    }
+
+    @Operation(summary = "API Advanced Search Book Definitions")
+    @PostMapping(value = UrlConstant.BookDefinition.ADVANCED_SEARCH, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> advancedSearchBooks(
+            @RequestBody List<Filter> filters,
+            @ParameterObject PaginationSortRequestDto requestDto
+    ) {
+        return VsResponseUtil.success(bookDefinitionService.advancedSearchBooks(filters, requestDto));
     }
 }

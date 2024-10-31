@@ -1,10 +1,14 @@
 package com.example.librarymanager.service;
 
+import com.example.librarymanager.domain.dto.filter.Filter;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
+import com.example.librarymanager.domain.dto.pagination.PaginationSortRequestDto;
 import com.example.librarymanager.domain.dto.request.BookDefinitionRequestDto;
 import com.example.librarymanager.domain.dto.response.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 public interface BookDefinitionService {
     void initBookDefinitionsFromCsv(String bookDefinitionsCsvPath);
@@ -26,4 +30,6 @@ public interface BookDefinitionService {
     PaginationResponseDto<GetBookForUserResponseDto> getBooksForUser(PaginationFullRequestDto requestDto, Long categoryGroupId, Long categoryId);
 
     GetBookDetailForUserResponseDto getBookDetailForUser(Long id);
+
+    PaginationResponseDto<GetBookForUserResponseDto> advancedSearchBooks(List<Filter> filters, PaginationSortRequestDto requestDto);
 }

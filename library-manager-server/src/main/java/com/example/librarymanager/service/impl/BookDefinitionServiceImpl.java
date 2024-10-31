@@ -4,13 +4,16 @@ import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.EventConstants;
 import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.constant.SuccessMessage;
+import com.example.librarymanager.domain.dto.filter.Filter;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
+import com.example.librarymanager.domain.dto.pagination.PaginationSortRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
 import com.example.librarymanager.domain.dto.request.BookDefinitionRequestDto;
 import com.example.librarymanager.domain.dto.response.*;
 import com.example.librarymanager.domain.entity.*;
 import com.example.librarymanager.domain.mapper.BookDefinitionMapper;
+import com.example.librarymanager.domain.specification.BookSpecification;
 import com.example.librarymanager.exception.BadRequestException;
 import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.*;
@@ -418,6 +421,28 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
         }
 
         return new GetBookDetailForUserResponseDto(bookDefinition);
+    }
+
+    @Override
+    public PaginationResponseDto<GetBookForUserResponseDto> advancedSearchBooks(List<Filter> filters, PaginationSortRequestDto requestDto) {
+        Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BOOK_DEFINITION);
+
+        Specification<BookDefinition> spec = filterByBooksCountGreaterThanZero()
+                .and(BookSpecification.getSpecificationFromFilters(filters));
+
+        Page<BookDefinition> page = bookDefinitionRepository.findAll(spec, pageable);
+
+        List<GetBookForUserResponseDto> items = page.getContent().stream()
+                .map(GetBookForUserResponseDto::new)
+                .toList();
+
+        PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.BOOK_DEFINITION, page);
+
+        PaginationResponseDto<GetBookForUserResponseDto> responseDto = new PaginationResponseDto<>();
+        responseDto.setItems(items);
+        responseDto.setMeta(pagingMeta);
+
+        return responseDto;
     }
 
 }

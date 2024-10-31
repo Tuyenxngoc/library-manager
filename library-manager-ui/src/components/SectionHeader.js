@@ -38,7 +38,7 @@ function SectionHeader({ title, subtitle, onViewAll, onPrev, onNext }) {
 }
 
 SectionHeader.propTypes = {
-    title: PropTypes.string.isRequired,
+    title: PropTypes.node.isRequired,
     subtitle: PropTypes.string,
     onViewAll: PropTypes.func,
     onPrev: PropTypes.func,

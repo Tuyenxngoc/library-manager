@@ -51,7 +51,7 @@ export const createBookDefinition = (values) => {
         }
     }
 
-    return axiosPrivate.post('book-definitions', formData, {
+    return axiosPrivate.post('admin/book-definitions', formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },

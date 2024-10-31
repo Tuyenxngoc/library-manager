@@ -3,6 +3,9 @@ package com.example.librarymanager.util;
 import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.exception.BadRequestException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SpecificationsUtil {
 
     public static Object castToRequiredType(Class<?> fieldType, String value) {
@@ -28,4 +31,11 @@ public class SpecificationsUtil {
         return null;
     }
 
+    public static Object castToRequiredType(Class<?> fieldType, List<String> value) {
+        List<Object> lists = new ArrayList<>();
+        for (String s : value) {
+            lists.add(castToRequiredType(fieldType, s));
+        }
+        return lists;
+    }
 }
