@@ -1,5 +1,6 @@
 package com.example.librarymanager.service;
 
+import com.example.librarymanager.domain.dto.filter.BookDefinitionFilter;
 import com.example.librarymanager.domain.dto.filter.Filter;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
@@ -32,4 +33,6 @@ public interface BookDefinitionService {
     GetBookDetailForUserResponseDto getBookDetailForUser(Long id);
 
     PaginationResponseDto<GetBookForUserResponseDto> advancedSearchBooks(List<Filter> filters, PaginationSortRequestDto requestDto);
+
+    PaginationResponseDto<GetBookForUserResponseDto> searchBooks(BookDefinitionFilter filters, PaginationSortRequestDto requestDto);
 }

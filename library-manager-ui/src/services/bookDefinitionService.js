@@ -65,3 +65,11 @@ export const deleteBookDefinition = (id) => {
 export const toggleActiveFlag = (id) => {
     return axiosPrivate.patch(`admin/book-definitions/${id}/toggle-active`);
 };
+
+export const searchBooks = (params, values) => {
+    return axiosPrivate.post(`book-definitions/search?${params}`, values);
+};
+
+export const advancedSearchBooks = (params, values) => {
+    return axiosPrivate.post(`book-definitions/advanced-search?${params}`, values);
+};

@@ -4,6 +4,7 @@ import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.EventConstants;
 import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.constant.SuccessMessage;
+import com.example.librarymanager.domain.dto.filter.BookDefinitionFilter;
 import com.example.librarymanager.domain.dto.filter.Filter;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
@@ -429,6 +430,28 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
 
         Specification<BookDefinition> spec = filterByBooksCountGreaterThanZero()
                 .and(BookSpecification.getSpecificationFromFilters(filters));
+
+        Page<BookDefinition> page = bookDefinitionRepository.findAll(spec, pageable);
+
+        List<GetBookForUserResponseDto> items = page.getContent().stream()
+                .map(GetBookForUserResponseDto::new)
+                .toList();
+
+        PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.BOOK_DEFINITION, page);
+
+        PaginationResponseDto<GetBookForUserResponseDto> responseDto = new PaginationResponseDto<>();
+        responseDto.setItems(items);
+        responseDto.setMeta(pagingMeta);
+
+        return responseDto;
+    }
+
+    @Override
+    public PaginationResponseDto<GetBookForUserResponseDto> searchBooks(BookDefinitionFilter filters, PaginationSortRequestDto requestDto) {
+        Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BOOK_DEFINITION);
+
+        Specification<BookDefinition> spec = filterByBooksCountGreaterThanZero()
+                .and(BookSpecification.filterBooks(filters));
 
         Page<BookDefinition> page = bookDefinitionRepository.findAll(spec, pageable);
 

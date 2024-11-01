@@ -89,6 +89,7 @@ public class SecurityConfig {
                                 "api/v1/stats/library"
                         ).permitAll()
                         .requestMatchers(HttpMethod.POST,
+                                "api/v1/book-definitions/search",
                                 "api/v1/book-definitions/advanced-search"
                         ).permitAll()
                         .anyRequest().authenticated()

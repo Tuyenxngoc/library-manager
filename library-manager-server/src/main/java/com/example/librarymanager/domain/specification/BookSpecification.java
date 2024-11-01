@@ -2,9 +2,13 @@ package com.example.librarymanager.domain.specification;
 
 import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.JoinType;
+import com.example.librarymanager.domain.dto.filter.BookDefinitionFilter;
 import com.example.librarymanager.domain.dto.filter.Filter;
-import com.example.librarymanager.domain.entity.BookDefinition;
+import com.example.librarymanager.domain.entity.*;
 import com.example.librarymanager.exception.BadRequestException;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
@@ -68,10 +72,11 @@ public class BookSpecification {
         Specification<BookDefinition> specification = Specification.where(createSpecification(filters.get(0)));
 
         for (int i = 1; i < filters.size(); i++) {
-            Filter filter = filters.get(i);
-            Specification<BookDefinition> nextSpecification = createSpecification(filter);
+            Filter currentFilter = filters.get(i);
+            Filter previousFilter = filters.get(i - 1);
+            Specification<BookDefinition> nextSpecification = createSpecification(currentFilter);
 
-            if (filter.getJoinType() == JoinType.OR) {
+            if (previousFilter.getJoinType() == JoinType.OR) {
                 specification = specification.or(nextSpecification);
             } else {
                 specification = specification.and(nextSpecification);
@@ -80,4 +85,37 @@ public class BookSpecification {
         return specification;
     }
 
+    public static Specification<BookDefinition> filterBooks(BookDefinitionFilter filters) {
+        return (root, query, builder) -> {
+            query.distinct(true);
+
+            Predicate predicate = builder.conjunction();
+
+            if (filters.getBookCode() != null && StringUtils.isNotBlank(filters.getBookCode())) {
+                Join<BookDefinition, Book> bookJoin = root.join(BookDefinition_.books, jakarta.persistence.criteria.JoinType.LEFT);
+                predicate = builder.and(predicate, builder.equal(bookJoin.get(Book_.bookCode), filters.getBookCode()));
+            }
+
+            if (filters.getTitle() != null && StringUtils.isNotBlank(filters.getTitle())) {
+                predicate = builder.and(predicate, builder.like(root.get(BookDefinition_.title), "%" + filters.getTitle() + "%"));
+            }
+
+            if (filters.getKeyword() != null && StringUtils.isNotBlank(filters.getKeyword())) {
+                predicate = builder.and(predicate, builder.like(root.get(BookDefinition_.keywords), "%" + filters.getKeyword() + "%"));
+            }
+
+            if (filters.getPublishingYear() != null && StringUtils.isNotBlank(filters.getPublishingYear())) {
+                predicate = builder.and(predicate, builder.like(root.get(BookDefinition_.publishingYear), "%" + filters.getPublishingYear() + "%"));
+            }
+
+            if (filters.getAuthor() != null && StringUtils.isNotBlank(filters.getAuthor())) {
+                Join<BookDefinition, BookAuthor> bookAuthorJoin = root.join(BookDefinition_.bookAuthors, jakarta.persistence.criteria.JoinType.LEFT);
+                Join<BookAuthor, Author> authorJoin = bookAuthorJoin.join(BookAuthor_.author, jakarta.persistence.criteria.JoinType.LEFT);
+
+                predicate = builder.and(predicate, builder.like(authorJoin.get(Author_.fullName), "%" + filters.getAuthor() + "%"));
+            }
+
+            return predicate;
+        };
+    }
 }

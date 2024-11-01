@@ -32,7 +32,7 @@ const defaultValue = {
     values: [],
 };
 
-function AdvancedSearchForm({ messageApi }) {
+function AdvancedSearchForm({ onSearch }) {
     const [searchCriteria, setSearchCriteria] = useState([{ ...defaultValue }]);
 
     const addCriteria = () => {
@@ -58,68 +58,87 @@ function AdvancedSearchForm({ messageApi }) {
         setSearchCriteria(newCriteria);
     };
 
-    const handleSearch = async (values, { setSubmitting }) => {};
+    const handleSearchSubmit = async (e) => {
+        e.preventDefault();
+
+        const formattedCriteria = searchCriteria.map(({ field, operator, value, joinType }) => ({
+            field,
+            operator,
+            value,
+            values: value.split(',').map((item) => item.trim()),
+            joinType,
+        }));
+
+        onSearch(formattedCriteria);
+    };
 
     return (
-        <form>
-            <div className="">
-                {searchCriteria.map((criteria, index) => (
-                    <Space key={index} className="mb-2">
-                        {index > 0 ? (
+        <>
+            <form onSubmit={handleSearchSubmit}>
+                <div>
+                    {searchCriteria.map((criteria, index) => (
+                        <Space key={index} className="mb-2">
+                            {index > 0 ? (
+                                <Select
+                                    size="large"
+                                    value={searchCriteria[index - 1].joinType}
+                                    style={{ width: 120 }}
+                                    options={conditionOptions}
+                                    onChange={(value) => handleInputChange(index - 1, 'joinType', value)}
+                                />
+                            ) : (
+                                <div style={{ width: 120 }}></div>
+                            )}
+                            <Input
+                                name="value"
+                                size="large"
+                                placeholder="Nhập từ khóa"
+                                value={criteria.value}
+                                onChange={(e) => handleInputChange(index, 'value', e.target.value)}
+                            />
                             <Select
                                 size="large"
-                                value={criteria.joinType}
-                                style={{ width: 120 }}
-                                options={conditionOptions}
-                                onChange={(value) => handleInputChange(index, 'joinType', value)}
+                                value={criteria.operator}
+                                style={{ width: 180 }}
+                                options={comparisonOptions}
+                                onChange={(value) => handleInputChange(index, 'operator', value)}
                             />
-                        ) : (
-                            <div style={{ width: 120 }}></div>
-                        )}
-                        <Input
-                            name="value"
-                            size="large"
-                            placeholder="Nhập từ khóa"
-                            value={criteria.value}
-                            onChange={(e) => handleInputChange(index, 'value', e.target.value)}
-                        />
-                        <Select
-                            size="large"
-                            value={criteria.operator}
-                            style={{ width: 100 }}
-                            options={comparisonOptions}
-                            onChange={(value) => handleInputChange(index, 'operator', value)}
-                        />
-                        <span>Trong</span>
-                        <Select
-                            size="large"
-                            value={criteria.field}
-                            style={{ width: 150 }}
-                            options={searchFieldOptions}
-                            onChange={(value) => handleInputChange(index, 'field', value)}
-                        />
+                            <span>Trong</span>
+                            <Select
+                                size="large"
+                                value={criteria.field}
+                                style={{ width: 150 }}
+                                options={searchFieldOptions}
+                                onChange={(value) => handleInputChange(index, 'field', value)}
+                            />
 
-                        {index > 0 && (
-                            <Button type="text" danger icon={<FaRegTrashAlt />} onClick={() => deleteCriteria(index)} />
-                        )}
-                    </Space>
-                ))}
-            </div>
+                            {index > 0 && (
+                                <Button
+                                    type="text"
+                                    danger
+                                    icon={<FaRegTrashAlt />}
+                                    onClick={() => deleteCriteria(index)}
+                                />
+                            )}
+                        </Space>
+                    ))}
+                </div>
 
-            <Space>
-                <Button size="large" type="primary" onClick={addCriteria} icon={<FaPlus />}>
-                    Thêm điều kiện
-                </Button>
+                <Space>
+                    <Button size="large" type="primary" onClick={addCriteria} icon={<FaPlus />}>
+                        Thêm điều kiện
+                    </Button>
 
-                <Button size="large" onClick={resetCriteria} icon={<FaRetweet />}>
-                    Thiết lập lại
-                </Button>
+                    <Button size="large" onClick={resetCriteria} icon={<FaRetweet />}>
+                        Thiết lập lại
+                    </Button>
 
-                <Button size="large" type="primary" htmlType="submit" icon={<FaSearch />}>
-                    Tìm kiếm
-                </Button>
-            </Space>
-        </form>
+                    <Button size="large" type="primary" htmlType="submit" icon={<FaSearch />}>
+                        Tìm kiếm
+                    </Button>
+                </Space>
+            </form>
+        </>
     );
 }
 
