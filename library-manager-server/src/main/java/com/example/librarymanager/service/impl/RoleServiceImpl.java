@@ -40,6 +40,7 @@ public class RoleServiceImpl implements RoleService {
             roleRepository.save(new Role(ROLE_MANAGE_USER_GROUP));
             roleRepository.save(new Role(ROLE_MANAGE_SYSTEM_SETTINGS));
             roleRepository.save(new Role(ROLE_MANAGE_READER));
+            roleRepository.save(new Role(ROLE_MANAGE_BORROW_RECEIPT));
             roleRepository.save(new Role(ROLE_READER));
 
             log.info("Initializing roles");

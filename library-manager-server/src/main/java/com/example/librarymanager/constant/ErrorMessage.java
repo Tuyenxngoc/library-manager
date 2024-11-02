@@ -171,8 +171,15 @@ public class ErrorMessage {
 
     public static class Book {
         public static final String ERR_NOT_FOUND_ID = "exception.book.not.found.id";
+        public static final String ERR_NOT_FOUND_CODE = "exception.book.not.found.code";
         public static final String ERR_HAS_LINKED = "exception.book.has.linked";
         public static final String ERR_HAS_LINKED_EXPORT_RECEPTION = "exception.book.has.linked.exported";
+        public static final String ERR_BOOK_ALREADY_BORROWED = "exception.book.already.borrowed";
+    }
+
+    public static class BorrowReceipt {
+        public static final String ERR_RECEIPT_NOT_FOUND = "exception.borrow.receipt.not.found";
+        public static final String ERR_DUPLICATE_RECEIPT_NUMBER = "exception.borrow.receipt.duplicate.number";
     }
 
 }

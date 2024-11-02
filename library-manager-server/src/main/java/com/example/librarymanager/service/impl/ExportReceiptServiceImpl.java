@@ -58,9 +58,6 @@ public class ExportReceiptServiceImpl implements ExportReceiptService {
     private void getBook(ExportReceipt exportReceipt, Long bookId) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.Book.ERR_NOT_FOUND_ID, bookId));
-        if (book.getBookBorrow() != null) {
-            throw new ConflictException(ErrorMessage.Book.ERR_HAS_LINKED, book.getBookCode());
-        }
         if (book.getExportReceipt() != null) {
             throw new ConflictException(ErrorMessage.Book.ERR_HAS_LINKED_EXPORT_RECEPTION, book.getBookCode());
         }

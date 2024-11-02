@@ -46,6 +46,7 @@ const menuConfig = [
         label: 'Quản lý bạn đọc',
         key: '/admin/readers',
         icon: <FaUser />,
+        roles: [ROLES.ManageReader],
         children: [
             { label: 'Thẻ bạn đọc', key: '/admin/readers/cards' },
             { label: 'Xử lý vi phạm', key: '/admin/readers/violations' },
@@ -90,6 +91,7 @@ const menuConfig = [
         label: 'Quản lý lưu thông',
         key: '/admin/circulation',
         icon: <FaRecycle />,
+        roles: [ROLES.ManageBorrowReceipt],
         children: [
             { label: 'Mượn sách', key: '/admin/circulation/borrow' },
             { label: 'Trả-Gia hạn sách', key: '/admin/circulation/return-renew' },

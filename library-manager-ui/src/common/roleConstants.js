@@ -13,6 +13,8 @@ export const ROLES = {
     ManageCategoryGroup: 'ROLE_MANAGE_CATEGORY_GROUP',
     ManagePublisher: 'ROLE_MANAGE_PUBLISHER',
     ManageSystemSettings: 'ROLE_MANAGE_SYSTEM_SETTINGS',
+    ManageBorrowReceipt: 'ROLE_MANAGE_BORROW_RECEIPT',
+    ManageReader: 'ROLE_MANAGE_READER',
     Reader: 'ROLE_READER',
 };
 
@@ -31,6 +33,8 @@ export const ROLE_LABELS = {
     ROLE_MANAGE_BOOK_DEFINITION: 'Quản lý định nghĩa sách',
     ROLE_MANAGE_CATEGORY_GROUP: 'Quản lý nhóm danh mục',
     ROLE_MANAGE_PUBLISHER: 'Quản lý nhà xuất bản',
+    ROLE_MANAGE_BORROW_RECEIPT: 'Quản lý phiếu mượn',
+    ROLE_MANAGE_READER: 'Quản lý bạn đọc',
 };
 
 export const ROLE_NAMES = {
@@ -48,6 +52,8 @@ export const ROLE_NAMES = {
     ROLE_MANAGE_BOOK_DEFINITION: 'Quản lý định nghĩa sách',
     ROLE_MANAGE_CATEGORY_GROUP: 'Quản lý nhóm danh mục',
     ROLE_MANAGE_PUBLISHER: 'Quản lý nhà xuất bản',
+    ROLE_MANAGE_BORROW_RECEIPT: 'Quản lý phiếu mượn',
+    ROLE_MANAGE_READER: 'Quản lý bạn đọc',
 };
 
 export const ROLE_COLORS = {};

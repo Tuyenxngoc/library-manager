@@ -137,7 +137,7 @@ public class ImportReceiptServiceImpl implements ImportReceiptService {
         //Xử lý danh sách sách trong phiếu nhập
         List<Book> existingBooks = importReceipt.getBooks();
         for (Book book : existingBooks) {
-            if (book.getBookBorrow() != null || book.getExportReceipt() != null) {
+            if (!book.getBookBorrows().isEmpty() || book.getExportReceipt() != null) {
                 throw new BadRequestException(ErrorMessage.Book.ERR_HAS_LINKED, book.getBookCode());
             }
         }
@@ -166,7 +166,7 @@ public class ImportReceiptServiceImpl implements ImportReceiptService {
         //Kiểm tra sách đã phát sinh dữ liệu hay chưa
         List<Book> books = importReceipt.getBooks();
         for (Book book : books) {
-            if (book.getBookBorrow() != null || book.getExportReceipt() != null) {
+            if (!book.getBookBorrows().isEmpty() || book.getExportReceipt() != null) {
                 throw new BadRequestException(ErrorMessage.Book.ERR_HAS_LINKED, book.getBookCode());
             }
         }

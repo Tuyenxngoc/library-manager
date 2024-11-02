@@ -83,6 +83,16 @@ public class UrlConstant {
         public static final String TOGGLE_ACTIVE = PRE_FIX + "/{id}/toggle-active";
     }
 
+    public static class BorrowReceipt {
+        private static final String PRE_FIX = "/borrow-receipts";
+
+        public static final String CREATE = PRE_FIX;
+        public static final String GET_ALL = PRE_FIX;
+        public static final String GET_BY_ID = PRE_FIX + "/{id}";
+        public static final String UPDATE = PRE_FIX + "/{id}";
+        public static final String DELETE = PRE_FIX + "/{id}";
+    }
+
     public static class Publisher {
         private static final String PRE_FIX = "/publishers";
 

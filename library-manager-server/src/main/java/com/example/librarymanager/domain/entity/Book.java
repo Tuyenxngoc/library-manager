@@ -8,6 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,9 +32,9 @@ public class Book {
     @Column(name = "book_condition")
     private BookCondition bookCondition; // Tình trạng sách
 
-    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
-    private BookBorrow bookBorrow;// Phiếu mượn sách chi tiết
+    private List<BookBorrow> bookBorrows = new ArrayList<>();// Phiếu mượn sách chi tiết
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_definition_id", foreignKey = @ForeignKey(name = "FK_BOOK_BOOK_DEFINITION_ID"), referencedColumnName = "book_definition_id", nullable = false)

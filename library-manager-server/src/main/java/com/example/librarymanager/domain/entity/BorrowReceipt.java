@@ -14,7 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "borrow_receipts")
+@Table(name = "borrow_receipts",
+        uniqueConstraints = @UniqueConstraint(name = "UN_BOOK_RECEIPTS_RECEIPT_NUMBER", columnNames = "receipt_number"))
 public class BorrowReceipt {//Phiếu mượn sách
 
     @Id
@@ -22,8 +23,11 @@ public class BorrowReceipt {//Phiếu mượn sách
     @Column(name = "borrow_receipt_id")
     private Long id;
 
-    @Column(name = "loan_date", nullable = false)
-    private LocalDate loanDate; // Ngày mượn
+    @Column(name = "receipt_number", nullable = false)
+    private String receiptNumber;
+
+    @Column(name = "created_date", nullable = false)
+    private LocalDate createdDate;
 
     @Column(name = "note", length = 500)
     private String note; // Ghi chú

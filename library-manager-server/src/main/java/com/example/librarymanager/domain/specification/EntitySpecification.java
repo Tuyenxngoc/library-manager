@@ -508,4 +508,31 @@ public class EntitySpecification {
             return predicate;
         };
     }
+
+    public static Specification<BorrowReceipt> filterBorrowReceipts(String keyword, String searchBy) {
+        return (root, query, builder) -> {
+            query.distinct(true);
+
+            Predicate predicate = builder.conjunction();
+
+            if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(searchBy)) {
+                switch (searchBy) {
+                    case BorrowReceipt_.RECEIPT_NUMBER ->
+                            predicate = builder.and(predicate, builder.like(root.get(BorrowReceipt_.receiptNumber), "%" + keyword + "%"));
+
+                    case Reader_.FULL_NAME -> {
+                        Join<BorrowReceipt, Reader> readerJoin = root.join(BorrowReceipt_.reader);
+                        predicate = builder.and(predicate, builder.like(readerJoin.get(Reader_.fullName), "%" + keyword + "%"));
+                    }
+
+                    case Reader_.CARD_NUMBER -> {
+                        Join<BorrowReceipt, Reader> readerJoin = root.join(BorrowReceipt_.reader);
+                        predicate = builder.and(predicate, builder.like(readerJoin.get(Reader_.cardNumber), "%" + keyword + "%"));
+                    }
+                }
+            }
+
+            return predicate;
+        };
+    }
 }

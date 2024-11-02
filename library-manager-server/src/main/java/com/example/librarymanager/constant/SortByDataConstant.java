@@ -213,4 +213,16 @@ public enum SortByDataConstant implements SortByInterface {
         }
     },
 
+    BORROW_RECEIPT {
+        @Override
+        public String getSortBy(String sortBy) {
+            return switch (sortBy) {
+                case "receiptNumber" -> "receiptNumber";
+                case "createdDate" -> "createdDate";
+                case "note" -> "note";
+                default -> "id";
+            };
+        }
+    },
+
 }
