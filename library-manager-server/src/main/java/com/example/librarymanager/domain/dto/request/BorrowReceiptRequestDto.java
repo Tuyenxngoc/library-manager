@@ -1,13 +1,17 @@
 package com.example.librarymanager.domain.dto.request;
 
+import com.example.librarymanager.constant.ErrorMessage;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -15,14 +19,21 @@ import java.util.List;
 @AllArgsConstructor
 public class BorrowReceiptRequestDto {
 
+    @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)
+    @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
     private String receiptNumber;
 
+    @NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
     private LocalDate createdDate;
 
+    @Size(max = 255, message = ErrorMessage.INVALID_TEXT_LENGTH)
     private String note;
 
+    @NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
     private Long readerId;
 
-    private List<BookBorrowRequestDto> books = new ArrayList<>();
+    @NotNull(message = ErrorMessage.INVALID_ARRAY_IS_REQUIRED)
+    @Size(min = 1, max = 100, message = ErrorMessage.INVALID_ARRAY_LENGTH)
+    private Set<BookBorrowRequestDto> books = new HashSet<>();
 
 }

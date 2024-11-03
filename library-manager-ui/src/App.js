@@ -51,6 +51,10 @@ import LibraryVisit from './pages/LibraryVisit/LibraryVisit';
 import VisitorStatistics from './pages/LibraryVisit/VisitorStatistics';
 import ReaderViolations from './pages/Reader/ReaderViolations';
 import NewsArticleDetail from './pages/NewsArticles/NewsArticleDetail';
+import BorrowBook from './pages/BorrowBook/BorrowBook';
+import ReturnRenewBook from './pages/ReturnRenewBook/ReturnRenewBook';
+import ReturnHistory from './pages/ReturnHistory/ReturnHistory';
+import BorrowBookForm from './pages/BorrowBook/BorrowBookForm';
 
 function App() {
     return (
@@ -151,6 +155,18 @@ function App() {
                                 <Route path="new" element={<OutwardBookForm />} />
                                 <Route path="edit/:id" element={<OutwardBookForm />} />
                             </Route>
+                        </Route>
+
+                        {/* Quản lý lưu thông */}
+                        <Route path="circulation">
+                            <Route path="borrow">
+                                <Route index element={<BorrowBook />} />
+                                <Route path="new" element={<BorrowBookForm />} />
+                                <Route path="edit/:id" element={<BorrowBookForm />} />
+                            </Route>
+
+                            <Route path="return-renew" element={<ReturnRenewBook />} />
+                            <Route path="return-history" element={<ReturnHistory />} />
                         </Route>
 
                         {/* Tác giả */}
