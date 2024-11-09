@@ -36,6 +36,10 @@ public class Book {
     @JsonIgnore
     private List<BookBorrow> bookBorrows = new ArrayList<>();// Phiếu mượn sách chi tiết
 
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<CartDetail> cartDetails = new ArrayList<>();//Giỏ hàng
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_definition_id", foreignKey = @ForeignKey(name = "FK_BOOK_BOOK_DEFINITION_ID"), referencedColumnName = "book_definition_id", nullable = false)
     @JsonIgnore

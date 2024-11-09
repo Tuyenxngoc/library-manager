@@ -64,6 +64,10 @@ public class Reader {
     @Column(name = "status", nullable = false)
     private CardStatus status; // Trạng thái thẻ
 
+    @OneToOne(mappedBy = "reader", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private Cart cart;
+
     @OneToMany(mappedBy = "reader", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<BorrowReceipt> borrowReceipts = new ArrayList<>();

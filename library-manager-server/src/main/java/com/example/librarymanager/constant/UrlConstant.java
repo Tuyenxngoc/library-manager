@@ -232,4 +232,14 @@ public class UrlConstant {
 
         public static final String GET_LIBRARY_STATISTICS = PRE_FIX + "/library";
     }
+
+    public static class Cart {
+        private static final String PRE_FIX = "/carts";
+
+        public static final String GET_DETAILS = PRE_FIX + "/details";
+        public static final String ADD = PRE_FIX + "/add";
+        public static final String UPDATE = PRE_FIX + "/update";
+        public static final String REMOVE = PRE_FIX + "/remove";
+        public static final String CLEAR = PRE_FIX + "/clear";
+    }
 }

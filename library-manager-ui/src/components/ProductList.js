@@ -14,7 +14,7 @@ import { getBookByBookDefinitionsForUser } from '~/services/bookDefinitionServic
 
 const cx = classNames.bind(styles);
 
-function ProductList() {
+function ProductList({ messageApi }) {
     const sliderRef = useRef(null);
     const navigate = useNavigate();
 
@@ -85,7 +85,7 @@ function ProductList() {
                         ) : (
                             <Slider ref={sliderRef} {...settings}>
                                 {entityData.map((data, index) => (
-                                    <Product className="mx-2 my-1" key={index} data={data} />
+                                    <Product className="mx-2 my-1" key={index} data={data} messageApi={messageApi} />
                                 ))}
                             </Slider>
                         )}

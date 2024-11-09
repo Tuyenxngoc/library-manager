@@ -6,9 +6,22 @@ import classNames from 'classnames/bind';
 import styles from '~/styles/Product.module.scss';
 import { Button } from 'antd';
 import images from '~/assets';
+import { addToCart } from '~/services/cartService';
 
 const cx = classNames.bind(styles);
-function Product({ className, data }) {
+function Product({ className, data, messageApi }) {
+    const handleAddToCart = async (id) => {
+        try {
+            const response = await addToCart(id);
+            if (response.status === 201) {
+                messageApi.success(response.data.data.message);
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra mượn sách.';
+            messageApi.error(errorMessage);
+        }
+    };
+
     return (
         <div className={cx('postbook', className)}>
             <div className={cx('featureimg')}>
@@ -35,7 +48,7 @@ function Product({ className, data }) {
                     <Link to="#">???</Link>
                 </div>
 
-                <Button type="primary" shape="round" icon={<FaShare />}>
+                <Button type="primary" shape="round" icon={<FaShare />} onClick={() => handleAddToCart(data.id)}>
                     Đăng Ký Mượn
                 </Button>
             </div>

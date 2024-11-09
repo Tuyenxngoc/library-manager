@@ -49,17 +49,17 @@ function Header() {
         ? [
               {
                   key: '1',
-                  label: <Link to="/">Thông tin cá nhân</Link>,
+                  label: <Link to="/profile">Thông tin cá nhân</Link>,
                   icon: <FaUser />,
               },
               {
                   key: '2',
-                  label: <Link to="/">Lưu thông</Link>,
+                  label: <Link to="/borrow-history">Lưu thông</Link>,
                   icon: <FaHistory />,
               },
               {
                   key: '3',
-                  label: <Link to="/">Đã đăng ký mượn</Link>,
+                  label: <Link to="/borrowed-items">Đã đăng ký mượn</Link>,
                   icon: <FaRegEdit />,
               },
               {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Flex, Layout, Menu, theme } from 'antd';
 import { AiFillDashboard } from 'react-icons/ai';
 import { IoMdSettings } from 'react-icons/io';
@@ -163,7 +163,9 @@ function AdminLayout() {
             {/* Sider */}
             <Sider collapsible width={220} collapsed={collapsed} onCollapse={setCollapsed}>
                 <div className="text-center py-2">
-                    <img src={images.logo} alt="logo" width={34} />
+                    <Link to="/" className="d-block">
+                        <img src={images.logo} alt="logo" width={34} />
+                    </Link>
                 </div>
                 <Menu
                     theme="dark"

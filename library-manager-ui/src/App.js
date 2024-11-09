@@ -55,6 +55,9 @@ import BorrowBook from './pages/BorrowBook/BorrowBook';
 import ReturnRenewBook from './pages/ReturnRenewBook/ReturnRenewBook';
 import ReturnHistory from './pages/ReturnHistory/ReturnHistory';
 import BorrowBookForm from './pages/BorrowBook/BorrowBookForm';
+import UserProfile from './pages/UserProfile/UserProfile';
+import BorrowedItems from './pages/BorrowedItems/BorrowedItems';
+import BorrowHistory from './pages/BorrowHistory/BorrowHistory';
 
 function App() {
     return (
@@ -74,7 +77,17 @@ function App() {
                     <Route path="book/:id" element={<BookDetail />} />
                     <Route path="news-articles/:id" element={<NewsArticleDetail />} />
 
-                    <Route element={<RequireAuth />}>{/* Đường dẫn yêu cầu đăng nhập */}</Route>
+                    {/* Đường dẫn yêu cầu đăng nhập */}
+                    <Route element={<RequireAuth />}>
+                        {/* Thông tin cá nhân */}
+                        <Route path="profile" element={<UserProfile />} />
+
+                        {/* Lịch sử mượn */}
+                        <Route path="borrow-history" element={<BorrowHistory />} />
+
+                        {/* Đã đăng ký mượn */}
+                        <Route path="borrowed-items" element={<BorrowedItems />} />
+                    </Route>
                 </Route>
 
                 <Route
@@ -94,13 +107,15 @@ function App() {
                                 ROLES.ManageBookDefinition,
                                 ROLES.ManageCategoryGroup,
                                 ROLES.ManagePublisher,
+                                ROLES.ManageSystemSettings,
+                                ROLES.ManageBorrowReceipt,
+                                ROLES.ManageReader,
                             ]}
                         />
                     }
                 >
+                    {/* Đường dẫn yêu cầu quyền quản trị */}
                     <Route path="admin/" element={<AdminLayout />}>
-                        {/* Đường dẫn yêu cầu quyền quản trị */}
-
                         {/* Trang chủ */}
                         <Route index element={<Dashboard />} />
                         <Route path="home" element={<Dashboard />} />

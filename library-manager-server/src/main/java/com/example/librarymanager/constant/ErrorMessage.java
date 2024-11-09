@@ -182,4 +182,8 @@ public class ErrorMessage {
         public static final String ERR_DUPLICATE_RECEIPT_NUMBER = "exception.borrow.receipt.duplicate.number";
     }
 
+    public static class Cart {
+        public static final String ERR_MAX_BOOKS_IN_CART = "exception.cart.max.books.exceeded";
+    }
+
 }

@@ -5,7 +5,7 @@ import { ImBooks, ImUserPlus } from 'react-icons/im';
 import { FiUsers } from 'react-icons/fi';
 import { BsShop } from 'react-icons/bs';
 import CountUp from 'react-countup';
-import { Button, Statistic } from 'antd';
+import { Button, message, Statistic } from 'antd';
 
 import { backgrounds } from '~/assets';
 import ProductList from '~/components/ProductList';
@@ -25,6 +25,8 @@ function Home() {
 
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState(null);
+
+    const [messageApi, contextHolder] = message.useMessage();
 
     useEffect(() => {
         const fetchEntities = async () => {
@@ -51,9 +53,11 @@ function Home() {
 
     return (
         <>
+            {contextHolder}
+
             <Slider />
 
-            <ProductList />
+            <ProductList messageApi={messageApi} />
 
             <Parallax bgImage={backgrounds.bgparallax4} strength={500}>
                 <div className="container py-5">
@@ -79,7 +83,7 @@ function Home() {
                 </div>
             </Parallax>
 
-            <ProductList />
+            <ProductList messageApi={messageApi} />
 
             <Parallax bgImage={backgrounds.bgparallax5} strength={500}>
                 <div className="container py-5">
