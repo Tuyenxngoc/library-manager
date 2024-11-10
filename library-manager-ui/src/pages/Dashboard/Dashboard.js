@@ -100,7 +100,7 @@ function Dashboard() {
         <div>
             <div className="row g-3">
                 <div className="col-lg-3 col-md-6">
-                    <Card icon={FaEdit} count={0} label="Yêu cầu mượn" link="/admin/home" color="#337ab7" />
+                    <Card icon={FaEdit} count={0} label="Yêu cầu mượn" link="/admin/borrow-requests" color="#337ab7" />
                 </div>
                 <div className="col-lg-3 col-md-6">
                     <Card icon={FaThumbtack} count={0} label="Số đang mượn" link="/admin/home" color="#5cb85c" />

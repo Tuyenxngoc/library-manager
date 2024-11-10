@@ -58,6 +58,7 @@ import BorrowBookForm from './pages/BorrowBook/BorrowBookForm';
 import UserProfile from './pages/UserProfile/UserProfile';
 import BorrowedItems from './pages/BorrowedItems/BorrowedItems';
 import BorrowHistory from './pages/BorrowHistory/BorrowHistory';
+import BorrowRequests from './pages/BorrowRequests/BorrowRequests';
 
 function App() {
     return (
@@ -119,6 +120,9 @@ function App() {
                         {/* Trang chủ */}
                         <Route index element={<Dashboard />} />
                         <Route path="home" element={<Dashboard />} />
+
+                        {/* Yêu cầu mượn tài liệu */}
+                        <Route path="borrow-requests" element={<BorrowRequests />} />
 
                         {/* Thiết lập hệ thống */}
                         <Route path="settings">

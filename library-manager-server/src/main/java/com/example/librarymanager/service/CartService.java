@@ -1,5 +1,8 @@
 package com.example.librarymanager.service;
 
+import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
+import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
+import com.example.librarymanager.domain.dto.response.BorrowRequestSummaryResponseDto;
 import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.dto.response.GetCartDetailResponseDto;
 
@@ -15,4 +18,5 @@ public interface CartService {
 
     CommonResponseDto clearCart(String cardNumber);
 
+    PaginationResponseDto<BorrowRequestSummaryResponseDto> getPendingBorrowRequests(PaginationFullRequestDto requestDto);
 }

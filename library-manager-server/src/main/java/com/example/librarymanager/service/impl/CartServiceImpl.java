@@ -1,10 +1,16 @@
 package com.example.librarymanager.service.impl;
 
 import com.example.librarymanager.constant.ErrorMessage;
+import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.constant.SuccessMessage;
+import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
+import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
+import com.example.librarymanager.domain.dto.pagination.PagingMeta;
+import com.example.librarymanager.domain.dto.response.BorrowRequestSummaryResponseDto;
 import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.dto.response.GetCartDetailResponseDto;
 import com.example.librarymanager.domain.entity.*;
+import com.example.librarymanager.domain.specification.EntitySpecification;
 import com.example.librarymanager.exception.BadRequestException;
 import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.BookDefinitionRepository;
@@ -12,13 +18,17 @@ import com.example.librarymanager.repository.CartDetailRepository;
 import com.example.librarymanager.repository.CartRepository;
 import com.example.librarymanager.repository.ReaderRepository;
 import com.example.librarymanager.service.CartService;
+import com.example.librarymanager.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -142,4 +152,39 @@ public class CartServiceImpl implements CartService {
         return new CommonResponseDto(message);
     }
 
+    @Override
+    public PaginationResponseDto<BorrowRequestSummaryResponseDto> getPendingBorrowRequests(PaginationFullRequestDto requestDto) {
+        Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BORROW_REQUEST);
+
+        Page<Cart> page = cartRepository.findAll(
+                EntitySpecification.filterCarts(requestDto.getKeyword(), requestDto.getSearchBy()),
+                pageable);
+
+        LocalDateTime now = LocalDateTime.now();
+        List<BorrowRequestSummaryResponseDto> items = new ArrayList<>();
+        List<Cart> carts = page.getContent();
+        for (Cart cart : carts) {
+            List<CartDetail> cartDetails = cart.getCartDetails();
+            List<CartDetail> filteredCartDetails = new ArrayList<>();
+            for (CartDetail cartDetail : cartDetails) {
+                if (cartDetail.getBorrowTo().isAfter(now)) {
+                    filteredCartDetails.add(cartDetail);
+                }
+            }
+            if (!filteredCartDetails.isEmpty()) {
+                BorrowRequestSummaryResponseDto dto = new BorrowRequestSummaryResponseDto();
+                dto.setCartDetails(filteredCartDetails);
+                dto.setReader(cart.getReader());
+                items.add(dto);
+            }
+        }
+
+        PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.BORROW_REQUEST, page);
+        PaginationResponseDto<BorrowRequestSummaryResponseDto> responseDto = new PaginationResponseDto<>();
+
+        responseDto.setItems(items);
+        responseDto.setMeta(pagingMeta);
+
+        return responseDto;
+    }
 }

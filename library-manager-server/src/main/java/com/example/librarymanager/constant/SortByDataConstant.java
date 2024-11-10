@@ -225,4 +225,11 @@ public enum SortByDataConstant implements SortByInterface {
         }
     },
 
+    BORROW_REQUEST {
+        @Override
+        public String getSortBy(String sortBy) {
+            return "id";
+        }
+    },
+
 }

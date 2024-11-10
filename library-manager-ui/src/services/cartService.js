@@ -15,3 +15,7 @@ export const removeFromCart = (id) => {
 export const clearCart = () => {
     return axiosPrivate.delete('carts/clear');
 };
+
+export const getPendingBorrowRequests = (params) => {
+    return axiosPrivate.get(`carts/pending-borrow-requests?${params}`);
+};

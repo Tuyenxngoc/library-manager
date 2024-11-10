@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { Button, DatePicker, Divider, message, Select, Space, Table } from 'antd';
@@ -42,7 +42,15 @@ const validationSchema = yup.object({
 
 function BorrowBookForm() {
     const { id } = useParams();
+    const location = useLocation();
     const navigate = useNavigate();
+
+    // Hàm để lấy giá trị tham số cartId từ URL
+    const getQueryParams = () => {
+        const queryParams = new URLSearchParams(location.search);
+        return queryParams.get('cartId');
+    };
+    const cartId = getQueryParams();
 
     const [messageApi, contextHolder] = message.useMessage();
 
@@ -174,6 +182,21 @@ function BorrowBookForm() {
                 .catch((error) => {
                     messageApi.error(error.message || 'Có lỗi xảy ra khi tải dữ liệu phiếu mượn.');
                 });
+        } else if (cartId) {
+            // getBorrowReceiptByCartId(cartId)
+            //     .then((response) => {
+            //         const { receiptNumber, createdDate, note, readerId, books } = response.data.data;
+            //         formik.setValues({
+            //             receiptNumber,
+            //             createdDate: createdDate? dayjs(createdDate) : null,
+            //             note,
+            //             readerId,
+            //             books: books.map((book) => ({ bookCode: book.bookCode, dueDate: book.dueDate })),
+            //         });
+            //     })
+            //     .catch((error) => {
+            //         messageApi.error(error.message || 'Có l��i xảy ra khi tải dữ liệu phiếu mượn.');
+            //     });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
