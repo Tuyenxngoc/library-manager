@@ -21,10 +21,13 @@ public class BorrowReceiptRequestDto {
 
     @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)
     @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
-    private String receiptNumber;
+    private String receiptNumber;//Số phiếu mượn
 
     @NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
-    private LocalDate createdDate;
+    private LocalDate borrowDate;
+
+    @NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
+    private LocalDate dueDate;
 
     @Size(max = 255, message = ErrorMessage.INVALID_TEXT_LENGTH)
     private String note;
@@ -34,6 +37,9 @@ public class BorrowReceiptRequestDto {
 
     @NotNull(message = ErrorMessage.INVALID_ARRAY_IS_REQUIRED)
     @Size(min = 1, max = 100, message = ErrorMessage.INVALID_ARRAY_LENGTH)
-    private Set<BookBorrowRequestDto> books = new HashSet<>();
-
+    private Set<
+            @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)
+            @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
+                    String
+            > books = new HashSet<>();
 }

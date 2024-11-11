@@ -1,8 +1,9 @@
 package com.example.librarymanager.constant;
 
 public enum BorrowStatus {
-    BORROWED("Đang mượn"),
+    NOT_RETURNED("Chưa trả"),
     RETURNED("Đã trả"),
+    PARTIALLY_RETURNED("Chưa trả đủ"),
     OVERDUE("Quá hạn");
 
     private final String name;

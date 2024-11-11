@@ -19,4 +19,5 @@ public interface BorrowReceiptService {
 
     GetBorrowReceiptDetailResponseDto findById(Long id);
 
+    GetBorrowReceiptDetailResponseDto findByCartId(Long id);
 }

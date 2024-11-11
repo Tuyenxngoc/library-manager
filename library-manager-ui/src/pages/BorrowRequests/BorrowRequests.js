@@ -141,7 +141,7 @@ function BorrowRequests() {
 
             <Table
                 bordered
-                rowKey="id"
+                rowKey="cartId"
                 dataSource={entityData}
                 columns={columns}
                 loading={isLoading}

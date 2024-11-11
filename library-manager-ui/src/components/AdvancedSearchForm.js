@@ -52,8 +52,6 @@ function AdvancedSearchForm({ onSearch }) {
     const handleInputChange = (index, field, value) => {
         const newCriteria = [...searchCriteria];
 
-        console.log(newCriteria, index, field, value);
-
         newCriteria[index][field] = value;
         setSearchCriteria(newCriteria);
     };

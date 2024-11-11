@@ -10,8 +10,8 @@
         "axios": "^1.7.7",
         "bootstrap": "^5.3.3",
         "classnames": "^2.5.1",
-        "formik": "^2.4.6",
         "dayjs": "^1.11.13",
+        "formik": "^2.4.6",
         "normalize.css": "^8.0.1",
         "prop-types": "^15.8.1",
         "query-string": "^9.1.0",
@@ -24,7 +24,7 @@
         "react-router-dom": "^6.26.2",
         "react-scripts": "5.0.1",
         "react-slick": "^0.30.2",
-        "recharts": "^2.12.7",
+        "recharts": "^2.13.3",
         "slick-carousel": "^1.8.1",
         "web-vitals": "^2.1.4",
         "yup": "^1.4.0"

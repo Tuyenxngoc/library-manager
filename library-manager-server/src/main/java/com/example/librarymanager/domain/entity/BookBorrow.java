@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
-
 @Getter
 @Setter
 @Builder
@@ -19,9 +17,6 @@ public class BookBorrow {//Sách mượn chi tiết
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "book_borrow_id")
     private Long id;
-
-    @Column(name = "due_date", nullable = false)
-    private LocalDate dueDate; // Ngày hẹn trả
 
     @Column(name = "returned", nullable = false)
     private boolean returned = false; // Trạng thái đã trả

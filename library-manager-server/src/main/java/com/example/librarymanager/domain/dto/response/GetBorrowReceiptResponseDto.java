@@ -11,7 +11,9 @@ public class GetBorrowReceiptResponseDto {
 
     private final String receiptNumber;
 
-    private final LocalDate createdDate;
+    private final LocalDate borrowDate; //Ngày mượn
+
+    private final LocalDate dueDate; // Ngày hết hạn
 
     private final String note; // Ghi chú
 
@@ -19,12 +21,13 @@ public class GetBorrowReceiptResponseDto {
 
     private final String fullName; // Họ tên
 
-    private final int books;//Các sách mượn
+    private final int books;//Số sách mượn
 
     public GetBorrowReceiptResponseDto(BorrowReceipt borrowReceipt) {
         this.id = borrowReceipt.getId();
         this.receiptNumber = borrowReceipt.getReceiptNumber();
-        this.createdDate = borrowReceipt.getCreatedDate();
+        this.borrowDate = borrowReceipt.getBorrowDate();
+        this.dueDate = borrowReceipt.getDueDate();
         this.note = borrowReceipt.getNote();
         this.cardNumber = borrowReceipt.getReader().getCardNumber();
         this.fullName = borrowReceipt.getReader().getFullName();

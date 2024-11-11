@@ -1,5 +1,6 @@
 package com.example.librarymanager.domain.entity;
 
+import com.example.librarymanager.constant.BorrowStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,10 +25,17 @@ public class BorrowReceipt {//Phiếu mượn sách
     private Long id;
 
     @Column(name = "receipt_number", nullable = false)
-    private String receiptNumber;
+    private String receiptNumber; //Số phiếu mượn
 
-    @Column(name = "created_date", nullable = false)
-    private LocalDate createdDate;
+    @Column(name = "borrow_date", nullable = false)
+    private LocalDate borrowDate; // Ngày mượn
+
+    @Column(name = "due_date", nullable = false)
+    private LocalDate dueDate; // Ngày hẹn trả
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private BorrowStatus status;
 
     @Column(name = "note", length = 500)
     private String note; // Ghi chú

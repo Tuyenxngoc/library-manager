@@ -22,14 +22,12 @@ import styles from '~/styles/Dashboard.module.scss';
 
 const cx = classNames.bind(styles);
 
-const Card = ({ icon: Icon, count, label, link, color = 'white' }) => {
+const Card = ({ icon, count, label, link, color = 'white' }) => {
     return (
         <div className="card text-white" style={{ borderColor: color }}>
             <div className="card-header" style={{ backgroundColor: color }}>
                 <div className="row">
-                    <div className="col-3">
-                        <Icon className="fs-1" />
-                    </div>
+                    <div className="col-3">{icon}</div>
                     <div className="col-9 text-end">
                         <div className="fs-1">{count}</div>
                         <div className="fw-bold">{label}</div>
@@ -100,16 +98,40 @@ function Dashboard() {
         <div>
             <div className="row g-3">
                 <div className="col-lg-3 col-md-6">
-                    <Card icon={FaEdit} count={0} label="Yêu cầu mượn" link="/admin/borrow-requests" color="#337ab7" />
+                    <Card
+                        icon={<FaEdit className="fs-1" />}
+                        count={0}
+                        label="Yêu cầu mượn"
+                        link="/admin/borrow-requests"
+                        color="#337ab7"
+                    />
                 </div>
                 <div className="col-lg-3 col-md-6">
-                    <Card icon={FaThumbtack} count={0} label="Số đang mượn" link="/admin/home" color="#5cb85c" />
+                    <Card
+                        icon={<FaThumbtack className="fs-1" />}
+                        count={0}
+                        label="Số đang mượn"
+                        link="/admin/home"
+                        color="#5cb85c"
+                    />
                 </div>
                 <div className="col-lg-3 col-md-6">
-                    <Card icon={FaClock} count={0} label="Đến hạn trả" link="/admin/home" color="#f0ad4e" />
+                    <Card
+                        icon={<FaClock className="fs-1" />}
+                        count={0}
+                        label="Đến hạn trả"
+                        link="/admin/home"
+                        color="#f0ad4e"
+                    />
                 </div>
                 <div className="col-lg-3 col-md-6">
-                    <Card icon={FaBan} count={0} label="Quá hạn trả" link="/admin/home" color="#d9534f" />
+                    <Card
+                        icon={<FaBan className="fs-1" />}
+                        count={0}
+                        label="Quá hạn trả"
+                        link="/admin/home"
+                        color="#d9534f"
+                    />
                 </div>
             </div>
 
@@ -162,18 +184,19 @@ function Dashboard() {
                     <FaBook /> &nbsp;<b>Ấn phẩm được mượn nhiều nhất</b>
                 </div>
                 <div className={cx('body')}>
-                    <Timeline mode="alternate">
-                        {mostBorrowedPublications.map((publication, index) => (
-                            <Timeline.Item
-                                key={index}
-                                color={index % 2 === 0 ? 'gray' : 'green'}
-                                dot={<FaBook style={{ fontSize: '16px' }} />}
-                            >
-                                <strong>{publication.title}</strong> - <em>{publication.date}</em>
-                                <p>{publication.description}</p>
-                            </Timeline.Item>
-                        ))}
-                    </Timeline>
+                    <Timeline
+                        mode="alternate"
+                        items={mostBorrowedPublications.map((publication, index) => ({
+                            color: index % 2 === 0 ? 'gray' : 'green',
+                            dot: <FaBook style={{ fontSize: '16px' }} />,
+                            children: (
+                                <>
+                                    <strong>{publication.title}</strong> - <em>{publication.date}</em>
+                                    <p>{publication.description}</p>
+                                </>
+                            ),
+                        }))}
+                    />
                 </div>
             </div>
         </div>

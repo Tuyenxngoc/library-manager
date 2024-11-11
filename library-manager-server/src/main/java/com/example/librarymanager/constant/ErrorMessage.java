@@ -175,6 +175,7 @@ public class ErrorMessage {
         public static final String ERR_HAS_LINKED = "exception.book.has.linked";
         public static final String ERR_HAS_LINKED_EXPORT_RECEPTION = "exception.book.has.linked.exported";
         public static final String ERR_BOOK_ALREADY_BORROWED = "exception.book.already.borrowed";
+        public static final String ERR_BOOK_RESERVED_BY_ANOTHER_READER = "exception.book.reserved.by.another.reader";
     }
 
     public static class BorrowReceipt {
@@ -183,6 +184,7 @@ public class ErrorMessage {
     }
 
     public static class Cart {
+        public static final String ERR_NOT_FOUND_ID = "exception.cart.not.found.id";
         public static final String ERR_MAX_BOOKS_IN_CART = "exception.cart.max.books.exceeded";
     }
 

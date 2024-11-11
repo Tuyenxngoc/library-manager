@@ -1,30 +1,20 @@
 package com.example.librarymanager.service.impl;
 
-import com.example.librarymanager.constant.ErrorMessage;
-import com.example.librarymanager.constant.EventConstants;
-import com.example.librarymanager.constant.SortByDataConstant;
-import com.example.librarymanager.constant.SuccessMessage;
+import com.example.librarymanager.constant.*;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
-import com.example.librarymanager.domain.dto.request.BookBorrowRequestDto;
 import com.example.librarymanager.domain.dto.request.BorrowReceiptRequestDto;
 import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.dto.response.GetBorrowReceiptDetailResponseDto;
 import com.example.librarymanager.domain.dto.response.GetBorrowReceiptResponseDto;
-import com.example.librarymanager.domain.entity.Book;
-import com.example.librarymanager.domain.entity.BookBorrow;
-import com.example.librarymanager.domain.entity.BorrowReceipt;
-import com.example.librarymanager.domain.entity.Reader;
+import com.example.librarymanager.domain.entity.*;
 import com.example.librarymanager.domain.mapper.BorrowReceiptMapper;
 import com.example.librarymanager.domain.specification.EntitySpecification;
 import com.example.librarymanager.exception.ConflictException;
 import com.example.librarymanager.exception.ForbiddenException;
 import com.example.librarymanager.exception.NotFoundException;
-import com.example.librarymanager.repository.BookBorrowRepository;
-import com.example.librarymanager.repository.BookRepository;
-import com.example.librarymanager.repository.BorrowReceiptRepository;
-import com.example.librarymanager.repository.ReaderRepository;
+import com.example.librarymanager.repository.*;
 import com.example.librarymanager.service.BorrowReceiptService;
 import com.example.librarymanager.service.LogService;
 import com.example.librarymanager.util.PaginationUtil;
@@ -37,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -59,6 +50,10 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
 
     private final BookBorrowRepository bookBorrowRepository;
 
+    private final CartRepository cartRepository;
+
+    private final CartDetailRepository cartDetailRepository;
+
     private BorrowReceipt getEntity(Long id) {
         return borrowReceiptRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.BorrowReceipt.ERR_RECEIPT_NOT_FOUND, id));
@@ -79,24 +74,34 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
         borrowReceipt.setReader(reader);
     }
 
-    private void getBook(BorrowReceipt borrowReceipt, BookBorrowRequestDto requestDto) {
-        Book book = bookRepository.findByBookCode(requestDto.getBookCode())
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.Book.ERR_NOT_FOUND_CODE, requestDto.getBookCode()));
+    private void getBook(BorrowReceipt borrowReceipt, String bookCode) {
+        Book book = bookRepository.findByBookCode(bookCode)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.Book.ERR_NOT_FOUND_CODE, bookCode));
 
+        //Kiểm tra sách đã được mượn hay chưa
         for (BookBorrow bookBorrow : book.getBookBorrows()) {
             if (!bookBorrow.isReturned()) {
-                throw new ConflictException(ErrorMessage.Book.ERR_BOOK_ALREADY_BORROWED, requestDto.getBookCode());
+                throw new ConflictException(ErrorMessage.Book.ERR_BOOK_ALREADY_BORROWED, bookCode);
+            }
+        }
+
+        //Kiểm tra sách xem có ai khác đã đăng ký mượn từ trước hay chưa
+        LocalDateTime now = LocalDateTime.now();
+        for (CartDetail cartDetail : book.getCartDetails()) {
+            if (cartDetail.getBorrowTo().isAfter(now)
+                    && !Objects.equals(cartDetail.getCart().getReader().getId(), borrowReceipt.getReader().getId())) {
+                throw new ConflictException(ErrorMessage.Book.ERR_BOOK_RESERVED_BY_ANOTHER_READER, bookCode);
             }
         }
 
         BookBorrow bookBorrow = new BookBorrow();
         bookBorrow.setBook(book);
         bookBorrow.setBorrowReceipt(borrowReceipt);
-        bookBorrow.setDueDate(requestDto.getDueDate());
         borrowReceipt.getBookBorrows().add(bookBorrow);
     }
 
     @Override
+    @Transactional
     public CommonResponseDto save(BorrowReceiptRequestDto requestDto, String userId) {
         //Kiểm tra số phiếu mượn
         if (borrowReceiptRepository.existsByReceiptNumber(requestDto.getReceiptNumber())) {
@@ -104,15 +109,30 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
         }
 
         BorrowReceipt borrowReceipt = borrowReceiptMapper.toBorrowReceipt(requestDto);
+        borrowReceipt.setStatus(BorrowStatus.NOT_RETURNED);
 
         //Lấy ra bạn đọc và kiểm tra thông tin
         getReader(borrowReceipt, requestDto);
         borrowReceipt.setBookBorrows(new ArrayList<>());
 
         //Lấy ra sách và kiểm tra thông tin
-        for (BookBorrowRequestDto dto : requestDto.getBooks()) {
-            getBook(borrowReceipt, dto);
+        for (String code : requestDto.getBooks()) {
+            getBook(borrowReceipt, code);
         }
+
+        // Xóa tất cả các CartDetail todo bug
+        LocalDateTime now = LocalDateTime.now();
+        Set<Book> booksToBorrow = borrowReceipt.getBookBorrows().stream()
+                .map(BookBorrow::getBook)
+                .collect(Collectors.toSet());
+
+        List<CartDetail> cartDetails = borrowReceipt.getReader().getCart().getCartDetails();
+        List<CartDetail> cartDetailsToDelete = cartDetails.stream()
+                .filter(cartDetail -> cartDetail.getBorrowTo().isAfter(now) && booksToBorrow.contains(cartDetail.getBook()))
+                .collect(Collectors.toList());
+
+        cartDetails.removeAll(cartDetailsToDelete);
+        cartDetailRepository.deleteAll(cartDetailsToDelete);
 
         borrowReceiptRepository.save(borrowReceipt);
 
@@ -139,32 +159,32 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
         }
 
         // Lấy danh sách sách hiện tại trong phiếu mượn
-        Set<BookBorrowRequestDto> currentBookCodes = borrowReceipt.getBookBorrows().stream()
-                .map(BookBorrowRequestDto::new)
+        Set<String> currentBookCodes = borrowReceipt.getBookBorrows().stream()
+                .map(bookBorrow -> bookBorrow.getBook().getBookCode())
                 .collect(Collectors.toSet());
 
         //Lấy danh sách mới
-        Set<BookBorrowRequestDto> newBookCodes = requestDto.getBooks();
+        Set<String> newBookCodes = requestDto.getBooks();
 
         // Tìm sách cần thêm mới
-        Set<BookBorrowRequestDto> bookCodesToAdd = new HashSet<>(newBookCodes);
+        Set<String> bookCodesToAdd = new HashSet<>(newBookCodes);
         bookCodesToAdd.removeAll(currentBookCodes);
 
         // Tìm sách cần xóa
-        Set<BookBorrowRequestDto> bookCodesToRemove = new HashSet<>(currentBookCodes);
+        Set<String> bookCodesToRemove = new HashSet<>(currentBookCodes);
         bookCodesToRemove.removeAll(newBookCodes);
 
         // Thêm sách mới vào phiếu xuất
         if (!bookCodesToAdd.isEmpty()) {
-            for (BookBorrowRequestDto bookId : bookCodesToAdd) {
-                getBook(borrowReceipt, bookId);
+            for (String code : bookCodesToAdd) {
+                getBook(borrowReceipt, code);
             }
         }
 
         // Xóa sách không còn trong danh sách
         if (!bookCodesToRemove.isEmpty()) {
             Set<BookBorrow> booksToRemove = borrowReceipt.getBookBorrows().stream()
-                    .filter(book -> bookCodesToRemove.contains(new BookBorrowRequestDto(book.getBook().getBookCode())))
+                    .filter(bookBorrow -> bookCodesToRemove.contains(bookBorrow.getBook().getBookCode()))
                     .collect(Collectors.toSet());
 
             bookBorrowRepository.deleteAll(booksToRemove);
@@ -173,7 +193,8 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
         }
 
         borrowReceipt.setReceiptNumber(requestDto.getReceiptNumber());
-        borrowReceipt.setCreatedDate(requestDto.getCreatedDate());
+        borrowReceipt.setBorrowDate(requestDto.getBorrowDate());
+        borrowReceipt.setDueDate(requestDto.getDueDate());
         borrowReceipt.setNote(requestDto.getNote());
 
         borrowReceiptRepository.save(borrowReceipt);
@@ -222,4 +243,23 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
         BorrowReceipt borrowReceipt = getEntity(id);
         return new GetBorrowReceiptDetailResponseDto(borrowReceipt);
     }
+
+    @Override
+    public GetBorrowReceiptDetailResponseDto findByCartId(Long id) {
+        Cart cart = cartRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.Cart.ERR_NOT_FOUND_ID, id));
+
+        GetBorrowReceiptDetailResponseDto responseDto = new GetBorrowReceiptDetailResponseDto();
+        responseDto.setReaderId(cart.getReader().getId());
+
+        LocalDateTime now = LocalDateTime.now();
+        for (CartDetail cartDetail : cart.getCartDetails()) {
+            if (cartDetail.getBorrowTo().isAfter(now)) {
+                responseDto.getBooks().add(cartDetail.getBook().getBookCode());
+            }
+        }
+
+        return responseDto;
+    }
+
 }

@@ -98,17 +98,9 @@ function BorrowedItems() {
                 </div>
 
                 {isLoading ? (
-                    <tr>
-                        <td colSpan="7" style={{ textAlign: 'center' }}>
-                            Đang tải dữ liệu...
-                        </td>
-                    </tr>
+                    <div>Đang tải dữ liệu...</div>
                 ) : errorMessage ? (
-                    <tr>
-                        <td colSpan="7" style={{ textAlign: 'center', color: 'red' }}>
-                            Lỗi tải dữ liệu: {errorMessage}
-                        </td>
-                    </tr>
+                    <div>Lỗi tải dữ liệu: {errorMessage}</div>
                 ) : (
                     entityData && (
                         <>
@@ -138,6 +130,7 @@ function BorrowedItems() {
                                             <tr role="row">
                                                 <th style={{ width: 20, textAlign: 'center' }}>
                                                     <Checkbox
+                                                        name="checkbox"
                                                         checked={
                                                             selectedItems.length === entityData.length &&
                                                             entityData.length > 0
@@ -165,6 +158,7 @@ function BorrowedItems() {
                                                     <tr key={item.bookCode || index}>
                                                         <td style={{ textAlign: 'center' }}>
                                                             <Checkbox
+                                                                name="checkbox"
                                                                 checked={selectedItems.includes(item.id)}
                                                                 onChange={() => handleCheckboxChange(item.id)}
                                                             />

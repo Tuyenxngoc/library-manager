@@ -16,6 +16,10 @@ export const getBorrowReceiptById = (id) => {
     return axiosPrivate.get(`borrow-receipts/${id}`);
 };
 
+export const getBorrowReceiptByCartId = (id) => {
+    return axiosPrivate.get(`borrow-receipts/cart/${id}`);
+};
+
 export const getBorrowReceipts = (params) => {
     return axiosPrivate.get(`borrow-receipts?${params}`);
 };
