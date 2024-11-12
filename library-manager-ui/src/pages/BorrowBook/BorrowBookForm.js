@@ -142,7 +142,7 @@ function BorrowBookForm() {
             return;
         }
 
-        const updatedBooks = [...currentBooks, selectedBookCode];
+        const updatedBooks = [...currentBooks, { bookCode: selectedBookCode }];
         formik.setFieldValue('books', updatedBooks);
         setSelectedBookCode(null);
     };
@@ -168,10 +168,11 @@ function BorrowBookForm() {
             // Nếu có id, lấy thông tin phiếu mượn
             getBorrowReceiptById(id)
                 .then((response) => {
-                    const { receiptNumber, borrowDate, note, readerId, books } = response.data.data;
+                    const { receiptNumber, borrowDate, dueDate, note, readerId, books } = response.data.data;
                     formik.setValues({
                         receiptNumber,
                         borrowDate: borrowDate ? dayjs(borrowDate) : null,
+                        dueDate: dueDate ? dayjs(dueDate) : null,
                         note,
                         readerId,
                         books: books.map((bookCode) => ({ bookCode })),

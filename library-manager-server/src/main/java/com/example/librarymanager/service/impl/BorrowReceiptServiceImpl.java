@@ -120,19 +120,14 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
             getBook(borrowReceipt, code);
         }
 
-        // Xóa tất cả các CartDetail todo bug
-        LocalDateTime now = LocalDateTime.now();
-        Set<Book> booksToBorrow = borrowReceipt.getBookBorrows().stream()
-                .map(BookBorrow::getBook)
-                .collect(Collectors.toSet());
-
-        List<CartDetail> cartDetails = borrowReceipt.getReader().getCart().getCartDetails();
-        List<CartDetail> cartDetailsToDelete = cartDetails.stream()
-                .filter(cartDetail -> cartDetail.getBorrowTo().isAfter(now) && booksToBorrow.contains(cartDetail.getBook()))
-                .collect(Collectors.toList());
-
-        cartDetails.removeAll(cartDetailsToDelete);
-        cartDetailRepository.deleteAll(cartDetailsToDelete);
+        Cart cart = borrowReceipt.getReader().getCart();
+        if (cart != null) {
+            LocalDateTime now = LocalDateTime.now();
+            Set<Book> booksToBorrow = borrowReceipt.getBookBorrows().stream()
+                    .map(BookBorrow::getBook)
+                    .collect(Collectors.toSet());
+            cartDetailRepository.deleteByCartIdAndBooks(cart.getId(), booksToBorrow, now);
+        }
 
         borrowReceiptRepository.save(borrowReceipt);
 
