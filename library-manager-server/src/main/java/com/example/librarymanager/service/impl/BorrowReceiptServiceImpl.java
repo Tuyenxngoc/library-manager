@@ -7,6 +7,7 @@ import com.example.librarymanager.domain.dto.pagination.PagingMeta;
 import com.example.librarymanager.domain.dto.request.BorrowReceiptRequestDto;
 import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.dto.response.GetBorrowReceiptDetailResponseDto;
+import com.example.librarymanager.domain.dto.response.GetBorrowReceiptForReaderResponseDto;
 import com.example.librarymanager.domain.dto.response.GetBorrowReceiptResponseDto;
 import com.example.librarymanager.domain.entity.*;
 import com.example.librarymanager.domain.mapper.BorrowReceiptMapper;
@@ -23,6 +24,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -253,6 +255,27 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
                 responseDto.getBooks().add(cartDetail.getBook().getBookCode());
             }
         }
+
+        return responseDto;
+    }
+
+    @Override
+    public PaginationResponseDto<GetBorrowReceiptForReaderResponseDto> findByCardNumber(String cardNumber, PaginationFullRequestDto requestDto) {
+        Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BORROW_RECEIPT);
+
+        Specification<BorrowReceipt> spec = EntitySpecification.filterBorrowReceiptsByReader(cardNumber)
+                .and(EntitySpecification.filterBorrowReceipts(requestDto.getKeyword(), requestDto.getSearchBy()));
+        Page<BorrowReceipt> page = borrowReceiptRepository.findAll(spec, pageable);
+
+        List<GetBorrowReceiptForReaderResponseDto> items = page.getContent().stream()
+                .map(GetBorrowReceiptForReaderResponseDto::new)
+                .toList();
+
+        PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.BORROW_RECEIPT, page);
+
+        PaginationResponseDto<GetBorrowReceiptForReaderResponseDto> responseDto = new PaginationResponseDto<>();
+        responseDto.setItems(items);
+        responseDto.setMeta(pagingMeta);
 
         return responseDto;
     }

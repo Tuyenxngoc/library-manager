@@ -79,4 +79,15 @@ public class BorrowReceiptController {
     public ResponseEntity<?> getBorrowReceiptByCartId(@PathVariable Long id) {
         return VsResponseUtil.success(borrowReceiptService.findByCartId(id));
     }
+
+    @Operation(summary = "API Get Borrow Receipts by Reader")
+    @PreAuthorize("hasRole('ROLE_READER')")
+    @GetMapping(UrlConstant.BorrowReceipt.GET_BY_READER)
+    public ResponseEntity<?> getBorrowReceiptsByReader(
+            @CurrentUser CustomUserDetails userDetails,
+            @ParameterObject PaginationFullRequestDto requestDto
+    ) {
+        return VsResponseUtil.success(borrowReceiptService.findByCardNumber(userDetails.getCardNumber(), requestDto));
+    }
+
 }

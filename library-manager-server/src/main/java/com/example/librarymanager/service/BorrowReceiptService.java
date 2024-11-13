@@ -5,6 +5,7 @@ import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.request.BorrowReceiptRequestDto;
 import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.dto.response.GetBorrowReceiptDetailResponseDto;
+import com.example.librarymanager.domain.dto.response.GetBorrowReceiptForReaderResponseDto;
 import com.example.librarymanager.domain.dto.response.GetBorrowReceiptResponseDto;
 
 public interface BorrowReceiptService {
@@ -20,4 +21,6 @@ public interface BorrowReceiptService {
     GetBorrowReceiptDetailResponseDto findById(Long id);
 
     GetBorrowReceiptDetailResponseDto findByCartId(Long id);
+
+    PaginationResponseDto<GetBorrowReceiptForReaderResponseDto> findByCardNumber(String cardNumber, PaginationFullRequestDto requestDto);
 }

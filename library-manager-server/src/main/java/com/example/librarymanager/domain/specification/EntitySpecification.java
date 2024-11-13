@@ -563,4 +563,17 @@ public class EntitySpecification {
             return predicate;
         };
     }
+
+    public static Specification<BorrowReceipt> filterBorrowReceiptsByReader(String cardNumber) {
+        return (root, query, builder) -> {
+            query.distinct(true);
+
+            Predicate predicate = builder.conjunction();
+
+            Join<BorrowReceipt, Reader> borrowReceiptReaderJoin = root.join(BorrowReceipt_.reader, JoinType.INNER);
+            predicate = builder.and(predicate, builder.equal(borrowReceiptReaderJoin.get(Reader_.cardNumber), cardNumber));
+
+            return predicate;
+        };
+    }
 }
