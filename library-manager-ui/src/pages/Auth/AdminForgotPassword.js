@@ -11,7 +11,7 @@ import classNames from 'classnames/bind';
 import styles from '~/styles/AdminLogin.module.scss';
 import useAuth from '~/hooks/useAuth';
 import { handleError } from '~/utils/errorHandler';
-import { forgotPassword } from '~/services/authService';
+import { adminForgotPassword } from '~/services/authService';
 
 const cx = classNames.bind(styles);
 
@@ -34,7 +34,7 @@ function AdminForgotPassword() {
 
     const handleLogin = async (values, { setSubmitting }) => {
         try {
-            const response = await forgotPassword(values);
+            const response = await adminForgotPassword(values);
             if (response.status === 200) {
                 const { accessToken, refreshToken } = response.data.data;
                 login({ accessToken, refreshToken });

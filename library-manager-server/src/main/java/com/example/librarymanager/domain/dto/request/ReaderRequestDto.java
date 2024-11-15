@@ -1,10 +1,7 @@
 package com.example.librarymanager.domain.dto.request;
 
 import com.example.librarymanager.constant.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +22,6 @@ public class ReaderRequestDto {
     @Size(min = 2, max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
     private String fullName;
 
-    @NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
     private LocalDate dateOfBirth;
 
     @NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)
@@ -33,6 +29,11 @@ public class ReaderRequestDto {
 
     @Size(max = 255, message = ErrorMessage.INVALID_TEXT_LENGTH)
     private String address;
+
+    @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)
+    @Email(message = ErrorMessage.INVALID_FORMAT_EMAIL)
+    @Size(min = 5, max = 255, message = ErrorMessage.INVALID_TEXT_LENGTH)
+    private String email;
 
     @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)
     @Pattern(regexp = CommonConstant.REGEXP_PHONE_NUMBER, message = ErrorMessage.INVALID_FORMAT_PHONE)

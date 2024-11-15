@@ -13,7 +13,11 @@ import java.util.Set;
 public interface ReaderRepository extends JpaRepository<Reader, Long>, JpaSpecificationExecutor<Reader> {
     Optional<Reader> findByCardNumber(String cardNumber);
 
+    Optional<Reader> findByCardNumberAndEmail(String cardNumber, String email);
+
     boolean existsByCardNumber(String cardNumber);
+
+    boolean existsByEmail(String email);
 
     List<Reader> findAllByIdIn(Set<Long> readerIds);
 }

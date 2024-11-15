@@ -439,7 +439,7 @@ function Reader() {
                         <Col span={16}>
                             <Row gutter={16}>
                                 {/* Loại thẻ */}
-                                <Col span={12}>
+                                <Col span={24}>
                                     <Form.Item
                                         label="Loại thẻ"
                                         name="cardType"
@@ -476,11 +476,7 @@ function Reader() {
 
                                 {/* Ngày sinh */}
                                 <Col span={12}>
-                                    <Form.Item
-                                        label="Ngày sinh"
-                                        name="dateOfBirth"
-                                        rules={[{ required: true, message: 'Vui lòng chọn ngày sinh' }]}
-                                    >
+                                    <Form.Item label="Ngày sinh" name="dateOfBirth">
                                         <DatePicker
                                             format="YYYY-MM-DD"
                                             placeholder="Chọn ngày sinh"
@@ -510,6 +506,34 @@ function Reader() {
                                         rules={[{ max: 255, message: 'Địa chỉ quá dài' }]}
                                     >
                                         <Input placeholder="Nhập địa chỉ" autoComplete="off" />
+                                    </Form.Item>
+                                </Col>
+
+                                {/* Email */}
+                                <Col span={12}>
+                                    <Form.Item
+                                        label="Email"
+                                        name="email"
+                                        rules={[
+                                            {
+                                                type: 'email',
+                                                message: 'Địa chỉ email không hợp lệ',
+                                            },
+                                            {
+                                                min: 5,
+                                                message: 'Email phải có ít nhất 5 ký tự',
+                                            },
+                                            {
+                                                max: 255,
+                                                message: 'Email không được vượt quá 255 ký tự',
+                                            },
+                                            {
+                                                required: true,
+                                                message: 'Vui lòng nhập email',
+                                            },
+                                        ]}
+                                    >
+                                        <Input placeholder="Nhập email" autoComplete="off" />
                                     </Form.Item>
                                 </Col>
 
@@ -648,7 +672,7 @@ function Reader() {
                         <Col span={16}>
                             <Row gutter={16}>
                                 {/* Loại thẻ */}
-                                <Col span={12}>
+                                <Col span={24}>
                                     <Form.Item
                                         label="Loại thẻ"
                                         name="cardType"
@@ -685,11 +709,7 @@ function Reader() {
 
                                 {/* Ngày sinh */}
                                 <Col span={12}>
-                                    <Form.Item
-                                        label="Ngày sinh"
-                                        name="dateOfBirth"
-                                        rules={[{ required: true, message: 'Vui lòng chọn ngày sinh' }]}
-                                    >
+                                    <Form.Item label="Ngày sinh" name="dateOfBirth">
                                         <DatePicker
                                             format="YYYY-MM-DD"
                                             placeholder="Chọn ngày sinh"
@@ -719,6 +739,34 @@ function Reader() {
                                         rules={[{ max: 255, message: 'Địa chỉ quá dài' }]}
                                     >
                                         <Input placeholder="Nhập địa chỉ" autoComplete="off" />
+                                    </Form.Item>
+                                </Col>
+
+                                {/* Email */}
+                                <Col span={12}>
+                                    <Form.Item
+                                        label="Email"
+                                        name="email"
+                                        rules={[
+                                            {
+                                                type: 'email',
+                                                message: 'Địa chỉ email không hợp lệ',
+                                            },
+                                            {
+                                                min: 5,
+                                                message: 'Email phải có ít nhất 5 ký tự',
+                                            },
+                                            {
+                                                max: 255,
+                                                message: 'Email không được vượt quá 255 ký tự',
+                                            },
+                                            {
+                                                required: true,
+                                                message: 'Vui lòng nhập email',
+                                            },
+                                        ]}
+                                    >
+                                        <Input placeholder="Nhập email" autoComplete="off" />
                                     </Form.Item>
                                 </Col>
 

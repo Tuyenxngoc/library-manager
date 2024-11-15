@@ -201,7 +201,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public CommonResponseDto forgetPassword(ForgetPasswordRequestDto requestDto) {
+    public CommonResponseDto adminForgetPassword(AdminForgetPasswordRequestDto requestDto) {
         User user = userRepository.findByUsernameAndEmail(requestDto.getUsername(), requestDto.getEmail())
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.User.ERR_NOT_FOUND_ACCOUNT));
 
@@ -228,7 +228,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public CommonResponseDto changePassword(ChangePasswordRequestDto requestDto, String username) {
+    public CommonResponseDto adminChangePassword(ChangePasswordRequestDto requestDto, String username) {
         if (!requestDto.getPassword().equals(requestDto.getRepeatPassword())) {
             throw new BadRequestException(ErrorMessage.INVALID_REPEAT_PASSWORD);
         }
@@ -247,6 +247,58 @@ public class AuthServiceImpl implements AuthService {
         Map<String, Object> properties = new HashMap<>();
         properties.put("currentTime", new Date());
         sendEmail(user.getEmail(), "Đổi mật khẩu thành công", properties, "changePassword.html");
+
+        String message = messageSource.getMessage(SuccessMessage.User.CHANGE_PASSWORD, null, LocaleContextHolder.getLocale());
+        return new CommonResponseDto(message);
+    }
+
+    @Override
+    public CommonResponseDto forgetPassword(ReaderForgetPasswordRequestDto requestDto) {
+        Reader reader = readerRepository.findByCardNumberAndEmail(requestDto.getCardNumber(), requestDto.getEmail())
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.User.ERR_NOT_FOUND_ACCOUNT));
+
+        // Kiểm tra giới hạn thời gian gửi email
+        if (emailRateLimiterService.isMailLimited(requestDto.getEmail())) {
+            String message = messageSource.getMessage(ErrorMessage.User.RATE_LIMIT, null, LocaleContextHolder.getLocale());
+            return new CommonResponseDto(message);
+        }
+
+        String newPassword = RandomPasswordUtil.random();
+
+        reader.setPassword(passwordEncoder.encode(newPassword));
+        readerRepository.save(reader);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("username", requestDto.getCardNumber());
+        properties.put("newPassword", newPassword);
+        sendEmail(reader.getEmail(), "Lấy lại mật khẩu", properties, "forgetPassword.html");
+
+        emailRateLimiterService.setMailLimit(requestDto.getEmail(), 1, TimeUnit.MINUTES);
+
+        String message = messageSource.getMessage(SuccessMessage.User.FORGET_PASSWORD, null, LocaleContextHolder.getLocale());
+        return new CommonResponseDto(message);
+    }
+
+    @Override
+    public CommonResponseDto changePassword(ChangePasswordRequestDto requestDto, String cardNumber) {
+        if (!requestDto.getPassword().equals(requestDto.getRepeatPassword())) {
+            throw new BadRequestException(ErrorMessage.INVALID_REPEAT_PASSWORD);
+        }
+
+        Reader reader = readerRepository.findByCardNumber(cardNumber)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.Reader.ERR_NOT_FOUND_CARD_NUMBER, cardNumber));
+
+        boolean isCorrectPassword = passwordEncoder.matches(requestDto.getOldPassword(), reader.getPassword());
+        if (!isCorrectPassword) {
+            throw new BadRequestException(ErrorMessage.Auth.ERR_INCORRECT_PASSWORD);
+        }
+
+        reader.setPassword(passwordEncoder.encode(requestDto.getPassword()));
+        readerRepository.save(reader);
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("currentTime", new Date());
+        sendEmail(reader.getEmail(), "Đổi mật khẩu thành công", properties, "changePassword.html");
 
         String message = messageSource.getMessage(SuccessMessage.User.CHANGE_PASSWORD, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message);

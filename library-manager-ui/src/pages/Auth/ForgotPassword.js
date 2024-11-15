@@ -4,8 +4,8 @@ import { Button, Input, message, Space } from 'antd';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 
-import { forgotPassword } from '~/services/authService';
 import { handleError } from '~/utils/errorHandler';
+import { readerForgotPassword } from '~/services/authService';
 
 const validationSchema = yup.object({
     cardNumber: yup.string().trim().required('Vui lòng nhập số thẻ'),
@@ -22,7 +22,7 @@ function ForgotPassword() {
 
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
-            const response = await forgotPassword(values);
+            const response = await readerForgotPassword(values);
             if (response.status === 200 && response?.data?.data?.message) {
                 messageApi.success(response.data.data.message);
             }

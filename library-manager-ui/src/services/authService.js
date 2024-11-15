@@ -1,21 +1,29 @@
-import axios, { axiosPrivate } from '~/apis/configHttp.js';
+import httpRequest, { axiosPrivate } from '~/apis/configHttp.js';
 
 export const readerLogin = (values) => {
-    return axios.post('auth/login', values);
+    return httpRequest.post('auth/login', values);
 };
 
-export const adminLogin = (values) => {
-    return axios.post('admin/auth/login', values);
+export const readerForgotPassword = (values) => {
+    return httpRequest.post('auth/forget-password', values);
+};
+
+export const readerChangePassword = (values) => {
+    return axiosPrivate.patch('auth/change-password', values);
 };
 
 export const logoutToken = () => {
     return axiosPrivate.post('auth/logout');
 };
 
-export const forgotPassword = (values) => {
-    return axios.post('auth/forgot-password', values);
+export const adminLogin = (values) => {
+    return httpRequest.post('admin/auth/login', values);
 };
 
-export const changePassword = (values) => {
-    return axiosPrivate.patch('auth/change-password', values);
+export const adminForgotPassword = (values) => {
+    return httpRequest.post('admin/auth/forget-password', values);
+};
+
+export const adminChangePassword = (values) => {
+    return axiosPrivate.patch('admin/auth/change-password', values);
 };

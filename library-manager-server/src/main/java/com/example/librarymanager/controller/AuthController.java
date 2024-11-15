@@ -57,9 +57,24 @@ public class AuthController {
         return VsResponseUtil.success(authService.refresh(tokenRefreshRequestDto));
     }
 
+    @Operation(summary = "API Admin forget password")
+    @PostMapping(UrlConstant.Auth.ADMIN_FORGET_PASSWORD)
+    public ResponseEntity<?> adminForgetPassword(@Valid @RequestBody AdminForgetPasswordRequestDto requestDto) {
+        return VsResponseUtil.success(authService.adminForgetPassword(requestDto));
+    }
+
+    @Operation(summary = "API Admin change password")
+    @PatchMapping(UrlConstant.Auth.ADMIN_CHANGE_PASSWORD)
+    public ResponseEntity<?> adminChangePassword(
+            @Valid @RequestBody ChangePasswordRequestDto requestDto,
+            @CurrentUser CustomUserDetails userDetails
+    ) {
+        return VsResponseUtil.success(authService.adminChangePassword(requestDto, userDetails.getUsername()));
+    }
+
     @Operation(summary = "API forget password")
     @PostMapping(UrlConstant.Auth.FORGET_PASSWORD)
-    public ResponseEntity<?> forgetPassword(@Valid @RequestBody ForgetPasswordRequestDto requestDto) {
+    public ResponseEntity<?> forgetPassword(@Valid @RequestBody ReaderForgetPasswordRequestDto requestDto) {
         return VsResponseUtil.success(authService.forgetPassword(requestDto));
     }
 
@@ -69,6 +84,6 @@ public class AuthController {
             @Valid @RequestBody ChangePasswordRequestDto requestDto,
             @CurrentUser CustomUserDetails userDetails
     ) {
-        return VsResponseUtil.success(authService.changePassword(requestDto, userDetails.getUsername()));
+        return VsResponseUtil.success(authService.changePassword(requestDto, userDetails.getCardNumber()));
     }
 }

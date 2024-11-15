@@ -6,9 +6,11 @@ import { useFormik } from 'formik';
 
 import { backgrounds } from '~/assets';
 import { handleError } from '~/utils/errorHandler';
-import { changePassword } from '~/services/authService';
+import { readerChangePassword } from '~/services/authService';
 import Breadcrumb from '~/components/Breadcrumb';
 import SectionHeader from '~/components/SectionHeader';
+import { useEffect, useState } from 'react';
+import { getReaderDetails } from '~/services/readerService';
 
 const { TextArea } = Input;
 
@@ -35,11 +37,23 @@ const validationSchema = yup.object({
 });
 
 function UserProfile() {
+    const [readerDetails, setReaderDetails] = useState({
+        cardNumber: '',
+        fullName: '',
+        email: '',
+        phoneNumber: '',
+        gender: '',
+        dateOfBirth: '',
+        address: '',
+        status: '',
+        createdDate: '',
+        expiryDate: '',
+    });
     const [messageApi, contextHolder] = message.useMessage();
 
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
-            let response = await changePassword(values);
+            let response = await readerChangePassword(values);
             messageApi.success(response.data.data.message);
         } catch (error) {
             handleError(error, formik, messageApi);
@@ -53,6 +67,20 @@ function UserProfile() {
         validationSchema: validationSchema,
         onSubmit: handleSubmit,
     });
+
+    useEffect(() => {
+        const fetchReaderDetails = async () => {
+            try {
+                const response = await getReaderDetails();
+                setReaderDetails(response.data.data);
+            } catch (error) {
+                messageApi.error('Không thể tải thông tin bạn đọc!');
+            }
+        };
+
+        fetchReaderDetails();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const items = [
         {
@@ -98,7 +126,12 @@ function UserProfile() {
                         <div className="col-md-6">
                             <div className="form-group mb-4">
                                 <label htmlFor="cardNumber">Số thẻ</label>
-                                <Input id="cardNumber" name="cardNumber" disabled />
+                                <Input
+                                    id="cardNumber"
+                                    name="cardNumber"
+                                    size="large"
+                                    value={readerDetails.cardNumber}
+                                />
                             </div>
 
                             <div className="form-group mb-4">
@@ -106,6 +139,7 @@ function UserProfile() {
                                 <Input.Password
                                     id="oldPassword"
                                     name="oldPassword"
+                                    size="large"
                                     status={formik.touched.oldPassword && formik.errors.oldPassword ? 'error' : ''}
                                     placeholder="Mật khẩu cũ"
                                     minLength="6"
@@ -123,6 +157,7 @@ function UserProfile() {
                                 <Input.Password
                                     id="password"
                                     name="password"
+                                    size="large"
                                     status={formik.touched.password && formik.errors.password ? 'error' : ''}
                                     placeholder="Mật khẩu mới"
                                     minLength="6"
@@ -140,6 +175,7 @@ function UserProfile() {
                                 <Input.Password
                                     id="repeatPassword"
                                     name="repeatPassword"
+                                    size="large"
                                     status={
                                         formik.touched.repeatPassword && formik.errors.repeatPassword ? 'error' : ''
                                     }
@@ -168,47 +204,76 @@ function UserProfile() {
                         <div className="col-md-6">
                             <div className="form-group mb-4">
                                 <label htmlFor="fullName">Họ tên</label>
-                                <Input id="fullName" name="fullName" disabled />
+                                <Input id="fullName" name="fullName" size="large" value={readerDetails.fullName} />
                             </div>
 
                             <div className="form-group mb-4">
                                 <label htmlFor="email">Email</label>
-                                <Input type="email" id="email" name="email" disabled autoComplete="off" />
+                                <Input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    size="large"
+                                    value={readerDetails.email}
+                                    autoComplete="off"
+                                />
                             </div>
 
                             <div className="form-group mb-4">
                                 <label htmlFor="phoneNumber">Số điện thoại</label>
-                                <Input type="tel" id="phoneNumber" name="phoneNumber" disabled />
+                                <Input
+                                    type="tel"
+                                    id="phoneNumber"
+                                    name="phoneNumber"
+                                    size="large"
+                                    value={readerDetails.phoneNumber}
+                                />
                             </div>
 
                             <div className="form-group mb-4">
                                 <label htmlFor="gender">Giới tính</label>
-                                <Input id="gender" name="gender" disabled />
+                                <Input id="gender" name="gender" size="large" value={readerDetails.gender} />
                             </div>
 
                             <div className="form-group mb-4">
                                 <label htmlFor="birthDate">Ngày sinh</label>
-                                <Input id="birthDate" name="birthDate" disabled />
+                                <Input id="birthDate" name="birthDate" size="large" value={readerDetails.dateOfBirth} />
                             </div>
 
                             <div className="form-group mb-4">
                                 <label htmlFor="address">Địa chỉ</label>
-                                <TextArea rows={4} id="address" name="address" disabled autoComplete="off" />
+                                <TextArea
+                                    rows={4}
+                                    id="address"
+                                    name="address"
+                                    value={readerDetails.address}
+                                    autoComplete="off"
+                                />
                             </div>
 
                             <div className="form-group mb-4">
                                 <label htmlFor="cardStatus">Trạng thái thẻ</label>
-                                <Input id="cardStatus" name="cardStatus" disabled />
+                                <Input id="cardStatus" name="cardStatus" size="large" value={readerDetails.status} />
                             </div>
 
                             <div className="form-group mb-4">
                                 <label htmlFor="cardRegistrationDate">Ngày đăng ký thẻ</label>
-                                <Input id="cardRegistrationDate" name="cardRegistrationDate" disabled />
+                                <Input
+                                    id="cardRegistrationDate"
+                                    name="cardRegistrationDate"
+                                    size="large"
+                                    value={readerDetails.createdDate}
+                                />
                             </div>
 
                             <div className="form-group mb-4">
                                 <label htmlFor="cardExpiryDate">Ngày hết hạn thẻ</label>
-                                <Input id="cardExpiryDate" name="cardExpiryDate" disabled />
+                                <Input
+                                    id="cardExpiryDate"
+                                    name="cardExpiryDate"
+                                    size="large"
+                                    value={readerDetails.expiryDate}
+                                />
                             </div>
 
                             <span>

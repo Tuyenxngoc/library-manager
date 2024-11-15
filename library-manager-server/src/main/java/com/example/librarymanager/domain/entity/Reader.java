@@ -20,7 +20,10 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "readers",
-        uniqueConstraints = @UniqueConstraint(name = "UN_READER_CARD_NUMBER", columnNames = "card_number"))
+        uniqueConstraints = {
+                @UniqueConstraint(name = "UN_READER_CARD_NUMBER", columnNames = "card_number"),
+                @UniqueConstraint(name = "UN_READER_EMAIL", columnNames = "email")
+        })
 public class Reader {
 
     @Id
@@ -35,7 +38,7 @@ public class Reader {
     @Column(name = "full_name", nullable = false, length = 100)
     private String fullName; // Họ tên
 
-    @Column(name = "date_of_birth", nullable = false)
+    @Column(name = "date_of_birth")
     private LocalDate dateOfBirth; // Ngày sinh
 
     @Enumerated(EnumType.STRING)
@@ -48,6 +51,9 @@ public class Reader {
     @Column(name = "address")
     private String address; // Địa chỉ
 
+    @Column(name = "email", nullable = false)
+    private String email;  // Địa chỉ email
+
     @Column(name = "phone_number", length = 15)
     private String phoneNumber; // Số điện thoại
 
@@ -56,6 +62,9 @@ public class Reader {
 
     @Column(name = "password", nullable = false)
     private String password; // Mật khẩu
+
+    @Column(name = "created_date", nullable = false)
+    private LocalDate createdDate;
 
     @Column(name = "expiry_date", nullable = false)
     private LocalDate expiryDate; // Ngày hết hạn

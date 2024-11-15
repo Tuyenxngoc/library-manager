@@ -98,4 +98,11 @@ public class ReaderController {
 
         return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
     }
+
+    @Operation(summary = "API Get Reader Details")
+    @PreAuthorize("hasRole('ROLE_READER')")
+    @GetMapping(UrlConstant.Reader.GET_DETAILS)
+    public ResponseEntity<?> getReaderDetails(@CurrentUser CustomUserDetails userDetails) {
+        return VsResponseUtil.success(readerService.getReaderDetailsByCardNumber(userDetails.getCardNumber()));
+    }
 }

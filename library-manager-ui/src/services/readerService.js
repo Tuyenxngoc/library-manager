@@ -59,3 +59,7 @@ export const printCards = (values) => {
         responseType: 'arraybuffer',
     });
 };
+
+export const getReaderDetails = (params) => {
+    return axiosPrivate.get('readers/details');
+};

@@ -92,6 +92,7 @@ public class ErrorMessage {
         public static final String ERR_NOT_FOUND_ID = "exception.reader.not.found.id";
         public static final String ERR_NOT_FOUND_CARD_NUMBER = "exception.reader.not.found.card.number";
         public static final String ERR_DUPLICATE_CARD_NUMBER = "exception.reader.duplicate.card.number";
+        public static final String ERR_DUPLICATE_EMAIL = "exception.reader.duplicate.email";
         public static final String ERR_READER_HAS_DATA = "exception.reader.has.data";
         public static final String ERR_READER_INACTIVE = "exception.reader.inactive";
         public static final String ERR_READER_SUSPENDED = "exception.reader.suspended";

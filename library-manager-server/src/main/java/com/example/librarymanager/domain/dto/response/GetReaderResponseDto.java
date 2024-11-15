@@ -25,6 +25,8 @@ public class GetReaderResponseDto {
 
     private final String address;
 
+    private String email;
+
     private final String phoneNumber;
 
     private final String cardNumber;
@@ -45,6 +47,7 @@ public class GetReaderResponseDto {
         this.gender = reader.getGender();
         this.avatar = reader.getAvatar();
         this.address = reader.getAddress();
+        this.email = reader.getEmail();
         this.phoneNumber = reader.getPhoneNumber();
         this.cardNumber = reader.getCardNumber();
         this.expiryDate = reader.getExpiryDate();

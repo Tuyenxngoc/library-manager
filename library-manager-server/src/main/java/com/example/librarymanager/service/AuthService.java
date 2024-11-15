@@ -18,7 +18,11 @@ public interface AuthService {
 
     TokenRefreshResponseDto refresh(TokenRefreshRequestDto request);
 
-    CommonResponseDto forgetPassword(ForgetPasswordRequestDto requestDto);
+    CommonResponseDto adminForgetPassword(AdminForgetPasswordRequestDto requestDto);
 
-    CommonResponseDto changePassword(ChangePasswordRequestDto requestDto, String username);
+    CommonResponseDto adminChangePassword(ChangePasswordRequestDto requestDto, String username);
+
+    CommonResponseDto forgetPassword(ReaderForgetPasswordRequestDto requestDto);
+
+    CommonResponseDto changePassword(ChangePasswordRequestDto requestDto, String cardNumber);
 }

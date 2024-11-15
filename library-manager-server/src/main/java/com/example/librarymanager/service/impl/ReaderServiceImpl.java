@@ -7,6 +7,7 @@ import com.example.librarymanager.domain.dto.pagination.PagingMeta;
 import com.example.librarymanager.domain.dto.request.CreateReaderCardsRequestDto;
 import com.example.librarymanager.domain.dto.request.ReaderRequestDto;
 import com.example.librarymanager.domain.dto.response.CommonResponseDto;
+import com.example.librarymanager.domain.dto.response.GetReaderDetailResponseDto;
 import com.example.librarymanager.domain.dto.response.GetReaderResponseDto;
 import com.example.librarymanager.domain.entity.Reader;
 import com.example.librarymanager.domain.mapper.ReaderMappper;
@@ -29,6 +30,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -91,9 +93,13 @@ public class ReaderServiceImpl implements ReaderService {
             throw new ConflictException(ErrorMessage.Reader.ERR_DUPLICATE_CARD_NUMBER, requestDto.getCardNumber());
         }
 
+        if (readerRepository.existsByEmail(requestDto.getEmail())) {
+            throw new ConflictException(ErrorMessage.Reader.ERR_DUPLICATE_EMAIL, requestDto.getEmail());
+        }
+
         Reader reader = readerMappper.toReader(requestDto);
         reader.setPassword(passwordEncoder.encode(requestDto.getPassword()));
-
+        reader.setCreatedDate(LocalDate.now());
         if (image != null && !image.isEmpty()) {
             String newImageUrl = uploadFileUtil.uploadFile(image);
             reader.setAvatar(newImageUrl);
@@ -126,6 +132,11 @@ public class ReaderServiceImpl implements ReaderService {
             throw new ConflictException(ErrorMessage.Reader.ERR_DUPLICATE_CARD_NUMBER, requestDto.getCardNumber());
         }
 
+        if (!Objects.equals(reader.getEmail(), requestDto.getEmail()) &&
+                readerRepository.existsByEmail(requestDto.getEmail())) {
+            throw new ConflictException(ErrorMessage.Reader.ERR_DUPLICATE_EMAIL, requestDto.getEmail());
+        }
+
         if (image != null && !image.isEmpty()) {
             String newImageUrl = uploadFileUtil.uploadFile(image);
 
@@ -139,6 +150,7 @@ public class ReaderServiceImpl implements ReaderService {
         reader.setDateOfBirth(requestDto.getDateOfBirth());
         reader.setGender(requestDto.getGender());
         reader.setAddress(requestDto.getAddress());
+        reader.setEmail(requestDto.getEmail());
         reader.setPhoneNumber(requestDto.getPhoneNumber());
         reader.setCardNumber(requestDto.getCardNumber());
         reader.setExpiryDate(requestDto.getExpiryDate());
@@ -214,6 +226,14 @@ public class ReaderServiceImpl implements ReaderService {
             throw new BadRequestException(ErrorMessage.Reader.ERR_NOT_FOUND_ID, 1);
         }
         return pdfService.createReaderCardPdf(requestDto, readers);
+    }
+
+    @Override
+    public GetReaderDetailResponseDto getReaderDetailsByCardNumber(String cardNumber) {
+        Reader reader = readerRepository.findByCardNumber(cardNumber)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.Reader.ERR_NOT_FOUND_CARD_NUMBER, cardNumber));
+
+        return new GetReaderDetailResponseDto(reader);
     }
 
 }
