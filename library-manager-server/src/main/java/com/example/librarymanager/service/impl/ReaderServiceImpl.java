@@ -1,14 +1,14 @@
 package com.example.librarymanager.service.impl;
 
 import com.example.librarymanager.constant.*;
+import com.example.librarymanager.domain.dto.common.CommonResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
 import com.example.librarymanager.domain.dto.request.CreateReaderCardsRequestDto;
 import com.example.librarymanager.domain.dto.request.ReaderRequestDto;
-import com.example.librarymanager.domain.dto.response.CommonResponseDto;
-import com.example.librarymanager.domain.dto.response.GetReaderDetailResponseDto;
-import com.example.librarymanager.domain.dto.response.GetReaderResponseDto;
+import com.example.librarymanager.domain.dto.response.reader.ReaderDetailResponseDto;
+import com.example.librarymanager.domain.dto.response.reader.ReaderResponseDto;
 import com.example.librarymanager.domain.entity.Reader;
 import com.example.librarymanager.domain.mapper.ReaderMappper;
 import com.example.librarymanager.domain.specification.EntitySpecification;
@@ -110,7 +110,7 @@ public class ReaderServiceImpl implements ReaderService {
         logService.createLog(TAG, EventConstants.ADD, "Thêm thẻ bạn đọc mới: " + reader.getCardNumber(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
-        return new CommonResponseDto(message, new GetReaderResponseDto(reader));
+        return new CommonResponseDto(message, new ReaderResponseDto(reader));
     }
 
     @Override
@@ -161,7 +161,7 @@ public class ReaderServiceImpl implements ReaderService {
         logService.createLog(TAG, EventConstants.EDIT, "Sửa thẻ bạn đọc: " + reader.getCardNumber(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
-        return new CommonResponseDto(message, new GetReaderResponseDto(reader));
+        return new CommonResponseDto(message, new ReaderResponseDto(reader));
     }
 
     @Override
@@ -187,20 +187,20 @@ public class ReaderServiceImpl implements ReaderService {
     }
 
     @Override
-    public PaginationResponseDto<GetReaderResponseDto> findAll(PaginationFullRequestDto requestDto) {
+    public PaginationResponseDto<ReaderResponseDto> findAll(PaginationFullRequestDto requestDto) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.READER);
 
         Page<Reader> page = readerRepository.findAll(
                 EntitySpecification.filterReaders(requestDto.getKeyword(), requestDto.getSearchBy()),
                 pageable);
 
-        List<GetReaderResponseDto> items = page.getContent().stream()
-                .map(GetReaderResponseDto::new)
+        List<ReaderResponseDto> items = page.getContent().stream()
+                .map(ReaderResponseDto::new)
                 .toList();
 
         PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.READER, page);
 
-        PaginationResponseDto<GetReaderResponseDto> responseDto = new PaginationResponseDto<>();
+        PaginationResponseDto<ReaderResponseDto> responseDto = new PaginationResponseDto<>();
         responseDto.setItems(items);
         responseDto.setMeta(pagingMeta);
 
@@ -208,15 +208,15 @@ public class ReaderServiceImpl implements ReaderService {
     }
 
     @Override
-    public GetReaderResponseDto findById(Long id) {
+    public ReaderResponseDto findById(Long id) {
         Reader reader = getEntity(id);
-        return new GetReaderResponseDto(reader);
+        return new ReaderResponseDto(reader);
     }
 
     @Override
-    public GetReaderResponseDto findByCardNumber(String cardNumber) {
+    public ReaderResponseDto findByCardNumber(String cardNumber) {
         Reader reader = getEntity(cardNumber);
-        return new GetReaderResponseDto(reader);
+        return new ReaderResponseDto(reader);
     }
 
     @Override
@@ -229,11 +229,11 @@ public class ReaderServiceImpl implements ReaderService {
     }
 
     @Override
-    public GetReaderDetailResponseDto getReaderDetailsByCardNumber(String cardNumber) {
+    public ReaderDetailResponseDto getReaderDetailsByCardNumber(String cardNumber) {
         Reader reader = readerRepository.findByCardNumber(cardNumber)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.Reader.ERR_NOT_FOUND_CARD_NUMBER, cardNumber));
 
-        return new GetReaderDetailResponseDto(reader);
+        return new ReaderDetailResponseDto(reader);
     }
 
 }

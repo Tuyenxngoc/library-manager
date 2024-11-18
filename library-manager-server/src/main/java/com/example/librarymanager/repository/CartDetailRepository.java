@@ -1,6 +1,6 @@
 package com.example.librarymanager.repository;
 
-import com.example.librarymanager.domain.dto.response.GetCartDetailResponseDto;
+import com.example.librarymanager.domain.dto.response.cart.CartDetailResponseDto;
 import com.example.librarymanager.domain.entity.Book;
 import com.example.librarymanager.domain.entity.Cart;
 import com.example.librarymanager.domain.entity.CartDetail;
@@ -19,10 +19,10 @@ import java.util.Set;
 @Repository
 public interface CartDetailRepository extends JpaRepository<CartDetail, Long>, JpaSpecificationExecutor<Cart> {
 
-    @Query("SELECT new com.example.librarymanager.domain.dto.response.GetCartDetailResponseDto(cd) " +
+    @Query("SELECT new com.example.librarymanager.domain.dto.response.cart.CartDetailResponseDto(cd) " +
             "FROM CartDetail cd INNER JOIN Cart c ON cd.cart.id = c.id " +
             "WHERE c.id = :cartId")
-    List<GetCartDetailResponseDto> getAllByCartId(@Param("cartId") Long cartId);
+    List<CartDetailResponseDto> getAllByCartId(@Param("cartId") Long cartId);
 
     @Modifying
     @Transactional

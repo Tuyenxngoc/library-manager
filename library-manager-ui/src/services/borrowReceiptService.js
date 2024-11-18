@@ -27,3 +27,7 @@ export const getBorrowReceipts = (params) => {
 export const getBorrowReceiptsForReader = (params) => {
     return axiosPrivate.get(`borrow-receipts?${params}`);
 };
+
+export const getBorrowReceiptDetails = (id) => {
+    return axiosPrivate.get(`admin/borrow-receipts/details/${id}`);
+};

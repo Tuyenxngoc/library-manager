@@ -4,12 +4,12 @@ import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.EventConstants;
 import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.constant.SuccessMessage;
+import com.example.librarymanager.domain.dto.common.CommonResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
 import com.example.librarymanager.domain.dto.request.NewsArticleRequestDto;
-import com.example.librarymanager.domain.dto.response.CommonResponseDto;
-import com.example.librarymanager.domain.dto.response.GetNewsArticleResponseDto;
+import com.example.librarymanager.domain.dto.response.NewsArticleResponseDto;
 import com.example.librarymanager.domain.entity.NewsArticle;
 import com.example.librarymanager.domain.mapper.NewsArticleMapper;
 import com.example.librarymanager.domain.specification.EntitySpecification;
@@ -151,20 +151,20 @@ public class NewsArticleServiceImpl implements NewsArticleService {
     }
 
     @Override
-    public PaginationResponseDto<GetNewsArticleResponseDto> getNewsArticles(PaginationFullRequestDto requestDto) {
+    public PaginationResponseDto<NewsArticleResponseDto> getNewsArticles(PaginationFullRequestDto requestDto) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.NEWS_ARTICLE);
 
         Page<NewsArticle> page = newsArticleRepository.findAll(
                 EntitySpecification.filterNewsArticles(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag()),
                 pageable);
 
-        List<GetNewsArticleResponseDto> items = page.getContent().stream()
-                .map(GetNewsArticleResponseDto::new)
+        List<NewsArticleResponseDto> items = page.getContent().stream()
+                .map(NewsArticleResponseDto::new)
                 .toList();
 
         PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.NEWS_ARTICLE, page);
 
-        PaginationResponseDto<GetNewsArticleResponseDto> responseDto = new PaginationResponseDto<>();
+        PaginationResponseDto<NewsArticleResponseDto> responseDto = new PaginationResponseDto<>();
         responseDto.setItems(items);
         responseDto.setMeta(pagingMeta);
 

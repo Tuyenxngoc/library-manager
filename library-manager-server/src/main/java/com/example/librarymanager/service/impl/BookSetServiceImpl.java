@@ -4,12 +4,12 @@ import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.EventConstants;
 import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.constant.SuccessMessage;
+import com.example.librarymanager.domain.dto.common.CommonResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
 import com.example.librarymanager.domain.dto.request.BookSetRequestDto;
-import com.example.librarymanager.domain.dto.response.CommonResponseDto;
-import com.example.librarymanager.domain.dto.response.GetBookSetResponseDto;
+import com.example.librarymanager.domain.dto.response.bookset.BookSetResponseDto;
 import com.example.librarymanager.domain.entity.BookSet;
 import com.example.librarymanager.domain.mapper.BookSetMapper;
 import com.example.librarymanager.domain.specification.EntitySpecification;
@@ -88,7 +88,7 @@ public class BookSetServiceImpl implements BookSetService {
         logService.createLog(TAG, EventConstants.ADD, "Tạo bộ sách mới: " + bookSet.getName(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
-        return new CommonResponseDto(message, new GetBookSetResponseDto(bookSet));
+        return new CommonResponseDto(message, new BookSetResponseDto(bookSet));
     }
 
     @Override
@@ -106,7 +106,7 @@ public class BookSetServiceImpl implements BookSetService {
         logService.createLog(TAG, EventConstants.EDIT, "Cập nhật bộ sách id: " + bookSet.getId() + ", tên mới: " + bookSet.getName(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
-        return new CommonResponseDto(message, new GetBookSetResponseDto(bookSet));
+        return new CommonResponseDto(message, new BookSetResponseDto(bookSet));
     }
 
     @Override
@@ -126,20 +126,20 @@ public class BookSetServiceImpl implements BookSetService {
     }
 
     @Override
-    public PaginationResponseDto<GetBookSetResponseDto> findAll(PaginationFullRequestDto requestDto) {
+    public PaginationResponseDto<BookSetResponseDto> findAll(PaginationFullRequestDto requestDto) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BOOK_SET);
 
         Page<BookSet> page = bookSetRepository.findAll(
                 EntitySpecification.filterBookSets(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag()),
                 pageable);
 
-        List<GetBookSetResponseDto> items = page.getContent().stream()
-                .map(GetBookSetResponseDto::new)
+        List<BookSetResponseDto> items = page.getContent().stream()
+                .map(BookSetResponseDto::new)
                 .toList();
 
         PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.BOOK_SET, page);
 
-        PaginationResponseDto<GetBookSetResponseDto> responseDto = new PaginationResponseDto<>();
+        PaginationResponseDto<BookSetResponseDto> responseDto = new PaginationResponseDto<>();
         responseDto.setItems(items);
         responseDto.setMeta(pagingMeta);
 

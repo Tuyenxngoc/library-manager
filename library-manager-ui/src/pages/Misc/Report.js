@@ -63,7 +63,7 @@ function Report() {
                         </div>
 
                         <div className="col-12">
-                            <TextArea name="content" rows={8} placeholder="Nhập thông tin phản hồi" />
+                            <TextArea name="content" size="large" rows={8} placeholder="Nhập thông tin phản hồi" />
                         </div>
 
                         <div className="col-12">

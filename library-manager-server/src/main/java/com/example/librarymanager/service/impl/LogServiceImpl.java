@@ -5,7 +5,7 @@ import com.example.librarymanager.domain.dto.filter.LogFilter;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
-import com.example.librarymanager.domain.dto.response.GetLogResponseDto;
+import com.example.librarymanager.domain.dto.response.LogResponseDto;
 import com.example.librarymanager.domain.entity.Log;
 import com.example.librarymanager.domain.entity.User;
 import com.example.librarymanager.domain.specification.EntitySpecification;
@@ -29,20 +29,20 @@ public class LogServiceImpl implements LogService {
     private final LogRepository logRepository;
 
     @Override
-    public PaginationResponseDto<GetLogResponseDto> findAll(PaginationFullRequestDto requestDto, LogFilter logFilter) {
+    public PaginationResponseDto<LogResponseDto> findAll(PaginationFullRequestDto requestDto, LogFilter logFilter) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.LOG);
 
         Page<Log> page = logRepository.findAll(
                 EntitySpecification.filterLogs(requestDto.getKeyword(), requestDto.getSearchBy(), logFilter),
                 pageable);
 
-        List<GetLogResponseDto> items = page.getContent().stream()
-                .map(GetLogResponseDto::new)
+        List<LogResponseDto> items = page.getContent().stream()
+                .map(LogResponseDto::new)
                 .toList();
 
         PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.LOG, page);
 
-        PaginationResponseDto<GetLogResponseDto> responseDto = new PaginationResponseDto<>();
+        PaginationResponseDto<LogResponseDto> responseDto = new PaginationResponseDto<>();
         responseDto.setItems(items);
         responseDto.setMeta(pagingMeta);
 

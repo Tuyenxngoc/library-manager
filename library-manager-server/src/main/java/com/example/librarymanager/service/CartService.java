@@ -1,16 +1,16 @@
 package com.example.librarymanager.service;
 
+import com.example.librarymanager.domain.dto.common.CommonResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
-import com.example.librarymanager.domain.dto.response.BorrowRequestSummaryResponseDto;
-import com.example.librarymanager.domain.dto.response.CommonResponseDto;
-import com.example.librarymanager.domain.dto.response.GetCartDetailResponseDto;
+import com.example.librarymanager.domain.dto.response.borrowreceipt.BorrowRequestSummaryResponseDto;
+import com.example.librarymanager.domain.dto.response.cart.CartDetailResponseDto;
 
 import java.util.List;
 
 public interface CartService {
 
-    List<GetCartDetailResponseDto> getCartDetails(String cardNumber);
+    List<CartDetailResponseDto> getCartDetails(String cardNumber);
 
     CommonResponseDto addToCart(String cardNumber, Long bookId);
 

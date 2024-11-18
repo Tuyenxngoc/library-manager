@@ -15,18 +15,24 @@ import classNames from 'classnames/bind';
 import styles from '~/styles/Home.module.scss';
 import PostList from '~/components/PostList';
 import { getLibraryInfo } from '~/services/statisticsService';
+import { useNavigate } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
 const formatter = (value) => <CountUp end={value} duration={10} separator="," />;
 
 function Home() {
+    const navigate = useNavigate();
     const [libraryStats, setLibraryStats] = useState(null);
 
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState(null);
 
     const [messageApi, contextHolder] = message.useMessage();
+
+    const handleCreateReport = () => {
+        navigate('/report');
+    };
 
     useEffect(() => {
         const fetchEntities = async () => {
@@ -89,7 +95,9 @@ function Home() {
                 <div className="container py-5">
                     <div className="row justify-content-center">
                         <div className="col-auto py-5">
-                            <Button type="primary">Gửi nhận xét của bạn</Button>
+                            <Button type="primary" onClick={handleCreateReport}>
+                                Gửi nhận xét của bạn
+                            </Button>
                         </div>
                     </div>
                 </div>

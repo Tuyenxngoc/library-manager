@@ -12,6 +12,7 @@ import styles from '~/styles/AdminLogin.module.scss';
 import useAuth from '~/hooks/useAuth';
 import { adminLogin } from '~/services/authService';
 import { handleError } from '~/utils/errorHandler';
+import images from '~/assets';
 
 const cx = classNames.bind(styles);
 
@@ -71,11 +72,7 @@ function AdminLogin() {
                     <div className={cx('login-panel')}>
                         <div className={cx('panel-heading')}>
                             <h3 className="panel-title text-center mb-0">
-                                <img
-                                    src="https://media.licdn.com/dms/image/v2/C560BAQE6t6jYd0fJpA/company-logo_100_100/company-logo_100_100/0/1631316008209?e=2147483647&v=beta&t=9O8BlvyaqqdaT-z51Kn1etrOerKtptsERA90Q1aSENU"
-                                    alt=""
-                                    style={{ height: 40 }}
-                                />
+                                <img src={images.logo} alt="logo" style={{ height: 40 }} />
                             </h3>
                         </div>
 

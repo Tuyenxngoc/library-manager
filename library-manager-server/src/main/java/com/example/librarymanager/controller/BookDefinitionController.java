@@ -5,7 +5,7 @@ import com.example.librarymanager.annotation.RestApiV1;
 import com.example.librarymanager.base.VsResponseUtil;
 import com.example.librarymanager.constant.UrlConstant;
 import com.example.librarymanager.domain.dto.filter.BookDefinitionFilter;
-import com.example.librarymanager.domain.dto.filter.Filter;
+import com.example.librarymanager.domain.dto.filter.QueryFilter;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationSortRequestDto;
 import com.example.librarymanager.domain.dto.request.BookDefinitionRequestDto;
@@ -122,10 +122,10 @@ public class BookDefinitionController {
     @Operation(summary = "API Advanced Search Book Definitions")
     @PostMapping(value = UrlConstant.BookDefinition.ADVANCED_SEARCH, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> advancedSearchBooks(
-            @RequestBody List<Filter> filters,
+            @RequestBody List<QueryFilter> queryFilters,
             @ParameterObject PaginationSortRequestDto requestDto
     ) {
-        return VsResponseUtil.success(bookDefinitionService.advancedSearchBooks(filters, requestDto));
+        return VsResponseUtil.success(bookDefinitionService.advancedSearchBooks(queryFilters, requestDto));
     }
 
     @Operation(summary = "API Search Book Definitions")

@@ -1,7 +1,7 @@
 package com.example.librarymanager.service;
 
+import com.example.librarymanager.domain.dto.common.CommonResponseDto;
 import com.example.librarymanager.domain.dto.request.auth.*;
-import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.dto.response.auth.LoginResponseDto;
 import com.example.librarymanager.domain.dto.response.auth.TokenRefreshResponseDto;
 import jakarta.servlet.http.HttpServletRequest;

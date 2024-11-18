@@ -2,9 +2,9 @@ package com.example.librarymanager.service.impl;
 
 import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.SuccessMessage;
+import com.example.librarymanager.domain.dto.common.CommonResponseDto;
 import com.example.librarymanager.domain.dto.common.DataMailDto;
 import com.example.librarymanager.domain.dto.request.auth.*;
-import com.example.librarymanager.domain.dto.response.CommonResponseDto;
 import com.example.librarymanager.domain.dto.response.auth.LoginResponseDto;
 import com.example.librarymanager.domain.dto.response.auth.TokenRefreshResponseDto;
 import com.example.librarymanager.domain.entity.Reader;

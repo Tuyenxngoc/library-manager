@@ -1,10 +1,10 @@
 package com.example.librarymanager.service;
 
+import com.example.librarymanager.domain.dto.common.CommonResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.request.ReaderViolationRequestDto;
-import com.example.librarymanager.domain.dto.response.CommonResponseDto;
-import com.example.librarymanager.domain.dto.response.GetReaderViolationResponseDto;
+import com.example.librarymanager.domain.dto.response.reader.ReaderViolationResponseDto;
 
 public interface ReaderViolationService {
     CommonResponseDto save(ReaderViolationRequestDto requestDto, String userId);
@@ -13,7 +13,7 @@ public interface ReaderViolationService {
 
     CommonResponseDto delete(Long id, String userId);
 
-    PaginationResponseDto<GetReaderViolationResponseDto> findAll(PaginationFullRequestDto requestDto);
+    PaginationResponseDto<ReaderViolationResponseDto> findAll(PaginationFullRequestDto requestDto);
 
-    GetReaderViolationResponseDto findById(Long id);
+    ReaderViolationResponseDto findById(Long id);
 }

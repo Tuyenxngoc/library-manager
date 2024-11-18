@@ -3,13 +3,13 @@ package com.example.librarymanager.service.impl;
 import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.constant.SuccessMessage;
+import com.example.librarymanager.domain.dto.common.CommonResponseDto;
 import com.example.librarymanager.domain.dto.filter.LibraryVisitFilter;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
 import com.example.librarymanager.domain.dto.request.LibraryVisitRequestDto;
-import com.example.librarymanager.domain.dto.response.CommonResponseDto;
-import com.example.librarymanager.domain.dto.response.GetLibraryVisitResponseDto;
+import com.example.librarymanager.domain.dto.response.LibraryVisitResponseDto;
 import com.example.librarymanager.domain.entity.LibraryVisit;
 import com.example.librarymanager.domain.entity.Reader;
 import com.example.librarymanager.domain.specification.EntitySpecification;
@@ -69,7 +69,7 @@ public class LibraryVisitServiceImpl implements LibraryVisitService {
             libraryVisitRepository.save(lastVisit);
 
             String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
-            return new CommonResponseDto(message, new GetLibraryVisitResponseDto(lastVisit));
+            return new CommonResponseDto(message, new LibraryVisitResponseDto(lastVisit));
         } else {
             // Nếu đã có lượt truy cập và thời gian thoát, tạo mới
             LibraryVisit newVisit = new LibraryVisit();
@@ -78,7 +78,7 @@ public class LibraryVisitServiceImpl implements LibraryVisitService {
             libraryVisitRepository.save(newVisit);
 
             String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
-            return new CommonResponseDto(message, new GetLibraryVisitResponseDto(newVisit));
+            return new CommonResponseDto(message, new LibraryVisitResponseDto(newVisit));
         }
     }
 
@@ -88,20 +88,20 @@ public class LibraryVisitServiceImpl implements LibraryVisitService {
     }
 
     @Override
-    public PaginationResponseDto<GetLibraryVisitResponseDto> findAll(PaginationFullRequestDto requestDto, LibraryVisitFilter filter) {
+    public PaginationResponseDto<LibraryVisitResponseDto> findAll(PaginationFullRequestDto requestDto, LibraryVisitFilter filter) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.LIBRARY_VISIT);
 
         Page<LibraryVisit> page = libraryVisitRepository.findAll(
                 EntitySpecification.filterLibraryVisits(requestDto.getKeyword(), requestDto.getSearchBy(), filter),
                 pageable);
 
-        List<GetLibraryVisitResponseDto> items = page.getContent().stream()
-                .map(GetLibraryVisitResponseDto::new)
+        List<LibraryVisitResponseDto> items = page.getContent().stream()
+                .map(LibraryVisitResponseDto::new)
                 .toList();
 
         PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.LIBRARY_VISIT, page);
 
-        PaginationResponseDto<GetLibraryVisitResponseDto> responseDto = new PaginationResponseDto<>();
+        PaginationResponseDto<LibraryVisitResponseDto> responseDto = new PaginationResponseDto<>();
         responseDto.setItems(items);
         responseDto.setMeta(pagingMeta);
 
@@ -109,7 +109,7 @@ public class LibraryVisitServiceImpl implements LibraryVisitService {
     }
 
     @Override
-    public GetLibraryVisitResponseDto findById(Long id) {
+    public LibraryVisitResponseDto findById(Long id) {
         return null;
     }
 

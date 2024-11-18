@@ -4,12 +4,12 @@ import com.example.librarymanager.constant.CardStatus;
 import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.EventConstants;
 import com.example.librarymanager.constant.SortByDataConstant;
+import com.example.librarymanager.domain.dto.common.CommonResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
 import com.example.librarymanager.domain.dto.request.ReaderViolationRequestDto;
-import com.example.librarymanager.domain.dto.response.CommonResponseDto;
-import com.example.librarymanager.domain.dto.response.GetReaderViolationResponseDto;
+import com.example.librarymanager.domain.dto.response.reader.ReaderViolationResponseDto;
 import com.example.librarymanager.domain.entity.Reader;
 import com.example.librarymanager.domain.entity.ReaderViolation;
 import com.example.librarymanager.domain.mapper.ReaderViolationMapper;
@@ -54,7 +54,7 @@ public class ReaderViolationServiceImpl implements ReaderViolationService {
 
         logService.createLog(TAG, EventConstants.ADD, "Tạo vi phạm mới cho bạn đọc: " + violation.getViolationDetails(), userId);
 
-        return new CommonResponseDto("Vi phạm đã được thêm thành công.", new GetReaderViolationResponseDto(violation));
+        return new CommonResponseDto("Vi phạm đã được thêm thành công.", new ReaderViolationResponseDto(violation));
     }
 
     private void getReader(ReaderViolationRequestDto requestDto, ReaderViolation violation) {
@@ -88,7 +88,7 @@ public class ReaderViolationServiceImpl implements ReaderViolationService {
 
         logService.createLog(TAG, EventConstants.EDIT, "Cập nhật vi phạm id: " + violation.getId(), userId);
 
-        return new CommonResponseDto("Vi phạm đã được cập nhật thành công.", new GetReaderViolationResponseDto(violation));
+        return new CommonResponseDto("Vi phạm đã được cập nhật thành công.", new ReaderViolationResponseDto(violation));
     }
 
     @Override
@@ -103,20 +103,20 @@ public class ReaderViolationServiceImpl implements ReaderViolationService {
     }
 
     @Override
-    public PaginationResponseDto<GetReaderViolationResponseDto> findAll(PaginationFullRequestDto requestDto) {
+    public PaginationResponseDto<ReaderViolationResponseDto> findAll(PaginationFullRequestDto requestDto) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.READER_VIOLATION);
 
         Page<ReaderViolation> page = readerViolationRepository.findAll(
                 EntitySpecification.filterReaderViolations(requestDto.getKeyword(), requestDto.getSearchBy()),
                 pageable);
 
-        List<GetReaderViolationResponseDto> items = page.getContent().stream()
-                .map(GetReaderViolationResponseDto::new)
+        List<ReaderViolationResponseDto> items = page.getContent().stream()
+                .map(ReaderViolationResponseDto::new)
                 .toList();
 
         PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.READER_VIOLATION, page);
 
-        PaginationResponseDto<GetReaderViolationResponseDto> responseDto = new PaginationResponseDto<>();
+        PaginationResponseDto<ReaderViolationResponseDto> responseDto = new PaginationResponseDto<>();
         responseDto.setItems(items);
         responseDto.setMeta(pagingMeta);
 
@@ -124,8 +124,8 @@ public class ReaderViolationServiceImpl implements ReaderViolationService {
     }
 
     @Override
-    public GetReaderViolationResponseDto findById(Long id) {
+    public ReaderViolationResponseDto findById(Long id) {
         ReaderViolation readerViolation = getEntity(id);
-        return new GetReaderViolationResponseDto(readerViolation);
+        return new ReaderViolationResponseDto(readerViolation);
     }
 }

@@ -1,14 +1,15 @@
 package com.example.librarymanager.service.impl;
 
 import com.example.librarymanager.constant.*;
+import com.example.librarymanager.domain.dto.common.CommonResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
 import com.example.librarymanager.domain.dto.request.BorrowReceiptRequestDto;
-import com.example.librarymanager.domain.dto.response.CommonResponseDto;
-import com.example.librarymanager.domain.dto.response.GetBorrowReceiptDetailResponseDto;
-import com.example.librarymanager.domain.dto.response.GetBorrowReceiptForReaderResponseDto;
-import com.example.librarymanager.domain.dto.response.GetBorrowReceiptResponseDto;
+import com.example.librarymanager.domain.dto.response.borrowreceipt.BorrowReceiptDetailResponseDto;
+import com.example.librarymanager.domain.dto.response.borrowreceipt.BorrowReceiptDetailsDto;
+import com.example.librarymanager.domain.dto.response.borrowreceipt.BorrowReceiptForReaderResponseDto;
+import com.example.librarymanager.domain.dto.response.borrowreceipt.BorrowReceiptResponseDto;
 import com.example.librarymanager.domain.entity.*;
 import com.example.librarymanager.domain.mapper.BorrowReceiptMapper;
 import com.example.librarymanager.domain.specification.EntitySpecification;
@@ -215,20 +216,20 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
     }
 
     @Override
-    public PaginationResponseDto<GetBorrowReceiptResponseDto> findAll(PaginationFullRequestDto requestDto) {
+    public PaginationResponseDto<BorrowReceiptResponseDto> findAll(PaginationFullRequestDto requestDto) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BORROW_RECEIPT);
 
         Page<BorrowReceipt> page = borrowReceiptRepository.findAll(
                 EntitySpecification.filterBorrowReceipts(requestDto.getKeyword(), requestDto.getSearchBy()),
                 pageable);
 
-        List<GetBorrowReceiptResponseDto> items = page.getContent().stream()
-                .map(GetBorrowReceiptResponseDto::new)
+        List<BorrowReceiptResponseDto> items = page.getContent().stream()
+                .map(BorrowReceiptResponseDto::new)
                 .toList();
 
         PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.BORROW_RECEIPT, page);
 
-        PaginationResponseDto<GetBorrowReceiptResponseDto> responseDto = new PaginationResponseDto<>();
+        PaginationResponseDto<BorrowReceiptResponseDto> responseDto = new PaginationResponseDto<>();
         responseDto.setItems(items);
         responseDto.setMeta(pagingMeta);
 
@@ -236,17 +237,17 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
     }
 
     @Override
-    public GetBorrowReceiptDetailResponseDto findById(Long id) {
+    public BorrowReceiptDetailResponseDto findById(Long id) {
         BorrowReceipt borrowReceipt = getEntity(id);
-        return new GetBorrowReceiptDetailResponseDto(borrowReceipt);
+        return new BorrowReceiptDetailResponseDto(borrowReceipt);
     }
 
     @Override
-    public GetBorrowReceiptDetailResponseDto findByCartId(Long id) {
+    public BorrowReceiptDetailResponseDto findByCartId(Long id) {
         Cart cart = cartRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.Cart.ERR_NOT_FOUND_ID, id));
 
-        GetBorrowReceiptDetailResponseDto responseDto = new GetBorrowReceiptDetailResponseDto();
+        BorrowReceiptDetailResponseDto responseDto = new BorrowReceiptDetailResponseDto();
         responseDto.setReaderId(cart.getReader().getId());
 
         LocalDateTime now = LocalDateTime.now();
@@ -260,24 +261,31 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
     }
 
     @Override
-    public PaginationResponseDto<GetBorrowReceiptForReaderResponseDto> findByCardNumber(String cardNumber, PaginationFullRequestDto requestDto) {
+    public PaginationResponseDto<BorrowReceiptForReaderResponseDto> findByCardNumber(String cardNumber, PaginationFullRequestDto requestDto) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BORROW_RECEIPT);
 
         Specification<BorrowReceipt> spec = EntitySpecification.filterBorrowReceiptsByReader(cardNumber)
                 .and(EntitySpecification.filterBorrowReceipts(requestDto.getKeyword(), requestDto.getSearchBy()));
         Page<BorrowReceipt> page = borrowReceiptRepository.findAll(spec, pageable);
 
-        List<GetBorrowReceiptForReaderResponseDto> items = page.getContent().stream()
-                .map(GetBorrowReceiptForReaderResponseDto::new)
+        List<BorrowReceiptForReaderResponseDto> items = page.getContent().stream()
+                .map(BorrowReceiptForReaderResponseDto::new)
                 .toList();
 
         PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.BORROW_RECEIPT, page);
 
-        PaginationResponseDto<GetBorrowReceiptForReaderResponseDto> responseDto = new PaginationResponseDto<>();
+        PaginationResponseDto<BorrowReceiptForReaderResponseDto> responseDto = new PaginationResponseDto<>();
         responseDto.setItems(items);
         responseDto.setMeta(pagingMeta);
 
         return responseDto;
+    }
+
+    @Override
+    public BorrowReceiptDetailsDto findDetailsById(Long id) {
+        BorrowReceipt borrowReceipt = getEntity(id);
+
+        return new BorrowReceiptDetailsDto(borrowReceipt);
     }
 
 }

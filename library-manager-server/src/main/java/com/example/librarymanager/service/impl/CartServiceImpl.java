@@ -3,12 +3,12 @@ package com.example.librarymanager.service.impl;
 import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.constant.SuccessMessage;
+import com.example.librarymanager.domain.dto.common.CommonResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
-import com.example.librarymanager.domain.dto.response.BorrowRequestSummaryResponseDto;
-import com.example.librarymanager.domain.dto.response.CommonResponseDto;
-import com.example.librarymanager.domain.dto.response.GetCartDetailResponseDto;
+import com.example.librarymanager.domain.dto.response.borrowreceipt.BorrowRequestSummaryResponseDto;
+import com.example.librarymanager.domain.dto.response.cart.CartDetailResponseDto;
 import com.example.librarymanager.domain.entity.*;
 import com.example.librarymanager.domain.specification.EntitySpecification;
 import com.example.librarymanager.exception.BadRequestException;
@@ -62,7 +62,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public List<GetCartDetailResponseDto> getCartDetails(String cardNumber) {
+    public List<CartDetailResponseDto> getCartDetails(String cardNumber) {
         Cart cart = getEntity(cardNumber);
         return cartDetailRepository.getAllByCartId(cart.getId());
     }

@@ -2,13 +2,13 @@ package com.example.librarymanager.service.impl;
 
 import com.example.librarymanager.config.properties.AdminInfo;
 import com.example.librarymanager.constant.*;
+import com.example.librarymanager.domain.dto.common.CommonResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
 import com.example.librarymanager.domain.dto.request.UserRequestDto;
-import com.example.librarymanager.domain.dto.response.CommonResponseDto;
-import com.example.librarymanager.domain.dto.response.GetUserResponseDto;
-import com.example.librarymanager.domain.dto.response.auth.GetCurrentUserLoginResponseDto;
+import com.example.librarymanager.domain.dto.response.UserResponseDto;
+import com.example.librarymanager.domain.dto.response.auth.CurrentUserLoginResponseDto;
 import com.example.librarymanager.domain.entity.Reader;
 import com.example.librarymanager.domain.entity.User;
 import com.example.librarymanager.domain.entity.UserGroup;
@@ -88,17 +88,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public GetCurrentUserLoginResponseDto getCurrentUser(CustomUserDetails userDetails) {
+    public CurrentUserLoginResponseDto getCurrentUser(CustomUserDetails userDetails) {
         if (userDetails.getUserId() != null) {
             User user = userRepository.findById(userDetails.getUserId())
                     .orElseThrow(() -> new NotFoundException(ErrorMessage.User.ERR_NOT_FOUND_ID, userDetails.getUserId()));
 
-            return GetCurrentUserLoginResponseDto.create(user);
+            return CurrentUserLoginResponseDto.create(user);
         } else if (userDetails.getCardNumber() != null) {
             Reader reader = readerRepository.findByCardNumber(userDetails.getCardNumber())
                     .orElseThrow(() -> new NotFoundException(ErrorMessage.Reader.ERR_NOT_FOUND_CARD_NUMBER, userDetails.getCardNumber()));
 
-            return GetCurrentUserLoginResponseDto.create(reader);
+            return CurrentUserLoginResponseDto.create(reader);
         }
         return null;
     }
@@ -127,7 +127,7 @@ public class UserServiceImpl implements UserService {
         logService.createLog(TAG, EventConstants.ADD, "Tạo người dùng mới: " + user.getUsername(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
-        return new CommonResponseDto(message, new GetUserResponseDto(user));
+        return new CommonResponseDto(message, new UserResponseDto(user));
     }
 
     @Override
@@ -169,7 +169,7 @@ public class UserServiceImpl implements UserService {
         logService.createLog(TAG, EventConstants.EDIT, "Cập nhật người dùng id: " + user.getId() + ", tên mới: " + user.getUsername(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
-        return new CommonResponseDto(message, new GetUserResponseDto(user));
+        return new CommonResponseDto(message, new UserResponseDto(user));
     }
 
     @Override
@@ -195,20 +195,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PaginationResponseDto<GetUserResponseDto> findAll(PaginationFullRequestDto requestDto) {
+    public PaginationResponseDto<UserResponseDto> findAll(PaginationFullRequestDto requestDto) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.USER);
 
         Page<User> page = userRepository.findAll(
                 EntitySpecification.filterUsers(requestDto.getKeyword(), requestDto.getSearchBy()),
                 pageable);
 
-        List<GetUserResponseDto> items = page.getContent().stream()
-                .map(GetUserResponseDto::new)
+        List<UserResponseDto> items = page.getContent().stream()
+                .map(UserResponseDto::new)
                 .collect(Collectors.toList());
 
         PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.USER, page);
 
-        PaginationResponseDto<GetUserResponseDto> responseDto = new PaginationResponseDto<>();
+        PaginationResponseDto<UserResponseDto> responseDto = new PaginationResponseDto<>();
         responseDto.setItems(items);
         responseDto.setMeta(pagingMeta);
 
@@ -216,8 +216,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public GetUserResponseDto findById(String id) {
+    public UserResponseDto findById(String id) {
         User user = getEntity(id);
-        return new GetUserResponseDto(user);
+        return new UserResponseDto(user);
     }
 }

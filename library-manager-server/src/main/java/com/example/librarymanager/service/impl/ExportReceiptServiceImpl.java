@@ -4,12 +4,12 @@ import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.EventConstants;
 import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.constant.SuccessMessage;
+import com.example.librarymanager.domain.dto.common.CommonResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
 import com.example.librarymanager.domain.dto.request.ExportReceiptRequestDto;
-import com.example.librarymanager.domain.dto.response.CommonResponseDto;
-import com.example.librarymanager.domain.dto.response.GetExportReceiptResponseDto;
+import com.example.librarymanager.domain.dto.response.ExportReceiptResponseDto;
 import com.example.librarymanager.domain.entity.Book;
 import com.example.librarymanager.domain.entity.ExportReceipt;
 import com.example.librarymanager.domain.mapper.ExportReceiptMapper;
@@ -169,20 +169,20 @@ public class ExportReceiptServiceImpl implements ExportReceiptService {
     }
 
     @Override
-    public PaginationResponseDto<GetExportReceiptResponseDto> findAll(PaginationFullRequestDto requestDto) {
+    public PaginationResponseDto<ExportReceiptResponseDto> findAll(PaginationFullRequestDto requestDto) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.EXPORT_RECEIPT);
 
         Page<ExportReceipt> page = exportReceiptRepository.findAll(
                 EntitySpecification.filterExportReceipts(requestDto.getKeyword(), requestDto.getSearchBy()),
                 pageable);
 
-        List<GetExportReceiptResponseDto> items = page.getContent().stream()
-                .map(GetExportReceiptResponseDto::new)
+        List<ExportReceiptResponseDto> items = page.getContent().stream()
+                .map(ExportReceiptResponseDto::new)
                 .toList();
 
         PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.EXPORT_RECEIPT, page);
 
-        PaginationResponseDto<GetExportReceiptResponseDto> responseDto = new PaginationResponseDto<>();
+        PaginationResponseDto<ExportReceiptResponseDto> responseDto = new PaginationResponseDto<>();
         responseDto.setItems(items);
         responseDto.setMeta(pagingMeta);
 
@@ -190,9 +190,9 @@ public class ExportReceiptServiceImpl implements ExportReceiptService {
     }
 
     @Override
-    public GetExportReceiptResponseDto findById(Long id) {
+    public ExportReceiptResponseDto findById(Long id) {
         ExportReceipt exportReceipt = getEntity(id);
-        GetExportReceiptResponseDto responseDto = new GetExportReceiptResponseDto(exportReceipt);
+        ExportReceiptResponseDto responseDto = new ExportReceiptResponseDto(exportReceipt);
 
         for (Book book : exportReceipt.getBooks()) {
             responseDto.getBookIds().add(book.getId());

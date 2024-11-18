@@ -1,10 +1,10 @@
 package com.example.librarymanager.service;
 
+import com.example.librarymanager.domain.dto.common.CommonResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.request.ImportReceiptRequestDto;
-import com.example.librarymanager.domain.dto.response.CommonResponseDto;
-import com.example.librarymanager.domain.dto.response.GetImportReceiptResponseDto;
+import com.example.librarymanager.domain.dto.response.ImportReceiptResponseDto;
 
 public interface ImportReceiptService {
     CommonResponseDto save(ImportReceiptRequestDto requestDto, String userId);
@@ -13,8 +13,8 @@ public interface ImportReceiptService {
 
     CommonResponseDto delete(Long id, String userId);
 
-    PaginationResponseDto<GetImportReceiptResponseDto> findAll(PaginationFullRequestDto requestDto);
+    PaginationResponseDto<ImportReceiptResponseDto> findAll(PaginationFullRequestDto requestDto);
 
-    GetImportReceiptResponseDto findById(Long id);
+    ImportReceiptResponseDto findById(Long id);
 
 }

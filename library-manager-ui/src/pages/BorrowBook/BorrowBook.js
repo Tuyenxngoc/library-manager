@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Flex, Input, message, Popconfirm, Select, Space, Table } from 'antd';
+import { Button, Drawer, Flex, Input, message, Popconfirm, Select, Space, Table } from 'antd';
 import { MdOutlineModeEdit } from 'react-icons/md';
 import { FaRegTrashAlt } from 'react-icons/fa';
 
 import queryString from 'query-string';
 
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
-import { deleteBorrowReceipt, getBorrowReceipts } from '~/services/borrowReceiptService';
+import { deleteBorrowReceipt, getBorrowReceiptDetails, getBorrowReceipts } from '~/services/borrowReceiptService';
 
 const options = [
     { value: 'receiptNumber', label: 'Số phiếu mượn' },
@@ -30,6 +30,10 @@ function BorrowBook() {
     const [errorMessage, setErrorMessage] = useState(null);
 
     const [messageApi, contextHolder] = message.useMessage();
+
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [receiptDetails, setReceiptDetails] = useState(null);
+    const [loadingDetails, setLoadingDetails] = useState(false);
 
     const handleChangePage = (newPage) => {
         setFilters((prev) => ({ ...prev, pageNum: newPage }));
@@ -59,6 +63,25 @@ function BorrowBook() {
             searchBy: searchBy || activeFilterOption,
             keyword: keyword || searchInput,
         }));
+    };
+
+    const showDrawer = async (receiptId) => {
+        setLoadingDetails(true);
+        setIsDrawerOpen(true);
+
+        try {
+            const response = await getBorrowReceiptDetails(receiptId);
+            setReceiptDetails(response.data.data);
+        } catch (error) {
+            message.error('Không thể tải chi tiết phiếu mượn.');
+        } finally {
+            setLoadingDetails(false);
+        }
+    };
+
+    const closeDrawer = () => {
+        setIsDrawerOpen(false);
+        setReceiptDetails(null);
     };
 
     const handleDeleteEntity = async (id) => {
@@ -102,6 +125,11 @@ function BorrowBook() {
             key: 'receiptNumber',
             sorter: true,
             showSorterTooltip: false,
+            render: (text, record) => (
+                <span style={{ color: '#0997eb', cursor: 'pointer' }} onClick={() => showDrawer(record.id)}>
+                    {text}
+                </span>
+            ),
         },
         {
             title: 'Số thẻ bạn đọc',
@@ -184,6 +212,63 @@ function BorrowBook() {
     return (
         <div>
             {contextHolder}
+
+            <Drawer title="Chi tiết phiếu mượn" width={720} onClose={closeDrawer} open={isDrawerOpen}>
+                {loadingDetails ? (
+                    <div>Đang tải...</div>
+                ) : receiptDetails ? (
+                    <div className="container">
+                        <div className="row mb-4">
+                            <div className="col-md-6">
+                                <div className="fw-bold">Tên người mượn:</div>
+                                <p>{receiptDetails.fullName}</p>
+                            </div>
+                            <div className="col-md-6">
+                                <div className="fw-bold">Ngày mượn:</div>
+                                <p>{receiptDetails.borrowDate}</p>
+                            </div>
+                            <div className="col-md-6">
+                                <div className="fw-bold">Ngày hẹn trả:</div>
+                                <p>{receiptDetails.dueDate}</p>
+                            </div>
+                            <div className="col-md-6">
+                                <div className="fw-bold">Tình trạng:</div>
+                                <p className={`text-${receiptDetails.status === 'Đã trả' ? 'success' : 'danger'}`}>
+                                    {receiptDetails.status}
+                                </p>
+                            </div>
+                        </div>
+
+                        <table className="table table-striped table-hover">
+                            <thead className="table-dark">
+                                <tr>
+                                    <th>Nhan đề</th>
+                                    <th>Số đăng ký cá biệt</th>
+                                    <th>Tình trạng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {receiptDetails.books.map((book, index) => (
+                                    <tr key={index}>
+                                        <td>{book.title}</td>
+                                        <td>{book.bookCode}</td>
+                                        <td>{book.returned ? 'Đã trả' : 'Chưa trả'}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colSpan="3" className="text-end fw-bold">
+                                        Tổng: {receiptDetails.books.length} đầu sách
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                ) : (
+                    <div>Không có dữ liệu.</div>
+                )}
+            </Drawer>
 
             <Flex wrap justify="space-between" align="center">
                 <h2>Mượn sách</h2>

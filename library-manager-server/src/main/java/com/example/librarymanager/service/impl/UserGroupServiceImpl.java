@@ -1,12 +1,12 @@
 package com.example.librarymanager.service.impl;
 
 import com.example.librarymanager.constant.*;
+import com.example.librarymanager.domain.dto.common.CommonResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
 import com.example.librarymanager.domain.dto.request.UserGroupRequestDto;
-import com.example.librarymanager.domain.dto.response.CommonResponseDto;
-import com.example.librarymanager.domain.dto.response.GetUserGroupResponseDto;
+import com.example.librarymanager.domain.dto.response.UserGroupResponseDto;
 import com.example.librarymanager.domain.entity.Role;
 import com.example.librarymanager.domain.entity.UserGroup;
 import com.example.librarymanager.domain.entity.UserGroupRole;
@@ -100,7 +100,7 @@ public class UserGroupServiceImpl implements UserGroupService {
         logService.createLog(TAG, EventConstants.ADD, "Tạo nhóm người dùng mới: " + userGroup.getName(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
-        return new CommonResponseDto(message, new GetUserGroupResponseDto(userGroup));
+        return new CommonResponseDto(message, new UserGroupResponseDto(userGroup));
     }
 
     @Override
@@ -153,7 +153,7 @@ public class UserGroupServiceImpl implements UserGroupService {
         logService.createLog(TAG, EventConstants.EDIT, "Cập nhật nhóm người dùng id: " + userGroup.getId() + ", tên mới: " + userGroup.getName(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
-        return new CommonResponseDto(message, new GetUserGroupResponseDto(userGroup));
+        return new CommonResponseDto(message, new UserGroupResponseDto(userGroup));
     }
 
     @Override
@@ -174,20 +174,20 @@ public class UserGroupServiceImpl implements UserGroupService {
     }
 
     @Override
-    public PaginationResponseDto<GetUserGroupResponseDto> findAll(PaginationFullRequestDto requestDto) {
+    public PaginationResponseDto<UserGroupResponseDto> findAll(PaginationFullRequestDto requestDto) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.USER_GROUP);
 
         Page<UserGroup> page = userGroupRepository.findAll(
                 EntitySpecification.filterUserGroups(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag()),
                 pageable);
 
-        List<GetUserGroupResponseDto> items = page.getContent().stream()
-                .map(GetUserGroupResponseDto::new)
+        List<UserGroupResponseDto> items = page.getContent().stream()
+                .map(UserGroupResponseDto::new)
                 .toList();
 
         PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.USER_GROUP, page);
 
-        PaginationResponseDto<GetUserGroupResponseDto> responseDto = new PaginationResponseDto<>();
+        PaginationResponseDto<UserGroupResponseDto> responseDto = new PaginationResponseDto<>();
         responseDto.setItems(items);
         responseDto.setMeta(pagingMeta);
 
@@ -195,9 +195,9 @@ public class UserGroupServiceImpl implements UserGroupService {
     }
 
     @Override
-    public GetUserGroupResponseDto findById(Long id) {
+    public UserGroupResponseDto findById(Long id) {
         UserGroup userGroup = getEntity(id);
-        return new GetUserGroupResponseDto(userGroup);
+        return new UserGroupResponseDto(userGroup);
     }
 
     @Override

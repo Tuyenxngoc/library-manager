@@ -3,7 +3,7 @@ package com.example.librarymanager.domain.specification;
 import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.JoinType;
 import com.example.librarymanager.domain.dto.filter.BookDefinitionFilter;
-import com.example.librarymanager.domain.dto.filter.Filter;
+import com.example.librarymanager.domain.dto.filter.QueryFilter;
 import com.example.librarymanager.domain.entity.*;
 import com.example.librarymanager.exception.BadRequestException;
 import jakarta.persistence.criteria.Join;
@@ -25,7 +25,7 @@ public class BookSpecification {
         }
     }
 
-    public static Specification<BookDefinition> createSpecification(Filter input) {
+    public static Specification<BookDefinition> createSpecification(QueryFilter input) {
         validateField(input.getField());
 
         return switch (input.getOperator()) {
@@ -64,19 +64,19 @@ public class BookSpecification {
         };
     }
 
-    public static Specification<BookDefinition> getSpecificationFromFilters(List<Filter> filters) {
-        if (filters.isEmpty()) {
+    public static Specification<BookDefinition> getSpecificationFromFilters(List<QueryFilter> queryFilters) {
+        if (queryFilters.isEmpty()) {
             return null;
         }
 
-        Specification<BookDefinition> specification = Specification.where(createSpecification(filters.get(0)));
+        Specification<BookDefinition> specification = Specification.where(createSpecification(queryFilters.get(0)));
 
-        for (int i = 1; i < filters.size(); i++) {
-            Filter currentFilter = filters.get(i);
-            Filter previousFilter = filters.get(i - 1);
-            Specification<BookDefinition> nextSpecification = createSpecification(currentFilter);
+        for (int i = 1; i < queryFilters.size(); i++) {
+            QueryFilter currentQueryFilter = queryFilters.get(i);
+            QueryFilter previousQueryFilter = queryFilters.get(i - 1);
+            Specification<BookDefinition> nextSpecification = createSpecification(currentQueryFilter);
 
-            if (previousFilter.getJoinType() == JoinType.OR) {
+            if (previousQueryFilter.getJoinType() == JoinType.OR) {
                 specification = specification.or(nextSpecification);
             } else {
                 specification = specification.and(nextSpecification);

@@ -4,13 +4,13 @@ import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.EventConstants;
 import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.constant.SuccessMessage;
+import com.example.librarymanager.domain.dto.common.CommonResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
 import com.example.librarymanager.domain.dto.request.BookRequestDto;
 import com.example.librarymanager.domain.dto.request.ImportReceiptRequestDto;
-import com.example.librarymanager.domain.dto.response.CommonResponseDto;
-import com.example.librarymanager.domain.dto.response.GetImportReceiptResponseDto;
+import com.example.librarymanager.domain.dto.response.ImportReceiptResponseDto;
 import com.example.librarymanager.domain.entity.Book;
 import com.example.librarymanager.domain.entity.BookDefinition;
 import com.example.librarymanager.domain.entity.ImportReceipt;
@@ -113,7 +113,7 @@ public class ImportReceiptServiceImpl implements ImportReceiptService {
         logService.createLog(TAG, EventConstants.ADD, "Tạo phiếu nhập mới: " + importReceipt.getReceiptNumber(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
-        return new CommonResponseDto(message, new GetImportReceiptResponseDto(importReceipt));
+        return new CommonResponseDto(message, new ImportReceiptResponseDto(importReceipt));
     }
 
     @Override
@@ -156,7 +156,7 @@ public class ImportReceiptServiceImpl implements ImportReceiptService {
 
         //Trả về kết quả thành công
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
-        return new CommonResponseDto(message, new GetImportReceiptResponseDto(importReceipt));
+        return new CommonResponseDto(message, new ImportReceiptResponseDto(importReceipt));
     }
 
     @Override
@@ -180,20 +180,20 @@ public class ImportReceiptServiceImpl implements ImportReceiptService {
     }
 
     @Override
-    public PaginationResponseDto<GetImportReceiptResponseDto> findAll(PaginationFullRequestDto requestDto) {
+    public PaginationResponseDto<ImportReceiptResponseDto> findAll(PaginationFullRequestDto requestDto) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.IMPORT_RECEIPT);
 
         Page<ImportReceipt> page = importReceiptRepository.findAll(
                 EntitySpecification.filterImportReceipts(requestDto.getKeyword(), requestDto.getSearchBy()),
                 pageable);
 
-        List<GetImportReceiptResponseDto> items = page.getContent().stream()
-                .map(GetImportReceiptResponseDto::new)
+        List<ImportReceiptResponseDto> items = page.getContent().stream()
+                .map(ImportReceiptResponseDto::new)
                 .toList();
 
         PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.IMPORT_RECEIPT, page);
 
-        PaginationResponseDto<GetImportReceiptResponseDto> responseDto = new PaginationResponseDto<>();
+        PaginationResponseDto<ImportReceiptResponseDto> responseDto = new PaginationResponseDto<>();
         responseDto.setItems(items);
         responseDto.setMeta(pagingMeta);
 
@@ -201,8 +201,8 @@ public class ImportReceiptServiceImpl implements ImportReceiptService {
     }
 
     @Override
-    public GetImportReceiptResponseDto findById(Long id) {
+    public ImportReceiptResponseDto findById(Long id) {
         ImportReceipt importReceipt = getEntity(id);
-        return new GetImportReceiptResponseDto(importReceipt);
+        return new ImportReceiptResponseDto(importReceipt);
     }
 }

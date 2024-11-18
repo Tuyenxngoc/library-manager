@@ -4,12 +4,12 @@ import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.EventConstants;
 import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.constant.SuccessMessage;
+import com.example.librarymanager.domain.dto.common.CommonResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
 import com.example.librarymanager.domain.dto.request.CategoryRequestDto;
-import com.example.librarymanager.domain.dto.response.CommonResponseDto;
-import com.example.librarymanager.domain.dto.response.GetCategoryResponseDto;
+import com.example.librarymanager.domain.dto.response.category.CategoryResponseDto;
 import com.example.librarymanager.domain.entity.Category;
 import com.example.librarymanager.domain.entity.CategoryGroup;
 import com.example.librarymanager.domain.mapper.CategoryMapper;
@@ -106,7 +106,7 @@ public class CategoryServiceImpl implements CategoryService {
         logService.createLog(TAG, EventConstants.ADD, "Thêm danh mục mới Id: " + categoryGroup.getId(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
-        return new CommonResponseDto(message, new GetCategoryResponseDto(category));
+        return new CommonResponseDto(message, new CategoryResponseDto(category));
     }
 
     @Override
@@ -137,7 +137,7 @@ public class CategoryServiceImpl implements CategoryService {
         logService.createLog(TAG, EventConstants.EDIT, "Cập nhật danh mục Id: " + category.getId(), userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
-        return new CommonResponseDto(message, new GetCategoryResponseDto(category));
+        return new CommonResponseDto(message, new CategoryResponseDto(category));
     }
 
     @Override
@@ -157,20 +157,20 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public PaginationResponseDto<GetCategoryResponseDto> findAll(PaginationFullRequestDto requestDto) {
+    public PaginationResponseDto<CategoryResponseDto> findAll(PaginationFullRequestDto requestDto) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.CATEGORY);
 
         Page<Category> page = categoryRepository.findAll(
                 EntitySpecification.filterCategories(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag()),
                 pageable);
 
-        List<GetCategoryResponseDto> items = page.getContent().stream()
-                .map(GetCategoryResponseDto::new)
+        List<CategoryResponseDto> items = page.getContent().stream()
+                .map(CategoryResponseDto::new)
                 .toList();
 
         PagingMeta pagingMeta = PaginationUtil.buildPagingMeta(requestDto, SortByDataConstant.CATEGORY, page);
 
-        PaginationResponseDto<GetCategoryResponseDto> responseDto = new PaginationResponseDto<>();
+        PaginationResponseDto<CategoryResponseDto> responseDto = new PaginationResponseDto<>();
         responseDto.setItems(items);
         responseDto.setMeta(pagingMeta);
 

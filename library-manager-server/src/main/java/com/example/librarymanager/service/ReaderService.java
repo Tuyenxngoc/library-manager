@@ -1,12 +1,12 @@
 package com.example.librarymanager.service;
 
+import com.example.librarymanager.domain.dto.common.CommonResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.request.CreateReaderCardsRequestDto;
 import com.example.librarymanager.domain.dto.request.ReaderRequestDto;
-import com.example.librarymanager.domain.dto.response.CommonResponseDto;
-import com.example.librarymanager.domain.dto.response.GetReaderDetailResponseDto;
-import com.example.librarymanager.domain.dto.response.GetReaderResponseDto;
+import com.example.librarymanager.domain.dto.response.reader.ReaderDetailResponseDto;
+import com.example.librarymanager.domain.dto.response.reader.ReaderResponseDto;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface ReaderService {
@@ -18,13 +18,13 @@ public interface ReaderService {
 
     CommonResponseDto delete(Long id, String userId);
 
-    PaginationResponseDto<GetReaderResponseDto> findAll(PaginationFullRequestDto requestDto);
+    PaginationResponseDto<ReaderResponseDto> findAll(PaginationFullRequestDto requestDto);
 
-    GetReaderResponseDto findById(Long id);
+    ReaderResponseDto findById(Long id);
 
-    GetReaderResponseDto findByCardNumber(String cardNumber);
+    ReaderResponseDto findByCardNumber(String cardNumber);
 
     byte[] generateReaderCards(CreateReaderCardsRequestDto requestDto);
 
-    GetReaderDetailResponseDto getReaderDetailsByCardNumber(String cardNumber);
+    ReaderDetailResponseDto getReaderDetailsByCardNumber(String cardNumber);
 }
