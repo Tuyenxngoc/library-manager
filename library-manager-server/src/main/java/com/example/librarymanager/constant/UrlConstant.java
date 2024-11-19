@@ -98,6 +98,18 @@ public class UrlConstant {
         public static final String GET_DETAILS_BY_ID = ADMIN_URL + PRE_FIX + "/details/{id}";
     }
 
+    public static class BookBorrow {
+        private static final String PRE_FIX = "/book-borrows";
+
+        public static final String CREATE = ADMIN_URL + PRE_FIX;
+        public static final String GET_ALL = ADMIN_URL + PRE_FIX;
+        public static final String GET_BY_ID = ADMIN_URL + PRE_FIX + "/{id}";
+        public static final String UPDATE = ADMIN_URL + PRE_FIX + "/{id}";
+        public static final String DELETE = ADMIN_URL + PRE_FIX + "/{id}";
+
+        public static final String RETURN_BOOKS = ADMIN_URL + PRE_FIX + "/return-books";
+    }
+
     public static class Publisher {
         private static final String PRE_FIX = "/publishers";
 

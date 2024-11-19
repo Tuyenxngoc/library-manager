@@ -184,6 +184,11 @@ public class ErrorMessage {
         public static final String ERR_DUPLICATE_RECEIPT_NUMBER = "exception.borrow.receipt.duplicate.number";
     }
 
+    public static class BookBorrow {
+        public static final String ERR_NOT_FOUND_ID = "exception.book.borrow.not.found.id";
+        public static final String ERR_RETURNED_BOOK_CANNOT_BE_RETURNED = "exception.book.borrow.returned";
+    }
+
     public static class Cart {
         public static final String ERR_NOT_FOUND_ID = "exception.cart.not.found.id";
         public static final String ERR_MAX_BOOKS_IN_CART = "exception.cart.max.books.exceeded";

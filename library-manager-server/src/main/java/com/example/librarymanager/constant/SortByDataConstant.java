@@ -232,4 +232,11 @@ public enum SortByDataConstant implements SortByInterface {
         }
     },
 
+    BOOK_BORROW {
+        @Override
+        public String getSortBy(String sortBy) {
+            return "id";
+        }
+    },
+
 }

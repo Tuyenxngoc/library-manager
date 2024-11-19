@@ -537,6 +537,46 @@ public class EntitySpecification {
         };
     }
 
+    public static Specification<BookBorrow> filterBookBorrows() {
+        return (root, query, builder) -> {
+            query.distinct(true);
+            Predicate predicate = builder.conjunction();
+            predicate = builder.and(predicate, builder.equal(root.get(BookBorrow_.returned), Boolean.FALSE));
+            return predicate;
+        };
+    }
+
+    public static Specification<BookBorrow> filterBookBorrows(String keyword, String searchBy) {
+        return (root, query, builder) -> {
+            query.distinct(true);
+
+            Predicate predicate = builder.conjunction();
+
+            if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(searchBy)) {
+                switch (searchBy) {
+                    case BorrowReceipt_.RECEIPT_NUMBER -> {
+                        Join<BookBorrow, BorrowReceipt> borrowReceiptJoin = root.join(BookBorrow_.borrowReceipt);
+                        predicate = builder.and(predicate, builder.like(borrowReceiptJoin.get(BorrowReceipt_.receiptNumber), "%" + keyword + "%"));
+                    }
+
+                    case Reader_.FULL_NAME -> {
+                        Join<BookBorrow, BorrowReceipt> borrowReceiptJoin = root.join(BookBorrow_.borrowReceipt);
+                        Join<BorrowReceipt, Reader> readerJoin = borrowReceiptJoin.join(BorrowReceipt_.reader);
+                        predicate = builder.and(predicate, builder.like(readerJoin.get(Reader_.fullName), "%" + keyword + "%"));
+                    }
+
+                    case Reader_.CARD_NUMBER -> {
+                        Join<BookBorrow, BorrowReceipt> borrowReceiptJoin = root.join(BookBorrow_.borrowReceipt);
+                        Join<BorrowReceipt, Reader> readerJoin = borrowReceiptJoin.join(BorrowReceipt_.reader);
+                        predicate = builder.and(predicate, builder.like(readerJoin.get(Reader_.cardNumber), "%" + keyword + "%"));
+                    }
+                }
+            }
+
+            return predicate;
+        };
+    }
+
     public static Specification<Cart> filterCarts(String keyword, String searchBy) {
         return (root, query, builder) -> {
             query.distinct(true);

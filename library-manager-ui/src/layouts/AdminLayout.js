@@ -95,7 +95,6 @@ const menuConfig = [
         children: [
             { label: 'Mượn sách', key: '/admin/circulation/borrow' },
             { label: 'Trả-Gia hạn sách', key: '/admin/circulation/return-renew' },
-            { label: 'Lịch sử trả sách', key: '/admin/circulation/return-history' },
         ],
     },
     {

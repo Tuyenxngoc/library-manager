@@ -294,7 +294,7 @@ function BorrowBook() {
                     </Space.Compact>
 
                     <Button type="primary" onClick={() => navigate('new')}>
-                        Thêm mới
+                        Lập phiếu mượn
                     </Button>
                 </Space>
             </Flex>

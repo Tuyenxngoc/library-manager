@@ -53,7 +53,6 @@ import ReaderViolations from './pages/Reader/ReaderViolations';
 import NewsArticleDetail from './pages/NewsArticles/NewsArticleDetail';
 import BorrowBook from './pages/BorrowBook/BorrowBook';
 import ReturnRenewBook from './pages/ReturnRenewBook/ReturnRenewBook';
-import ReturnHistory from './pages/ReturnHistory/ReturnHistory';
 import BorrowBookForm from './pages/BorrowBook/BorrowBookForm';
 import UserProfile from './pages/UserProfile/UserProfile';
 import BorrowedItems from './pages/BorrowedItems/BorrowedItems';
@@ -185,7 +184,6 @@ function App() {
                             </Route>
 
                             <Route path="return-renew" element={<ReturnRenewBook />} />
-                            <Route path="return-history" element={<ReturnHistory />} />
                         </Route>
 
                         {/* Tác giả */}
