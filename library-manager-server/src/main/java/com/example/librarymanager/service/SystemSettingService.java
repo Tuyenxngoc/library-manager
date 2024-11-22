@@ -7,5 +7,4 @@ public interface SystemSettingService {
     CommonResponseDto updateLibraryRules(LibraryRulesRequestDto requestDto, String userId);
 
     String getLibraryRules();
-
 }

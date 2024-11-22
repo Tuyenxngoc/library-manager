@@ -38,7 +38,6 @@ public class SystemSettingController {
     }
 
     @Operation(summary = "API Get Library Rules")
-    @PreAuthorize("hasRole('ROLE_MANAGE_SYSTEM_SETTINGS')")
     @GetMapping(UrlConstant.SystemSetting.GET_LIBRARY_RULES)
     public ResponseEntity<?> getLibraryRules() {
         return VsResponseUtil.success(systemSettingService.getLibraryRules());
