@@ -1,5 +1,9 @@
 function GeneralConfig() {
-    return <>GeneralConfig.js</>;
+    return (
+        <>
+            <h2>Cấu hình chung</h2>
+        </>
+    );
 }
 
 export default GeneralConfig;

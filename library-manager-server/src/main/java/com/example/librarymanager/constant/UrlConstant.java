@@ -262,4 +262,11 @@ public class UrlConstant {
         public static final String CLEAR = PRE_FIX + "/clear";
         public static final String PENDING_BORROW_REQUESTS = PRE_FIX + "/pending-borrow-requests";
     }
+
+    public static class SystemSetting {
+        public static final String PRE_FIX = "/system-settings";
+
+        public static final String UPDATE_LIBRARY_RULES = PRE_FIX + "/library-rules";
+        public static final String GET_LIBRARY_RULES = PRE_FIX + "/library-rules";
+    }
 }
