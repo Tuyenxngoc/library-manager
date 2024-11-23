@@ -132,8 +132,6 @@ function NewsArticles() {
             title: 'Trạng thái',
             dataIndex: 'activeFlag',
             key: 'activeFlag',
-            sorter: true,
-            showSorterTooltip: false,
             render: (text, record) => (
                 <Space>
                     {text ? 'Đang theo dõi' : 'Ngừng theo dõi'}

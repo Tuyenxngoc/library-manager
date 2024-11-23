@@ -27,3 +27,11 @@ export const updateHoliday = (id, values) => {
 export const deleteHoliday = (id) => {
     return axiosPrivate.delete(`system-settings/holidays/${id}`);
 };
+
+export const getLibraryConfig = () => {
+    return axiosPrivate.get('system-settings/library-config');
+};
+
+export const updateLibraryConfig = (values) => {
+    return axiosPrivate.put('system-settings/library-config', values);
+};

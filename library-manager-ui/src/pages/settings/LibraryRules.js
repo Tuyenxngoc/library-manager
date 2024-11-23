@@ -1,9 +1,9 @@
+import { useEffect, useState } from 'react';
 import { Button, message } from 'antd';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import 'react-quill/dist/quill.core.css';
 import { formats, modules } from '~/common/editorConfig';
-import { useEffect, useState } from 'react';
 import { getLibraryRules, updateLibraryRules } from '~/services/systemSettingService';
 
 function LibraryRules() {
@@ -20,7 +20,7 @@ function LibraryRules() {
                 messageApi.success(message);
             }
         } catch (error) {
-            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi thêm mới.';
+            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi sửa.';
             messageApi.error(errorMessage);
         }
     };
@@ -45,7 +45,7 @@ function LibraryRules() {
             <h2>Thiết lập nội quy thư viện</h2>
             <form>
                 <div className="row g-3">
-                    <div className="col-md-6">
+                    <div className="col-md-9">
                         <span>
                             <span className="text-danger">*</span>Nội quy thư viện:
                         </span>

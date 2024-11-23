@@ -5,6 +5,7 @@ import com.example.librarymanager.annotation.RestApiV1;
 import com.example.librarymanager.base.VsResponseUtil;
 import com.example.librarymanager.constant.UrlConstant;
 import com.example.librarymanager.domain.dto.request.HolidayRequestDto;
+import com.example.librarymanager.domain.dto.request.LibraryConfigRequestDto;
 import com.example.librarymanager.domain.dto.request.LibraryRulesRequestDto;
 import com.example.librarymanager.security.CustomUserDetails;
 import com.example.librarymanager.service.SystemSettingService;
@@ -81,5 +82,24 @@ public class SystemSettingController {
     @DeleteMapping(UrlConstant.SystemSetting.DELETE_HOLIDAY)
     public ResponseEntity<?> deleteHoliday(@PathVariable String id) {
         return VsResponseUtil.success(systemSettingService.deleteHoliday(id));
+    }
+
+    @Operation(summary = "Get Library Configuration")
+    @PreAuthorize("hasRole('ROLE_MANAGE_SYSTEM_SETTINGS')")
+    @GetMapping(UrlConstant.SystemSetting.GET_LIBRARY_CONFIG)
+    public ResponseEntity<?> getLibraryConfig() {
+        return VsResponseUtil.success(systemSettingService.getLibraryConfig());
+    }
+
+    @Operation(summary = "Update Library Configuration")
+    @PreAuthorize("hasRole('ROLE_MANAGE_SYSTEM_SETTINGS')")
+    @PutMapping(UrlConstant.SystemSetting.UPDATE_LIBRARY_CONFIG)
+    public ResponseEntity<?> updateLibraryConfig(
+            @Valid @RequestBody LibraryConfigRequestDto requestDto,
+            @CurrentUser CustomUserDetails userDetails
+    ) {
+        return VsResponseUtil.success(
+                systemSettingService.updateLibraryConfig(requestDto, userDetails.getUserId())
+        );
     }
 }
