@@ -268,5 +268,11 @@ public class UrlConstant {
 
         public static final String UPDATE_LIBRARY_RULES = PRE_FIX + "/library-rules";
         public static final String GET_LIBRARY_RULES = PRE_FIX + "/library-rules";
+
+        public static final String GET_ALL_HOLIDAYS = PRE_FIX + "/holidays";
+        public static final String ADD_HOLIDAY = PRE_FIX + "/holidays";
+        public static final String UPDATE_HOLIDAY = PRE_FIX + "/holidays/{id}";
+        public static final String DELETE_HOLIDAY = PRE_FIX + "/holidays/{id}";
+        public static final String GET_HOLIDAY_BY_ID = PRE_FIX + "/holidays/{id}";
     }
 }

@@ -3,7 +3,9 @@ package com.example.librarymanager.service.impl;
 import com.example.librarymanager.constant.EventConstants;
 import com.example.librarymanager.constant.SuccessMessage;
 import com.example.librarymanager.domain.dto.common.CommonResponseDto;
+import com.example.librarymanager.domain.dto.request.HolidayRequestDto;
 import com.example.librarymanager.domain.dto.request.LibraryRulesRequestDto;
+import com.example.librarymanager.domain.dto.response.HolidayResponseDto;
 import com.example.librarymanager.service.LogService;
 import com.example.librarymanager.service.SystemSettingService;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +17,20 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
 public class SystemSettingImpl implements SystemSettingService {
     private static final String LIBRARY_RULES_FILE_PATH = "data/library_rules.txt";
+    private static final String HOLIDAYS_FILE_PATH = "data/holidays.txt";
 
     private static final String TAG = "Thiết lập hệ thống";
 
@@ -40,8 +50,7 @@ public class SystemSettingImpl implements SystemSettingService {
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
                 writer.write(requestDto.getContent());
             }
-        } catch (IOException e) {
-
+        } catch (IOException ignored) {
         }
 
         logService.createLog(TAG, EventConstants.EDIT, "Cập nhật nội quy thư viện ngày: " + LocalDateTime.now(), userId);
@@ -65,4 +74,180 @@ public class SystemSettingImpl implements SystemSettingService {
             return "Error reading library rules: " + e.getMessage();
         }
     }
+
+    @Override
+    public List<HolidayResponseDto> getAllHolidays(Boolean activeFlag) {
+        File file = new File(HOLIDAYS_FILE_PATH);
+
+        if (!file.exists()) {
+            return List.of();
+        }
+
+        try (Stream<String> lines = Files.lines(Paths.get(HOLIDAYS_FILE_PATH))) {
+            return lines.map(line -> {
+                        String[] parts = line.split(",");
+                        if (parts.length == 5) {
+                            return new HolidayResponseDto(
+                                    parts[0],
+                                    parts[1],
+                                    LocalDate.parse(parts[2]),
+                                    LocalDate.parse(parts[3]),
+                                    Boolean.parseBoolean(parts[4])
+                            );
+                        } else {
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .filter(dto -> activeFlag == null || dto.getActiveFlag().equals(activeFlag))
+                    .toList();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return List.of();
+        }
+    }
+
+    @Override
+    public HolidayResponseDto getHolidayById(String id) {
+        File file = new File(HOLIDAYS_FILE_PATH);
+
+        if (!file.exists()) {
+            return null;
+        }
+
+        try (Stream<String> lines = Files.lines(Paths.get(HOLIDAYS_FILE_PATH))) {
+            return lines.map(line -> {
+                        String[] parts = line.split(",");
+                        if (parts.length == 5 && parts[0].equals(id)) {
+                            return new HolidayResponseDto(
+                                    parts[0],
+                                    parts[1],
+                                    LocalDate.parse(parts[2]),
+                                    LocalDate.parse(parts[3]),
+                                    Boolean.parseBoolean(parts[4])
+                            );
+                        } else {
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .orElse(null);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public CommonResponseDto addHoliday(HolidayRequestDto holidayRequestDto, String userId) {
+        List<HolidayResponseDto> holidays = readFromFile(HOLIDAYS_FILE_PATH);
+
+        HolidayResponseDto dto = new HolidayResponseDto();
+        dto.setId(String.valueOf(holidays.size()));
+        dto.setName(holidayRequestDto.getName());
+        dto.setStartDate(holidayRequestDto.getStartDate());
+        dto.setEndDate(holidayRequestDto.getEndDate());
+        dto.setActiveFlag(holidayRequestDto.getActiveFlag());
+        holidays.add(dto);
+
+        writeToFile(HOLIDAYS_FILE_PATH, holidays);
+        logService.createLog(TAG, EventConstants.ADD,
+                "Thêm ngày nghỉ lễ mới: " + holidayRequestDto.getName() + ", Ngày: " + holidayRequestDto.getStartDate(), userId);
+
+        String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
+        return new CommonResponseDto(message, dto);
+    }
+
+    @Override
+    public CommonResponseDto updateHoliday(String id, HolidayRequestDto holidayRequestDto, String userId) {
+        List<HolidayResponseDto> holidays = readFromFile(HOLIDAYS_FILE_PATH);
+        HolidayResponseDto dto = null;
+        for (HolidayResponseDto holidayResponseDto : holidays) {
+            if (holidayResponseDto.getId().equals(id)) {
+                dto = holidayResponseDto;
+                break;
+            }
+        }
+        if (dto == null) {
+            return new CommonResponseDto("Holiday with ID " + id + " not found.");
+        }
+
+        dto.setName(holidayRequestDto.getName());
+        dto.setStartDate(holidayRequestDto.getStartDate());
+        dto.setEndDate(holidayRequestDto.getEndDate());
+        dto.setActiveFlag(holidayRequestDto.getActiveFlag());
+        writeToFile(HOLIDAYS_FILE_PATH, holidays);
+
+        logService.createLog(TAG, EventConstants.EDIT,
+                "Cập nhật kỳ nghỉ: " + holidayRequestDto.getName() + " (" + holidayRequestDto.getStartDate() + " - " + holidayRequestDto.getEndDate() + ")", userId);
+
+        String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
+        return new CommonResponseDto(message, dto);
+    }
+
+    @Override
+    public CommonResponseDto deleteHoliday(String id) {
+        List<HolidayResponseDto> holidays = readFromFile(HOLIDAYS_FILE_PATH);
+        HolidayResponseDto dto = null;
+        for (HolidayResponseDto holidayResponseDto : holidays) {
+            if (holidayResponseDto.getId().equals(id)) {
+                dto = holidayResponseDto;
+                break;
+            }
+        }
+        if (dto == null) {
+            return new CommonResponseDto("Holiday with ID " + id + " not found.");
+        }
+
+        holidays.remove(dto);
+        writeToFile(HOLIDAYS_FILE_PATH, holidays);
+
+        logService.createLog(TAG, EventConstants.DELETE, "Xóa kỳ nghỉ với ID: " + id, null);
+
+        String message = messageSource.getMessage(SuccessMessage.DELETE, null, LocaleContextHolder.getLocale());
+        return new CommonResponseDto(message);
+    }
+
+    public List<HolidayResponseDto> readFromFile(String filePath) {
+        List<HolidayResponseDto> holidays = new ArrayList<>();
+        try {
+            List<String> lines = Files.readAllLines(Paths.get(filePath));
+
+            for (String line : lines) {
+                String[] parts = line.split(",");
+                if (parts.length == 5) {
+                    String id = parts[0];
+                    String name = parts[1];
+                    LocalDate startDate = LocalDate.parse(parts[2]);
+                    LocalDate endDate = LocalDate.parse(parts[3]);
+                    Boolean activeFlag = Boolean.valueOf(parts[4]);
+
+                    holidays.add(new HolidayResponseDto(id, name, startDate, endDate, activeFlag));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return holidays;
+    }
+
+    public void writeToFile(String filePath, List<HolidayResponseDto> holidays) {
+        List<String> lines = new ArrayList<>();
+        for (HolidayResponseDto holiday : holidays) {
+            String holidayData = holiday.getId() + ","
+                    + holiday.getName() + ","
+                    + holiday.getStartDate() + ","
+                    + holiday.getEndDate() + ","
+                    + holiday.getActiveFlag();
+            lines.add(holidayData);
+        }
+
+        try {
+            Files.write(Paths.get(filePath), lines);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
