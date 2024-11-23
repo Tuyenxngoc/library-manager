@@ -27,9 +27,7 @@ public class SlideServiceImpl implements SlideService {
     private static final String TAG = "Thiết lập hệ thống";
 
     private final LogService logService;
-
     private final MessageSource messageSource;
-
     private final UploadFileUtil uploadFileUtil;
 
     public List<SlideResponseDto> readFromFile(String filePath) {
@@ -74,12 +72,7 @@ public class SlideServiceImpl implements SlideService {
     }
 
     private SlideResponseDto findById(String id, List<SlideResponseDto> slides) {
-        for (SlideResponseDto slide : slides) {
-            if (slide.getId().equals(id)) {
-                return slide;
-            }
-        }
-        throw new RuntimeException("Slide with ID " + id + " not found.");
+        return slides.stream().filter(dto -> dto.getId().equals(id)).findFirst().orElse(null);
     }
 
     @Override
@@ -94,17 +87,14 @@ public class SlideServiceImpl implements SlideService {
         newSlide.setDescription(requestDto.getDescription());
         newSlide.setActiveFlag(requestDto.isActiveFlag());
 
-        // Upload the image and set the image URL
         String imageUrl = uploadFileUtil.uploadFile(image);
         newSlide.setImageUrl(imageUrl);
 
-        // Add the new slide to the list
         slides.add(newSlide);
 
-        // Write the updated slides list to file
         writeToFile(SLIDE_DATA_FILE_PATH, slides);
 
-        logService.createLog(TAG, EventConstants.ADD, "Added new slide: " + requestDto.getTitle(), userId);
+        logService.createLog(TAG, EventConstants.ADD, "Thêm mới slide", userId);
 
         String message = messageSource.getMessage(SuccessMessage.CREATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, newSlide);
@@ -116,8 +106,10 @@ public class SlideServiceImpl implements SlideService {
 
         List<SlideResponseDto> slides = readFromFile(SLIDE_DATA_FILE_PATH);
         SlideResponseDto slideToUpdate = findById(slideId, slides);
+        if (slideToUpdate == null) {
+            return new CommonResponseDto("Slide with ID " + slideId + " not found.");
+        }
 
-        // Update slide details
         slideToUpdate.setTitle(slideRequest.getTitle());
         slideToUpdate.setDescription(slideRequest.getDescription());
         slideToUpdate.setActiveFlag(slideRequest.isActiveFlag());
@@ -130,7 +122,7 @@ public class SlideServiceImpl implements SlideService {
 
         writeToFile(SLIDE_DATA_FILE_PATH, slides);
 
-        logService.createLog(TAG, EventConstants.EDIT, "Updated slide: " + slideRequest.getTitle(), userId);
+        logService.createLog(TAG, EventConstants.EDIT, "Sửa slide Id: " + slideId, userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message, slideToUpdate);
@@ -140,6 +132,9 @@ public class SlideServiceImpl implements SlideService {
     public CommonResponseDto deleteSlide(String slideId, String userId) {
         List<SlideResponseDto> slides = readFromFile(SLIDE_DATA_FILE_PATH);
         SlideResponseDto slideToDelete = findById(slideId, slides);
+        if (slideToDelete == null) {
+            return new CommonResponseDto("Slide with ID " + slideId + " not found.");
+        }
 
         uploadFileUtil.destroyFileWithUrl(slideToDelete.getImageUrl());
 
@@ -147,7 +142,7 @@ public class SlideServiceImpl implements SlideService {
 
         writeToFile(SLIDE_DATA_FILE_PATH, slides);
 
-        logService.createLog(TAG, EventConstants.DELETE, "Deleted slide with ID: " + slideId, userId);
+        logService.createLog(TAG, EventConstants.DELETE, "Sửa slide Id: " + slideId, userId);
 
         String message = messageSource.getMessage(SuccessMessage.DELETE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message);
@@ -163,7 +158,7 @@ public class SlideServiceImpl implements SlideService {
     @Override
     public SlideResponseDto getSlideById(String id) {
         List<SlideResponseDto> slides = readFromFile(SLIDE_DATA_FILE_PATH);
-        return slides.stream().filter(dto -> dto.getId().equals(id)).findFirst().orElse(null);
+        return findById(id, slides);
     }
 
     @Override
