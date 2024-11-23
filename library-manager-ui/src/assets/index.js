@@ -10,12 +10,6 @@ const images = {
     placeimgHorizontal: require('./images/placeimg_horizontal.svg').default,
 };
 
-export const slides = [
-    require('./images/slide/Library_img-e1577731640247.jpg'),
-    require('./images/slide/Thu-vien-la-gi.jpg'),
-    require('./images/slide/thu-vien-thiet-bi-truong-hoc-960x480.jpg'),
-];
-
 export const backgrounds = {
     bgparallax1: require('./images/bgparallax-01.jpg'),
     bgparallax2: require('./images/bgparallax-02.jpg'),

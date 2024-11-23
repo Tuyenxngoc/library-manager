@@ -211,7 +211,7 @@ function Holidays() {
     }
 
     return (
-        <div>
+        <>
             {contextHolder}
 
             {/* Modal thêm mới */}
@@ -310,7 +310,7 @@ function Holidays() {
                 loading={isLoading}
                 pagination={false}
             />
-        </div>
+        </>
     );
 }
 

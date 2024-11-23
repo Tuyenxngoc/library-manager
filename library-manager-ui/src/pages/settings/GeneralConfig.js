@@ -6,11 +6,11 @@ import { getLibraryConfig, updateLibraryConfig } from '~/services/systemSettingS
 import { handleError } from '~/utils/errorHandler';
 
 const defaultValue = {
-    rowsPerPage: 10,
-    reservationTime: 2,
-    maxBorrowLimit: 5,
-    maxRenewalTimes: 0,
-    maxRenewalDays: 0,
+    rowsPerPage: null,
+    reservationTime: null,
+    maxBorrowLimit: null,
+    maxRenewalTimes: null,
+    maxRenewalDays: null,
 };
 
 const validationSchema = yup.object({

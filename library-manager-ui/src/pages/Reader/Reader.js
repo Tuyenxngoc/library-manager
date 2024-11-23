@@ -77,10 +77,9 @@ function Reader() {
         // Tạo URL cho hình ảnh và cập nhật giá trị trong form
         const url = URL.createObjectURL(originFileObj);
         setPreviousImage(url);
-        if (addForm) {
+        if (isAddModalOpen) {
             addForm.setFieldValue('image', originFileObj);
-        }
-        if (editForm) {
+        } else if (isEditModalOpen) {
             editForm.setFieldValue('image', originFileObj);
         }
     };
@@ -92,6 +91,7 @@ function Reader() {
     const closeAddModal = () => {
         setIsAddModalOpen(false);
         addForm.resetFields();
+
         setPreviousImage(images.placeimg);
         setFileList([]);
     };
@@ -103,15 +103,17 @@ function Reader() {
             expiryDate: record.expiryDate ? dayjs(record.expiryDate) : null,
         };
 
+        setPreviousImage(record.avatar || images.placeimg);
+
         setEditingItem(values);
         editForm.setFieldsValue(values);
-        setPreviousImage(record.avatar || images.placeimg);
         setIsEditModalOpen(true);
     };
 
     const closeEditModal = () => {
         setIsEditModalOpen(false);
         editForm.resetFields();
+
         setPreviousImage(images.placeimg);
         setFileList([]);
     };

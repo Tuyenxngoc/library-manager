@@ -1,59 +1,163 @@
-import React, { useState } from 'react';
-import { Table, Button, Space, Modal, Input, Form, Switch, Image, Flex } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import React, { useEffect, useState } from 'react';
+import { FaRegTrashAlt } from 'react-icons/fa';
+import { MdOutlineModeEdit, MdOutlineFileUpload } from 'react-icons/md';
+import { Image, Flex, message, Popconfirm, Checkbox, Row, Col } from 'antd';
+import { Table, Button, Space, Modal, Input, Form, Switch, Upload } from 'antd';
+import images from '~/assets';
+import { addSlide, deleteSlide, getSlides, toggleActiveFlagSlide, updateSlide } from '~/services/systemSettingService';
+
+const { TextArea } = Input;
 
 function SlideConfig() {
-    const [slides, setSlides] = useState([
-        {
-            key: '1',
-            title: 'Slide 1',
-            description: 'Mô tả slide 1',
-            imageUrl: 'https://via.placeholder.com/150',
-            active: true,
-        },
-        {
-            key: '2',
-            title: 'Slide 2',
-            description: 'Mô tả slide 2',
-            imageUrl: 'https://via.placeholder.com/150',
-            active: false,
-        },
-    ]);
+    const [entityData, setEntityData] = useState(null);
 
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [editingSlide, setEditingSlide] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [errorMessage, setErrorMessage] = useState(null);
 
-    const handleDelete = (key) => {
-        setSlides(slides.filter((slide) => slide.key !== key));
-    };
+    const [messageApi, contextHolder] = message.useMessage();
 
-    const handleEdit = (record) => {
-        setEditingSlide(record);
-        setIsModalVisible(true);
-    };
+    // Modal thêm mới
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [addForm] = Form.useForm();
 
-    const handleAdd = () => {
-        setEditingSlide(null);
-        setIsModalVisible(true);
-    };
+    // Modal chỉnh sửa
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editingItem, setEditingItem] = useState(null);
+    const [editForm] = Form.useForm();
 
-    const handleSave = (values) => {
-        if (editingSlide) {
-            setSlides(slides.map((slide) => (slide.key === editingSlide.key ? { ...editingSlide, ...values } : slide)));
-        } else {
-            const newSlide = {
-                ...values,
-                key: Date.now().toString(),
-                active: true,
-            };
-            setSlides([...slides, newSlide]);
+    const [fileList, setFileList] = useState([]);
+    const [previousImage, setPreviousImage] = useState(images.placeimgHorizontal);
+
+    const handleUploadChange = ({ file, fileList }) => {
+        setFileList(fileList);
+
+        const { originFileObj } = file;
+        if (!originFileObj) {
+            return;
         }
-        setIsModalVisible(false);
+
+        // Tạo URL cho hình ảnh và cập nhật giá trị trong form
+        const url = URL.createObjectURL(originFileObj);
+        setPreviousImage(url);
+        if (isAddModalOpen) {
+            addForm.setFieldValue('image', originFileObj);
+        } else if (isEditModalOpen) {
+            editForm.setFieldValue('image', originFileObj);
+        }
     };
 
-    const handleStatusChange = (key, checked) => {
-        setSlides(slides.map((slide) => (slide.key === key ? { ...slide, active: checked } : slide)));
+    const showAddModal = () => {
+        setIsAddModalOpen(true);
     };
+
+    const closeAddModal = () => {
+        setIsAddModalOpen(false);
+        addForm.resetFields();
+
+        setPreviousImage(images.placeimgHorizontal);
+        setFileList([]);
+    };
+
+    const showEditModal = (record) => {
+        setPreviousImage(record.imageUrl || images.placeimgHorizontal);
+
+        setEditingItem(record);
+        editForm.setFieldsValue(record);
+        setIsEditModalOpen(true);
+    };
+
+    const closeEditModal = () => {
+        setIsEditModalOpen(false);
+        editForm.resetFields();
+
+        setPreviousImage(images.placeimgHorizontal);
+        setFileList([]);
+    };
+
+    const handleCreateEntity = async (values) => {
+        setIsLoading(true);
+        try {
+            const response = await addSlide(values);
+            if (response.status === 201) {
+                const { data, message } = response.data.data;
+                messageApi.success(message);
+
+                setEntityData((prevData) => [...prevData, data]);
+                closeAddModal();
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi thêm mới.';
+            messageApi.error(errorMessage);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleUpdateEntity = async (values) => {
+        setIsLoading(true);
+        try {
+            const response = await updateSlide(editingItem.id, values);
+            if (response.status === 200) {
+                const { data, message } = response.data.data;
+                messageApi.success(message);
+
+                setEntityData((prevData) => prevData.map((item) => (item.id === editingItem.id ? data : item)));
+                closeEditModal();
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi cập nhật.';
+            messageApi.error(errorMessage);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleDeleteEntity = async (id) => {
+        try {
+            const response = await deleteSlide(id);
+            if (response.status === 200) {
+                messageApi.success(response.data.data.message);
+
+                setEntityData((prev) => prev.filter((a) => a.id !== id));
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi xóa.';
+            messageApi.error(errorMessage);
+        }
+    };
+
+    const handleToggleActiveFlag = async (checked, record) => {
+        try {
+            const response = await toggleActiveFlagSlide(record.id);
+            if (response.status === 200) {
+                const { data, message } = response.data.data;
+                setEntityData((prevData) =>
+                    prevData.map((item) => (item.id === record.id ? { ...item, activeFlag: data } : item)),
+                );
+                messageApi.success(message);
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi cập nhật.';
+            messageApi.error(errorMessage);
+        }
+    };
+
+    useEffect(() => {
+        const fetchEntities = async () => {
+            setIsLoading(true);
+            setErrorMessage(null);
+            try {
+                const response = await getSlides();
+                setEntityData(response.data.data);
+            } catch (error) {
+                setErrorMessage(error.message);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchEntities();
+    }, []);
 
     const columns = [
         {
@@ -74,81 +178,190 @@ function SlideConfig() {
         },
         {
             title: 'Trạng thái',
-            dataIndex: 'active',
-            key: 'active',
+            dataIndex: 'activeFlag',
+            key: 'activeFlag',
             render: (text, record) => (
                 <Space>
                     {text ? 'Đang theo dõi' : 'Ngừng theo dõi'}
-                    <Switch checked={text} onChange={(checked) => handleStatusChange(record.key, checked)} />
+                    <Switch checked={text} onChange={(checked) => handleToggleActiveFlag(checked, record)} />
                 </Space>
             ),
         },
         {
-            title: 'Hành động',
+            title: '',
             key: 'action',
-            render: (text, record) => (
-                <Space size="middle">
-                    <Button icon={<EditOutlined />} onClick={() => handleEdit(record)}>
-                        Sửa
-                    </Button>
-                    <Button icon={<DeleteOutlined />} danger onClick={() => handleDelete(record.key)}>
-                        Xóa
-                    </Button>
+            render: (_, record) => (
+                <Space>
+                    <Button type="text" icon={<MdOutlineModeEdit />} onClick={() => showEditModal(record)} />
+                    <Popconfirm
+                        title="Thông báo"
+                        description={<div>Bạn có chắc muốn xóa slide này không?</div>}
+                        onConfirm={() => handleDeleteEntity(record.id)}
+                        okText="Xóa"
+                        cancelText="Hủy"
+                    >
+                        <Button type="text" danger icon={<FaRegTrashAlt />} />
+                    </Popconfirm>
                 </Space>
             ),
         },
     ];
 
+    if (errorMessage) {
+        return (
+            <div className="alert alert-danger p-2" role="alert">
+                Lỗi: {errorMessage}
+            </div>
+        );
+    }
+
     return (
         <>
+            {contextHolder}
+
+            {/* Modal thêm mới */}
             <Modal
-                title={editingSlide ? 'Chỉnh sửa slide' : 'Thêm mới slide'}
-                open={isModalVisible}
-                onCancel={() => setIsModalVisible(false)}
-                footer={null}
+                title="Thêm mới slide"
+                open={isAddModalOpen}
+                onOk={addForm.submit}
+                onCancel={closeAddModal}
+                footer={[
+                    <Button key="back" onClick={closeAddModal}>
+                        Hủy
+                    </Button>,
+                    <Button key="submit" type="primary" loading={isLoading} onClick={addForm.submit}>
+                        {isLoading ? 'Đang xử lý...' : 'Thêm mới'}
+                    </Button>,
+                ]}
             >
                 <Form
-                    initialValues={editingSlide || { title: '', description: '', imageUrl: '' }}
-                    onFinish={handleSave}
+                    form={addForm}
                     layout="vertical"
+                    onFinish={handleCreateEntity}
+                    initialValues={{ title: '', description: '', activeFlag: true }}
                 >
-                    <Form.Item
-                        label="Tiêu đề"
-                        name="title"
-                        rules={[{ required: true, message: 'Tiêu đề là bắt buộc.' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        label="Mô tả"
-                        name="description"
-                        rules={[{ required: true, message: 'Mô tả là bắt buộc.' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item
-                        label="URL Hình ảnh"
-                        name="imageUrl"
-                        rules={[{ required: true, message: 'URL hình ảnh là bắt buộc.' }]}
-                    >
-                        <Input />
-                    </Form.Item>
-                    <Form.Item>
-                        <Button type="primary" htmlType="submit">
-                            {editingSlide ? 'Lưu thay đổi' : 'Thêm mới'}
-                        </Button>
-                    </Form.Item>
+                    <Row gutter={16}>
+                        <Col span={12} className="text-center">
+                            <Image width={200} src={previousImage} fallback={images.placeimgHorizontal} />
+
+                            <Form.Item
+                                className="mt-2"
+                                name="image"
+                                help="Vui lòng chọn hình ảnh dung lượng không quá 2MB"
+                                rules={[{ required: true, message: 'Vui lòng chọn hình ảnh' }]}
+                            >
+                                <Upload
+                                    accept="image/*"
+                                    fileList={fileList}
+                                    maxCount={1}
+                                    showUploadList={false}
+                                    beforeUpload={(file) => {
+                                        const isImage = file.type.startsWith('image/');
+                                        if (!isImage) {
+                                            messageApi.error('Bạn chỉ có thể upload file hình ảnh!');
+                                        }
+                                        return isImage;
+                                    }}
+                                    onChange={handleUploadChange}
+                                    customRequest={() => false}
+                                >
+                                    <Button icon={<MdOutlineFileUpload />}>Chọn hình ảnh</Button>
+                                </Upload>
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item label="Tiêu đề" name="title">
+                                <Input placeholder="Nhập tiêu đề" />
+                            </Form.Item>
+
+                            <Form.Item label="Mô tả" name="description">
+                                <TextArea rows={3} placeholder="Nhập mô tả" />
+                            </Form.Item>
+
+                            <Form.Item label="Trạng thái" name="activeFlag" valuePropName="checked">
+                                <Checkbox>Kích hoạt</Checkbox>
+                            </Form.Item>
+                        </Col>
+                    </Row>
+                </Form>
+            </Modal>
+
+            {/* Modal chỉnh sửa */}
+            <Modal
+                title="Chỉnh sửa slide"
+                open={isEditModalOpen}
+                onOk={editForm.submit}
+                onCancel={closeEditModal}
+                footer={[
+                    <Button key="back" onClick={closeEditModal}>
+                        Hủy
+                    </Button>,
+                    <Button key="submit" type="primary" loading={isLoading} onClick={editForm.submit}>
+                        {isLoading ? 'Đang xử lý...' : 'Lưu'}
+                    </Button>,
+                ]}
+            >
+                <Form form={editForm} layout="vertical" onFinish={handleUpdateEntity}>
+                    <Row gutter={16}>
+                        <Col span={12} className="text-center">
+                            <Image width={200} src={previousImage} fallback={images.placeimgHorizontal} />
+
+                            <Form.Item
+                                className="mt-2"
+                                name="image"
+                                help="Vui lòng chọn hình ảnh dung lượng không quá 2MB"
+                            >
+                                <Upload
+                                    accept="image/*"
+                                    fileList={fileList}
+                                    maxCount={1}
+                                    showUploadList={false}
+                                    beforeUpload={(file) => {
+                                        const isImage = file.type.startsWith('image/');
+                                        if (!isImage) {
+                                            messageApi.error('Bạn chỉ có thể upload file hình ảnh!');
+                                        }
+                                        return isImage;
+                                    }}
+                                    onChange={handleUploadChange}
+                                    customRequest={() => false}
+                                >
+                                    <Button icon={<MdOutlineFileUpload />}>Chọn hình ảnh</Button>
+                                </Upload>
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item label="Tiêu đề" name="title">
+                                <Input placeholder="Nhập tiêu đề" />
+                            </Form.Item>
+
+                            <Form.Item label="Mô tả" name="description">
+                                <TextArea rows={3} placeholder="Nhập mô tả" />
+                            </Form.Item>
+
+                            <Form.Item label="Trạng thái" name="activeFlag" valuePropName="checked">
+                                <Checkbox>Kích hoạt</Checkbox>
+                            </Form.Item>
+                        </Col>
+                    </Row>
                 </Form>
             </Modal>
 
             <Flex className="py-2" wrap justify="space-between" align="center">
                 <h2>Thiết lập slide</h2>
-                <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>
+                <Button type="primary" onClick={showAddModal}>
                     Thêm slide
                 </Button>
             </Flex>
 
-            <Table bordered columns={columns} dataSource={slides} />
+            <Table
+                bordered
+                rowKey="id"
+                dataSource={entityData}
+                columns={columns}
+                loading={isLoading}
+                pagination={false}
+            />
         </>
     );
 }

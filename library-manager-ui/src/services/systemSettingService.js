@@ -35,3 +35,57 @@ export const getLibraryConfig = () => {
 export const updateLibraryConfig = (values) => {
     return axiosPrivate.put('system-settings/library-config', values);
 };
+
+export const addSlide = (values) => {
+    const formData = new FormData();
+
+    for (const key in values) {
+        if (values.hasOwnProperty(key)) {
+            const value = values[key];
+            if (value !== null) {
+                formData.append(key, value);
+            }
+        }
+    }
+
+    return axiosPrivate.post('system-settings/slides', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};
+
+export const updateSlide = (id, values) => {
+    const formData = new FormData();
+
+    for (const key in values) {
+        if (values.hasOwnProperty(key)) {
+            const value = values[key];
+            if (value !== null) {
+                formData.append(key, value);
+            }
+        }
+    }
+
+    return axiosPrivate.put(`system-settings/slides/${id}`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};
+
+export const toggleActiveFlagSlide = (id) => {
+    return axiosPrivate.patch(`system-settings/slides/${id}/toggle-active`);
+};
+
+export const deleteSlide = (id) => {
+    return axiosPrivate.delete(`system-settings/slides/${id}`);
+};
+
+export const getSlides = (params) => {
+    return axiosPrivate.get(`system-settings/slides?${params}`);
+};
+
+export const getSlidesById = (values) => {
+    return axiosPrivate.get('system-settings/slides', values);
+};

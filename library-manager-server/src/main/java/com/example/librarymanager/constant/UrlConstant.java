@@ -277,5 +277,12 @@ public class UrlConstant {
 
         public static final String GET_LIBRARY_CONFIG = PRE_FIX + "/library-config";
         public static final String UPDATE_LIBRARY_CONFIG = PRE_FIX + "/library-config";
+
+        public static final String ADD_SLIDE = PRE_FIX + "/slides";
+        public static final String GET_ALL_SLIDES = PRE_FIX + "/slides";
+        public static final String GET_SLIDE_BY_ID = PRE_FIX + "/slides/{id}";
+        public static final String UPDATE_SLIDE = PRE_FIX + "/slides/{id}";
+        public static final String DELETE_SLIDE = PRE_FIX + "/slides/{id}";
+        public static final String TOGGLE_ACTIVE_SLIDE = PRE_FIX + "/slides/{id}/toggle-active";
     }
 }

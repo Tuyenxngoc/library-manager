@@ -25,8 +25,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -121,66 +119,15 @@ public class SystemSettingImpl implements SystemSettingService {
 
     @Override
     public List<HolidayResponseDto> getAllHolidays(Boolean activeFlag) {
-        File file = new File(HOLIDAYS_FILE_PATH);
-
-        if (!file.exists()) {
-            return List.of();
-        }
-
-        try (Stream<String> lines = Files.lines(Paths.get(HOLIDAYS_FILE_PATH))) {
-            return lines.map(line -> {
-                        String[] parts = line.split(",");
-                        if (parts.length == 5) {
-                            return new HolidayResponseDto(
-                                    parts[0],
-                                    parts[1],
-                                    LocalDate.parse(parts[2]),
-                                    LocalDate.parse(parts[3]),
-                                    Boolean.parseBoolean(parts[4])
-                            );
-                        } else {
-                            return null;
-                        }
-                    })
-                    .filter(Objects::nonNull)
-                    .filter(dto -> activeFlag == null || dto.getActiveFlag().equals(activeFlag))
-                    .toList();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return List.of();
-        }
+        return readFromFile(HOLIDAYS_FILE_PATH).stream()
+                .filter(dto -> activeFlag == null || dto.getActiveFlag().equals(activeFlag))
+                .toList();
     }
 
     @Override
     public HolidayResponseDto getHolidayById(String id) {
-        File file = new File(HOLIDAYS_FILE_PATH);
-
-        if (!file.exists()) {
-            return null;
-        }
-
-        try (Stream<String> lines = Files.lines(Paths.get(HOLIDAYS_FILE_PATH))) {
-            return lines.map(line -> {
-                        String[] parts = line.split(",");
-                        if (parts.length == 5 && parts[0].equals(id)) {
-                            return new HolidayResponseDto(
-                                    parts[0],
-                                    parts[1],
-                                    LocalDate.parse(parts[2]),
-                                    LocalDate.parse(parts[3]),
-                                    Boolean.parseBoolean(parts[4])
-                            );
-                        } else {
-                            return null;
-                        }
-                    })
-                    .filter(Objects::nonNull)
-                    .findFirst()
-                    .orElse(null);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+        List<HolidayResponseDto> holidays = readFromFile(HOLIDAYS_FILE_PATH);
+        return holidays.stream().filter(dto -> dto.getId().equals(id)).findFirst().orElse(null);
     }
 
     @Override
