@@ -22,6 +22,7 @@ import com.example.librarymanager.service.ReaderService;
 import com.example.librarymanager.util.PaginationUtil;
 import com.example.librarymanager.util.UploadFileUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -30,10 +31,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReaderServiceImpl implements ReaderService {
@@ -74,6 +79,34 @@ public class ReaderServiceImpl implements ReaderService {
 
     @Override
     public void initReadersFromCsv(String readersCsvPath) {
+        if (readerRepository.count() > 0) {
+            return;
+        }
+        try (BufferedReader br = new BufferedReader(new FileReader(readersCsvPath))) {
+            String line;
+            br.readLine();
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(";");
+                if (values.length < 3) continue;
+
+                Reader reader = new Reader();
+                reader.setCardType(CardType.STUDENT);
+                reader.setFullName(values[0]);
+                reader.setEmail(values[1]);
+                reader.setCardNumber(values[2]);
+                reader.setPassword(passwordEncoder.encode(values[3]));
+                reader.setCreatedDate(LocalDate.now());
+                reader.setExpiryDate(LocalDate.now().plusMonths(1));
+                reader.setStatus(CardStatus.ACTIVE);
+
+                if (!readerRepository.existsByCardNumber(reader.getCardNumber())
+                        && !readerRepository.existsByEmail(reader.getEmail())) {
+                    readerRepository.save(reader);
+                }
+            }
+        } catch (IOException e) {
+            log.error("Error while saving reader: {}", e.getMessage(), e);
+        }
     }
 
     @Override

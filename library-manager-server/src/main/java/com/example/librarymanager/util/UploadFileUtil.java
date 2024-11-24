@@ -56,8 +56,8 @@ public class UploadFileUtil {
         int endIndex = url.lastIndexOf(".");
         String publicId = url.substring(startIndex, endIndex);
         try {
-            Map<?, ?> result = cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
-            log.info(String.format("Destroy image public id %s %s", publicId, result.toString()));
+            Map<?, ?> result = cloudinary.uploader().destroy(publicId, ObjectUtils.asMap("invalidate", true));
+            log.info("Destroy image public id {} {}", publicId, result.toString());
         } catch (IOException e) {
             throw new BadGatewayException("Remove file failed!");
         }
