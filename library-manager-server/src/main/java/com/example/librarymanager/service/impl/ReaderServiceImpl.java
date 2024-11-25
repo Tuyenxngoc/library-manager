@@ -256,9 +256,9 @@ public class ReaderServiceImpl implements ReaderService {
     public byte[] generateReaderCards(CreateReaderCardsRequestDto requestDto) {
         List<Reader> readers = readerRepository.findAllByIdIn(requestDto.getReaderIds());
         if (readers.isEmpty()) {
-            throw new BadRequestException(ErrorMessage.Reader.ERR_NOT_FOUND_ID, 1);
+            throw new BadRequestException(ErrorMessage.Reader.ERR_NOT_FOUND_ID, requestDto.getReaderIds());
         }
-        return pdfService.createReaderCardPdf(requestDto, readers);
+        return pdfService.createReaderCard(requestDto, readers);
     }
 
     @Override

@@ -88,13 +88,15 @@ public class UrlConstant {
     public static class BorrowReceipt {
         private static final String PRE_FIX = "/borrow-receipts";
 
+        public static final String GET_BY_READER = PRE_FIX;
+
         public static final String CREATE = ADMIN_URL + PRE_FIX;
         public static final String GET_ALL = ADMIN_URL + PRE_FIX;
         public static final String GET_BY_ID = ADMIN_URL + PRE_FIX + "/{id}";
         public static final String UPDATE = ADMIN_URL + PRE_FIX + "/{id}";
         public static final String DELETE = ADMIN_URL + PRE_FIX + "/{id}";
+        public static final String PRINT = ADMIN_URL + PRE_FIX + "/print";
         public static final String GET_BY_CART_ID = ADMIN_URL + PRE_FIX + "/cart/{id}";
-        public static final String GET_BY_READER = PRE_FIX;
         public static final String GET_DETAILS_BY_ID = ADMIN_URL + PRE_FIX + "/details/{id}";
     }
 

@@ -93,8 +93,8 @@ public class ReaderController {
         byte[] pdfBytes = readerService.generateReaderCards(requestDto);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "application/pdf");
-        headers.add("Content-Disposition", "inline; filename=generated.pdf");
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=readers.pdf");
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE);
 
         return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
     }

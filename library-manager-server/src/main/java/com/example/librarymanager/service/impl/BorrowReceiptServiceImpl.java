@@ -6,6 +6,7 @@ import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
 import com.example.librarymanager.domain.dto.request.BorrowReceiptRequestDto;
+import com.example.librarymanager.domain.dto.request.CreateBorrowReceiptRequestDto;
 import com.example.librarymanager.domain.dto.response.borrowreceipt.BorrowReceiptDetailResponseDto;
 import com.example.librarymanager.domain.dto.response.borrowreceipt.BorrowReceiptDetailsDto;
 import com.example.librarymanager.domain.dto.response.borrowreceipt.BorrowReceiptForReaderResponseDto;
@@ -13,12 +14,14 @@ import com.example.librarymanager.domain.dto.response.borrowreceipt.BorrowReceip
 import com.example.librarymanager.domain.entity.*;
 import com.example.librarymanager.domain.mapper.BorrowReceiptMapper;
 import com.example.librarymanager.domain.specification.EntitySpecification;
+import com.example.librarymanager.exception.BadRequestException;
 import com.example.librarymanager.exception.ConflictException;
 import com.example.librarymanager.exception.ForbiddenException;
 import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.*;
 import com.example.librarymanager.service.BorrowReceiptService;
 import com.example.librarymanager.service.LogService;
+import com.example.librarymanager.service.PdfService;
 import com.example.librarymanager.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
@@ -57,9 +60,13 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
 
     private final CartDetailRepository cartDetailRepository;
 
+    private final UserRepository userRepository;
+
+    private final PdfService pdfService;
+
     private BorrowReceipt getEntity(Long id) {
         return borrowReceiptRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.BorrowReceipt.ERR_RECEIPT_NOT_FOUND, id));
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.BorrowReceipt.ERR_NOT_FOUND_ID, id));
     }
 
     private void getReader(BorrowReceipt borrowReceipt, BorrowReceiptRequestDto requestDto) {
@@ -286,6 +293,19 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
         BorrowReceipt borrowReceipt = getEntity(id);
 
         return new BorrowReceiptDetailsDto(borrowReceipt);
+    }
+
+    @Override
+    public byte[] createPdfForReceipts(CreateBorrowReceiptRequestDto requestDto, String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.User.ERR_NOT_FOUND_ID, userId));
+
+        List<BorrowReceipt> borrowReceipts = borrowReceiptRepository.findAllByIdIn(requestDto.getBorrowIds());
+        if (borrowReceipts.isEmpty()) {
+            throw new BadRequestException(ErrorMessage.BorrowReceipt.ERR_NOT_FOUND_ID, requestDto.getBorrowIds());
+        }
+
+        return pdfService.createReceipt(user, requestDto, borrowReceipts);
     }
 
 }

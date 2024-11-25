@@ -6,6 +6,7 @@ import com.example.librarymanager.base.VsResponseUtil;
 import com.example.librarymanager.constant.UrlConstant;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.request.BorrowReceiptRequestDto;
+import com.example.librarymanager.domain.dto.request.CreateBorrowReceiptRequestDto;
 import com.example.librarymanager.security.CustomUserDetails;
 import com.example.librarymanager.service.BorrowReceiptService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,7 +16,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -95,5 +98,21 @@ public class BorrowReceiptController {
     @GetMapping(UrlConstant.BorrowReceipt.GET_DETAILS_BY_ID)
     public ResponseEntity<?> getBorrowReceiptDetailsById(@PathVariable Long id) {
         return VsResponseUtil.success(borrowReceiptService.findDetailsById(id));
+    }
+
+    @Operation(summary = "API Print Borrow Receipts")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BORROW_RECEIPT')")
+    @PostMapping(UrlConstant.BorrowReceipt.PRINT)
+    public ResponseEntity<byte[]> printBorrowReceipts(
+            @Valid @RequestBody CreateBorrowReceiptRequestDto requestDto,
+            @CurrentUser CustomUserDetails userDetails
+    ) {
+        byte[] pdfBytes = borrowReceiptService.createPdfForReceipts(requestDto, userDetails.getUserId());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=borrow_receipts.pdf");
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE);
+
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
     }
 }

@@ -180,7 +180,7 @@ public class ErrorMessage {
     }
 
     public static class BorrowReceipt {
-        public static final String ERR_RECEIPT_NOT_FOUND = "exception.borrow.receipt.not.found";
+        public static final String ERR_NOT_FOUND_ID = "exception.borrow.receipt.not.found.id";
         public static final String ERR_DUPLICATE_RECEIPT_NUMBER = "exception.borrow.receipt.duplicate.number";
     }
 
