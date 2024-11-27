@@ -2,12 +2,17 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Drawer, Flex, Input, message, Popconfirm, Select, Space, Table } from 'antd';
 import { MdOutlineModeEdit } from 'react-icons/md';
-import { FaRegTrashAlt } from 'react-icons/fa';
+import { FaRegTrashAlt, FaPrint } from 'react-icons/fa';
 
 import queryString from 'query-string';
 
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
-import { deleteBorrowReceipt, getBorrowReceiptDetails, getBorrowReceipts } from '~/services/borrowReceiptService';
+import {
+    deleteBorrowReceipt,
+    getBorrowReceiptDetails,
+    getBorrowReceipts,
+    printBorrowReceipts,
+} from '~/services/borrowReceiptService';
 
 const options = [
     { value: 'receiptNumber', label: 'Số phiếu mượn' },
@@ -34,6 +39,8 @@ function BorrowBook() {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
     const [receiptDetails, setReceiptDetails] = useState(null);
     const [loadingDetails, setLoadingDetails] = useState(false);
+
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
     const handleChangePage = (newPage) => {
         setFilters((prev) => ({ ...prev, pageNum: newPage }));
@@ -98,6 +105,38 @@ function BorrowBook() {
         }
     };
 
+    const handlePrintBorrow = async () => {
+        if (selectedRowKeys.length === 0) {
+            messageApi.info('Vui lòng chọn ít nhất một phiếu.');
+            return;
+        }
+        setIsLoading(true);
+        try {
+            const response = await printBorrowReceipts({
+                schoolName: 'Trường Đại học Công nghiệp Hà Nội',
+                borrowIds: selectedRowKeys,
+            });
+
+            if (response.status === 200) {
+                // Chuyển đổi mảng byte thành Blob
+                const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+                const url = URL.createObjectURL(pdfBlob);
+
+                // Mở hoặc tải xuống file PDF
+                const newTab = window.open(url, '_blank');
+                newTab.focus(); // Đưa tab mới lên trước
+
+                // Giải phóng URL sau khi sử dụng
+                URL.revokeObjectURL(url);
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi xuất dữ liệu.';
+            messageApi.error(errorMessage);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
         const fetchEntities = async () => {
             setIsLoading(true);
@@ -117,6 +156,15 @@ function BorrowBook() {
 
         fetchEntities();
     }, [filters]);
+
+    const rowSelection = {
+        onChange: (selectedRowKeys) => {
+            setSelectedRowKeys(selectedRowKeys);
+        },
+        getCheckboxProps: (record, index) => ({
+            name: record.id,
+        }),
+    };
 
     const columns = [
         {
@@ -296,6 +344,8 @@ function BorrowBook() {
                     <Button type="primary" onClick={() => navigate('new')}>
                         Lập phiếu mượn
                     </Button>
+
+                    <Button icon={<FaPrint />} onClick={handlePrintBorrow}></Button>
                 </Space>
             </Flex>
 
@@ -306,6 +356,7 @@ function BorrowBook() {
                 columns={columns}
                 loading={isLoading}
                 onChange={handleSortChange}
+                rowSelection={rowSelection}
                 pagination={{
                     current: filters.pageNum,
                     pageSize: filters.pageSize,

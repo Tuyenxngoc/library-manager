@@ -183,7 +183,7 @@ public class PdfServiceImpl implements PdfService {
         infoCell.addElement(createParagraph("THẺ THƯ VIỆN", boldFontMedium, Element.ALIGN_CENTER));
         infoCell.addElement(new Paragraph(String.format("Họ và tên: %s", reader.getFullName()), normalFontMedium));
         infoCell.addElement(new Paragraph(String.format("Loại thẻ: %s", reader.getCardType().getDisplayName()), normalFontMedium));
-        infoCell.addElement(new Paragraph(String.format("Ngày sinh: %s", reader.getDateOfBirth().format(formatter)), normalFontMedium));
+        infoCell.addElement(new Paragraph(String.format("Ngày sinh: %s", reader.getDateOfBirth() != null ? reader.getDateOfBirth().format(formatter) : "Không có"), normalFontMedium));
         infoCell.addElement(new Paragraph(String.format("Ngày hết hạn: %s", reader.getExpiryDate() != null ? reader.getExpiryDate().format(formatter) : "Không có"), normalFontMedium));
         infoCell.addElement(createParagraph("Ban giám hiệu", normalFontMedium, Element.ALIGN_CENTER));
         infoCell.addElement(createParagraph(requestDto.getPrincipalName().toUpperCase(), italicFontMedium, Element.ALIGN_CENTER));

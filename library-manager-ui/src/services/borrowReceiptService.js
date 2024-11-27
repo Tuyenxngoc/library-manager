@@ -31,3 +31,9 @@ export const getBorrowReceiptsForReader = (params) => {
 export const getBorrowReceiptDetails = (id) => {
     return axiosPrivate.get(`admin/borrow-receipts/details/${id}`);
 };
+
+export const printBorrowReceipts = (values) => {
+    return axiosPrivate.post('admin/borrow-receipts/print', values, {
+        responseType: 'arraybuffer',
+    });
+};
