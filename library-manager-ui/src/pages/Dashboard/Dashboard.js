@@ -19,6 +19,8 @@ import {
 } from 'recharts';
 import classNames from 'classnames/bind';
 import styles from '~/styles/Dashboard.module.scss';
+import { useEffect, useState } from 'react';
+import { getBorrowStats } from '~/services/statisticsService';
 
 const cx = classNames.bind(styles);
 
@@ -94,13 +96,33 @@ function Dashboard() {
     // Màu sắc cho các phần của biểu đồ
     const COLORS = ['#5cb85c', '#d9534f'];
 
+    const [borrowStats, setBorrowStats] = useState({
+        borrowRequests: 0,
+        currentlyBorrowed: 0,
+        dueToday: 0,
+        overdue: 0,
+    });
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const response = await getBorrowStats();
+                setBorrowStats(response.data.data);
+            } catch (error) {
+                console.error('Failed to fetch borrow stats:', error);
+            }
+        };
+
+        fetchStats();
+    }, []);
+
     return (
         <div>
             <div className="row g-3">
                 <div className="col-lg-3 col-md-6">
                     <Card
                         icon={<FaEdit className="fs-1" />}
-                        count={0}
+                        count={borrowStats.borrowRequests}
                         label="Yêu cầu mượn"
                         link="/admin/borrow-requests"
                         color="#337ab7"
@@ -109,27 +131,27 @@ function Dashboard() {
                 <div className="col-lg-3 col-md-6">
                     <Card
                         icon={<FaThumbtack className="fs-1" />}
-                        count={0}
+                        count={borrowStats.currentlyBorrowed}
                         label="Số đang mượn"
-                        link="/admin/home"
+                        link="/admin/circulation/borrow"
                         color="#5cb85c"
                     />
                 </div>
                 <div className="col-lg-3 col-md-6">
                     <Card
                         icon={<FaClock className="fs-1" />}
-                        count={0}
+                        count={borrowStats.dueToday}
                         label="Đến hạn trả"
-                        link="/admin/home"
+                        link="/admin/circulation/borrow?type=1"
                         color="#f0ad4e"
                     />
                 </div>
                 <div className="col-lg-3 col-md-6">
                     <Card
                         icon={<FaBan className="fs-1" />}
-                        count={0}
+                        count={borrowStats.overdue}
                         label="Quá hạn trả"
-                        link="/admin/home"
+                        link="/admin/circulation/borrow?type=2"
                         color="#d9534f"
                     />
                 </div>

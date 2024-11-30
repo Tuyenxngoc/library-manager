@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @RestApiV1
@@ -25,5 +26,12 @@ public class StatsController {
     public ResponseEntity<?> getLibraryStatistics() {
         return VsResponseUtil.success(statisticsService.getLibraryStatistics());
 
+    }
+
+    @Operation(summary = "Get Borrow Statistics")
+    @PreAuthorize("!hasRole('ROLE_READER')")
+    @GetMapping(UrlConstant.Stats.GET_BORROW_STATISTICS)
+    public ResponseEntity<?> getBorrowStatistics() {
+        return VsResponseUtil.success(statisticsService.getBorrowStatistics());
     }
 }

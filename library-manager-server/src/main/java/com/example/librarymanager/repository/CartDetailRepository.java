@@ -24,6 +24,9 @@ public interface CartDetailRepository extends JpaRepository<CartDetail, Long>, J
             "WHERE c.id = :cartId")
     List<CartDetailResponseDto> getAllByCartId(@Param("cartId") Long cartId);
 
+    @Query("SELECT COUNT(DISTINCT cd.cart.id) FROM CartDetail cd WHERE cd.borrowTo > CURRENT_DATE")
+    int countBorrowRequests();
+
     @Modifying
     @Transactional
     @Query("DELETE " +
