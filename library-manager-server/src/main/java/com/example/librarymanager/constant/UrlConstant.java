@@ -253,6 +253,9 @@ public class UrlConstant {
 
         public static final String GET_LIBRARY_STATISTICS = PRE_FIX + "/library";
         public static final String GET_BORROW_STATISTICS = PRE_FIX + "/borrow";
+        public static final String GET_LOAN_STATUS = PRE_FIX + "/loan-status";
+        public static final String GET_MOST_BORROWED = PRE_FIX + "/most-borrowed";
+        public static final String GET_PUBLICATION_STATISTICS = PRE_FIX + "/publication-by-category";
     }
 
     public static class Cart {

@@ -1,9 +1,9 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Timeline } from 'antd';
 import { FaEdit, FaThumbtack, FaBook, FaClock, FaBan, FaArrowAltCircleRight } from 'react-icons/fa';
 import { IoBarChartSharp } from 'react-icons/io5';
 import { FaChartPie } from 'react-icons/fa6';
-
 import {
     BarChart,
     Bar,
@@ -19,8 +19,12 @@ import {
 } from 'recharts';
 import classNames from 'classnames/bind';
 import styles from '~/styles/Dashboard.module.scss';
-import { useEffect, useState } from 'react';
-import { getBorrowStats } from '~/services/statisticsService';
+import {
+    getBorrowStats,
+    getLoanStatus,
+    getMostBorrowedPublications,
+    getPublicationStatisticsByCategory,
+} from '~/services/statisticsService';
 
 const cx = classNames.bind(styles);
 
@@ -49,71 +53,58 @@ const Card = ({ icon, count, label, link, color = 'white' }) => {
     );
 };
 
+const CHART_COLORS = ['#5cb85c', '#d9534f'];
+
 function Dashboard() {
-    const data = [
-        { category: 'Sách', count: 10 },
-        { category: 'Tạp chí', count: 5 },
-        { category: 'Báo', count: 15 },
-        { category: 'Tài liệu tham khảo', count: 8 },
-        { category: 'Sách', count: 10 },
-        { category: 'Tạp chí', count: 5 },
-        { category: 'Báo', count: 15 },
-        { category: 'Tài liệu tham khảo', count: 8 },
-        { category: 'Sách', count: 10 },
-        { category: 'Tạp chí', count: 5 },
-        { category: 'Báo', count: 15 },
-        { category: 'Tài liệu tham khảo', count: 8 },
-    ];
-
-    const pieData = [
-        { name: 'Đang cho mượn', value: 75 },
-        { name: 'Quá hạn', value: 25 },
-    ];
-
-    const mostBorrowedPublications = [
-        {
-            title: 'The Great Gatsby',
-            date: '2023-01-15',
-            description: 'Một câu chuyện về sự xa hoa và những giấc mơ không thành của Mỹ thập niên 1920.',
-        },
-        {
-            title: 'To Kill a Mockingbird',
-            date: '2023-02-10',
-            description: 'Cuốn tiểu thuyết kinh điển về nạn phân biệt chủng tộc và công lý ở miền Nam nước Mỹ.',
-        },
-        {
-            title: '1984',
-            date: '2023-03-20',
-            description: 'Tác phẩm kinh điển của George Orwell về một xã hội kiểm soát toàn diện.',
-        },
-        {
-            title: 'Pride and Prejudice',
-            date: '2023-04-25',
-            description: 'Câu chuyện lãng mạn nổi tiếng của Jane Austen về tình yêu và định kiến.',
-        },
-    ];
-
-    // Màu sắc cho các phần của biểu đồ
-    const COLORS = ['#5cb85c', '#d9534f'];
-
-    const [borrowStats, setBorrowStats] = useState({
+    const [borrowStatistics, setBorrowStatistics] = useState({
         borrowRequests: 0,
         currentlyBorrowed: 0,
         dueToday: 0,
         overdue: 0,
     });
+    const [loanStatusData, setLoanStatusData] = useState([]);
+    const [topBorrowedBooks, setTopBorrowedBooks] = useState([]);
+    const [categoryStatistics, setCategoryStatistics] = useState([]);
+
+    const fetchBorrowStatistics = async () => {
+        try {
+            const response = await getBorrowStats();
+            setBorrowStatistics(response.data.data);
+        } catch (error) {}
+    };
+
+    const fetchLoanStatusData = async () => {
+        try {
+            const response = await getLoanStatus();
+            const data = response.data.data;
+
+            const chartData = [
+                { name: 'Đang cho mượn', value: data.percentageBorrowed },
+                { name: 'Quá hạn', value: data.percentageOverdue },
+            ];
+            setLoanStatusData(chartData);
+        } catch (error) {}
+    };
+
+    const fetchTopBorrowedBooks = async () => {
+        try {
+            const response = await getMostBorrowedPublications();
+            setTopBorrowedBooks(response.data.data);
+        } catch (error) {}
+    };
+
+    const fetchCategoryStatistics = async () => {
+        try {
+            const response = await getPublicationStatisticsByCategory();
+            setCategoryStatistics(response.data.data);
+        } catch (error) {}
+    };
 
     useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                const response = await getBorrowStats();
-                setBorrowStats(response.data.data);
-            } catch (error) {
-                console.error('Failed to fetch borrow stats:', error);
-            }
-        };
-
-        fetchStats();
+        fetchLoanStatusData();
+        fetchBorrowStatistics();
+        fetchTopBorrowedBooks();
+        fetchCategoryStatistics();
     }, []);
 
     return (
@@ -122,7 +113,7 @@ function Dashboard() {
                 <div className="col-lg-3 col-md-6">
                     <Card
                         icon={<FaEdit className="fs-1" />}
-                        count={borrowStats.borrowRequests}
+                        count={borrowStatistics.borrowRequests}
                         label="Yêu cầu mượn"
                         link="/admin/borrow-requests"
                         color="#337ab7"
@@ -131,7 +122,7 @@ function Dashboard() {
                 <div className="col-lg-3 col-md-6">
                     <Card
                         icon={<FaThumbtack className="fs-1" />}
-                        count={borrowStats.currentlyBorrowed}
+                        count={borrowStatistics.currentlyBorrowed}
                         label="Số đang mượn"
                         link="/admin/circulation/borrow"
                         color="#5cb85c"
@@ -140,7 +131,7 @@ function Dashboard() {
                 <div className="col-lg-3 col-md-6">
                     <Card
                         icon={<FaClock className="fs-1" />}
-                        count={borrowStats.dueToday}
+                        count={borrowStatistics.dueToday}
                         label="Đến hạn trả"
                         link="/admin/circulation/borrow?type=1"
                         color="#f0ad4e"
@@ -149,7 +140,7 @@ function Dashboard() {
                 <div className="col-lg-3 col-md-6">
                     <Card
                         icon={<FaBan className="fs-1" />}
-                        count={borrowStats.overdue}
+                        count={borrowStatistics.overdue}
                         label="Quá hạn trả"
                         link="/admin/circulation/borrow?type=2"
                         color="#d9534f"
@@ -163,9 +154,9 @@ function Dashboard() {
                 </div>
                 <div className={cx('body')}>
                     <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={data}>
+                        <BarChart data={categoryStatistics}>
                             <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="category" />
+                            <XAxis dataKey="categoryName" />
                             <YAxis />
                             <Tooltip />
                             <Legend />
@@ -183,7 +174,7 @@ function Dashboard() {
                     <ResponsiveContainer width="100%" height={300}>
                         <PieChart>
                             <Pie
-                                data={pieData}
+                                data={loanStatusData}
                                 dataKey="value"
                                 nameKey="name"
                                 cx="50%"
@@ -191,8 +182,8 @@ function Dashboard() {
                                 outerRadius={80}
                                 fill="#8884d8"
                             >
-                                {pieData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index]} />
+                                {loanStatusData.map((_, index) => (
+                                    <Cell key={`cell-${index}`} fill={CHART_COLORS[index]} />
                                 ))}
                             </Pie>
                             <Tooltip />
@@ -208,13 +199,17 @@ function Dashboard() {
                 <div className={cx('body')}>
                     <Timeline
                         mode="alternate"
-                        items={mostBorrowedPublications.map((publication, index) => ({
+                        items={topBorrowedBooks.map((publication, index) => ({
                             color: index % 2 === 0 ? 'gray' : 'green',
                             dot: <FaBook style={{ fontSize: '16px' }} />,
                             children: (
                                 <>
-                                    <strong>{publication.title}</strong> - <em>{publication.date}</em>
-                                    <p>{publication.description}</p>
+                                    <strong>{publication.title}</strong>
+                                    <p>
+                                        <small className="text-muted">
+                                            <FaClock /> {publication.borrowCount} lượt mượn
+                                        </small>
+                                    </p>
                                 </>
                             ),
                         }))}
