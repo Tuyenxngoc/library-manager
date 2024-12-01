@@ -61,7 +61,8 @@ const AuthProvider = ({ children }) => {
     };
 
     const logout = async () => {
-        await logoutToken();
+        const refreshToken = localStorage.getItem(REFRESH_TOKEN);
+        await logoutToken(refreshToken);
         setAuthData(defaultAuth);
         localStorage.removeItem(ACCESS_TOKEN);
         localStorage.removeItem(REFRESH_TOKEN);

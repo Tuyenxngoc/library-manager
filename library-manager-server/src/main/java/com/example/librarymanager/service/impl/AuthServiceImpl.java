@@ -19,6 +19,7 @@ import com.example.librarymanager.security.jwt.JwtTokenProvider;
 import com.example.librarymanager.service.AuthService;
 import com.example.librarymanager.service.EmailRateLimiterService;
 import com.example.librarymanager.service.JwtTokenService;
+import com.example.librarymanager.util.JwtUtil;
 import com.example.librarymanager.util.RandomPasswordUtil;
 import com.example.librarymanager.util.SendMailUtil;
 import jakarta.mail.MessagingException;
@@ -86,9 +87,6 @@ public class AuthServiceImpl implements AuthService {
             String accessToken = jwtTokenProvider.generateToken(customUserDetails, Boolean.FALSE);
             String refreshToken = jwtTokenProvider.generateToken(customUserDetails, Boolean.TRUE);
 
-            jwtTokenService.saveAccessToken(accessToken, customUserDetails.getCardNumber());
-            jwtTokenService.saveRefreshToken(refreshToken, customUserDetails.getCardNumber());
-
             return new LoginResponseDto(
                     accessToken,
                     refreshToken
@@ -117,9 +115,6 @@ public class AuthServiceImpl implements AuthService {
             String accessToken = jwtTokenProvider.generateToken(customUserDetails, Boolean.FALSE);
             String refreshToken = jwtTokenProvider.generateToken(customUserDetails, Boolean.TRUE);
 
-            jwtTokenService.saveAccessToken(accessToken, customUserDetails.getUserId());
-            jwtTokenService.saveRefreshToken(refreshToken, customUserDetails.getUserId());
-
             return new LoginResponseDto(
                     accessToken,
                     refreshToken
@@ -137,14 +132,17 @@ public class AuthServiceImpl implements AuthService {
             HttpServletResponse response,
             Authentication authentication
     ) {
-        if (authentication != null && authentication.getPrincipal() != null) {
-            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-            if (customUserDetails.getUserId() != null) {
-                jwtTokenService.deleteTokens(customUserDetails.getUserId());
-            }
-            if (customUserDetails.getCardNumber() != null) {
-                jwtTokenService.deleteTokens(customUserDetails.getCardNumber());
-            }
+        String accessToken = JwtUtil.extractTokenFromRequest(request);
+        String refreshToken = JwtUtil.extractRefreshTokenFromRequest(request);
+
+        if (accessToken != null) {
+            // Lưu accessToken vào blacklist
+            jwtTokenService.blacklistAccessToken(accessToken);
+        }
+
+        if (refreshToken != null) {
+            // Lưu refreshToken vào blacklist
+            jwtTokenService.blacklistRefreshToken(refreshToken);
         }
 
         SecurityContextLogoutHandler logout = new SecurityContextLogoutHandler();
@@ -161,7 +159,8 @@ public class AuthServiceImpl implements AuthService {
         if (jwtTokenProvider.validateToken(refreshToken)) {
             String userId = jwtTokenProvider.extractSubjectFromJwt(refreshToken);
 
-            if (userId != null && jwtTokenService.isRefreshTokenExists(refreshToken, userId)) {//Kiểm tra nếu có userId
+            //Kiểm tra nếu có userId
+            if (userId != null && jwtTokenService.isTokenAllowed(refreshToken)) {
                 User user = userRepository.findById(userId)
                         .orElseThrow(() -> new BadRequestException(ErrorMessage.Auth.ERR_INVALID_REFRESH_TOKEN));
                 CustomUserDetails userDetails = CustomUserDetails.create(user);
@@ -169,14 +168,13 @@ public class AuthServiceImpl implements AuthService {
                 String newAccessToken = jwtTokenProvider.generateToken(userDetails, Boolean.FALSE);
                 String newRefreshToken = jwtTokenProvider.generateToken(userDetails, Boolean.TRUE);
 
-                jwtTokenService.saveAccessToken(newAccessToken, user.getId());
-                jwtTokenService.saveRefreshToken(newRefreshToken, user.getId());
-
                 return new TokenRefreshResponseDto(newAccessToken, newRefreshToken);
-            } else {//Nếu không kiểm tra cardNumber
+            } else {
+
+                //Nếu không kiểm tra cardNumber
                 String cardNumber = jwtTokenProvider.extractClaimCardNumber(refreshToken);
 
-                if (cardNumber != null && jwtTokenService.isRefreshTokenExists(refreshToken, cardNumber)) {
+                if (cardNumber != null && jwtTokenService.isTokenAllowed(refreshToken)) {
                     Reader reader = readerRepository.findByCardNumber(cardNumber)
                             .orElseThrow(() -> new BadRequestException(ErrorMessage.Auth.ERR_INVALID_REFRESH_TOKEN));
 
@@ -185,15 +183,9 @@ public class AuthServiceImpl implements AuthService {
                     String newAccessToken = jwtTokenProvider.generateToken(userDetails, Boolean.FALSE);
                     String newRefreshToken = jwtTokenProvider.generateToken(userDetails, Boolean.TRUE);
 
-                    jwtTokenService.saveAccessToken(newAccessToken, cardNumber);
-                    jwtTokenService.saveRefreshToken(newRefreshToken, cardNumber);
-
                     return new TokenRefreshResponseDto(newAccessToken, newRefreshToken);
-
                 }
-
             }
-
         }
 
         //Trả về lỗi refresh token không hợp lệ

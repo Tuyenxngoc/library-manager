@@ -12,8 +12,16 @@ export const readerChangePassword = (values) => {
     return axiosPrivate.patch('auth/change-password', values);
 };
 
-export const logoutToken = () => {
-    return axiosPrivate.post('auth/logout');
+export const logoutToken = (refreshToken) => {
+    return axiosPrivate.post(
+        'auth/logout',
+        {},
+        {
+            headers: {
+                'X-Refresh-Token': refreshToken,
+            },
+        },
+    );
 };
 
 export const adminLogin = (values) => {

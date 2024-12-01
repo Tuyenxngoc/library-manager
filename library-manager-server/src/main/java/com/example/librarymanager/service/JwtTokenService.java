@@ -1,15 +1,9 @@
 package com.example.librarymanager.service;
 
 public interface JwtTokenService {
+    void blacklistAccessToken(String accessToken);
 
-    void saveAccessToken(String accessToken, String userIdOrCardNumber);
+    void blacklistRefreshToken(String refreshToken);
 
-    void saveRefreshToken(String refreshToken, String userIdOrCardNumber);
-
-    boolean isAccessTokenExists(String accessToken, String userIdOrCardNumber);
-
-    boolean isRefreshTokenExists(String refreshToken, String userIdOrCardNumber);
-
-    void deleteTokens(String userIdOrCardNumber);
-
+    boolean isTokenAllowed(String token);
 }
