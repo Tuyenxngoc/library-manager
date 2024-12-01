@@ -1,9 +1,12 @@
-import { Button, Input, message } from 'antd';
+import { useEffect, useState } from 'react';
+import { Button, Input, message, Upload } from 'antd';
+import { MdOutlineFileUpload } from 'react-icons/md';
 import ReactQuill from 'react-quill';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { formats, modules } from '~/common/editorConfig';
 import { handleError } from '~/utils/errorHandler';
+import { getLibraryInfo, updateLibraryInfo } from '~/services/systemSettingService';
 const { TextArea } = Input;
 
 const defaultValue = {
@@ -21,7 +24,6 @@ const defaultValue = {
     email: '',
     pageTitle: '',
     motto: '',
-    logo: '',
     introduction: '',
 };
 
@@ -38,10 +40,27 @@ const validationSchema = yup.object({
 });
 
 function LibraryInfo() {
+    const [fileList, setFileList] = useState([]);
     const [messageApi, contextHolder] = message.useMessage();
+
+    const handleUploadChange = ({ file, fileList }) => {
+        setFileList(fileList);
+
+        const { originFileObj } = file;
+        if (!originFileObj) {
+            return;
+        }
+
+        formik.setFieldValue('logo', originFileObj);
+    };
 
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
+            const response = await updateLibraryInfo(values);
+            if (response.status === 200) {
+                const { message } = response.data.data;
+                messageApi.success(message);
+            }
         } catch (error) {
             handleError(error, formik, messageApi);
         } finally {
@@ -55,6 +74,21 @@ function LibraryInfo() {
         onSubmit: handleSubmit,
         enableReinitialize: true,
     });
+
+    useEffect(() => {
+        const fetchEntities = async () => {
+            try {
+                const response = await getLibraryInfo();
+                const { data } = response.data;
+                if (data) {
+                    formik.setValues(data);
+                }
+            } catch (error) {}
+        };
+
+        fetchEntities();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <>
@@ -329,8 +363,23 @@ function LibraryInfo() {
                         <label htmlFor="logo">Logo:</label>
                     </div>
                     <div className="col-md-6">
-                        <Input type="file" id="logo" name="" />
-                        <div className="text-danger"></div>
+                        <Upload
+                            accept="image/*"
+                            fileList={fileList}
+                            maxCount={1}
+                            showUploadList={false}
+                            beforeUpload={(file) => {
+                                const isImage = file.type.startsWith('image/');
+                                if (!isImage) {
+                                    messageApi.error('Bạn chỉ có thể upload file hình ảnh!');
+                                }
+                                return isImage;
+                            }}
+                            onChange={handleUploadChange}
+                            customRequest={() => false}
+                        >
+                            <Button icon={<MdOutlineFileUpload />}>Chọn hình ảnh</Button>
+                        </Upload>
                     </div>
                 </div>
                 <div className="row mb-3">
@@ -341,10 +390,15 @@ function LibraryInfo() {
                         <ReactQuill
                             className="custom-quill"
                             placeholder="Nhập nội dung"
+                            value={formik.values.introduction}
                             modules={modules}
                             formats={formats}
+                            onChange={(value) => formik.setFieldValue('introduction', value)}
+                            onBlur={() => formik.setFieldTouched('introduction', true)}
                         />
-                        <div className="text-danger"></div>
+                        {formik.touched.introduction && formik.errors.introduction ? (
+                            <div className="text-danger">{formik.errors.introduction}</div>
+                        ) : null}
                     </div>
                 </div>
 
@@ -353,7 +407,7 @@ function LibraryInfo() {
                         <span className="text-warning">(*):Không được phép để trống!</span>
                     </div>
                     <div className="col-md-6">
-                        <Button type="primary" htmlType="submit">
+                        <Button type="primary" htmlType="submit" loading={formik.isSubmitting}>
                             Lưu
                         </Button>
                     </div>

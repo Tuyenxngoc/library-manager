@@ -61,11 +61,16 @@ const AuthProvider = ({ children }) => {
     };
 
     const logout = async () => {
-        const refreshToken = localStorage.getItem(REFRESH_TOKEN);
-        await logoutToken(refreshToken);
-        setAuthData(defaultAuth);
-        localStorage.removeItem(ACCESS_TOKEN);
-        localStorage.removeItem(REFRESH_TOKEN);
+        try {
+            const refreshToken = localStorage.getItem(REFRESH_TOKEN);
+            const response = await logoutToken(refreshToken);
+            if (response.status === 200) {
+                setAuthData(defaultAuth);
+
+                localStorage.removeItem(ACCESS_TOKEN);
+                localStorage.removeItem(REFRESH_TOKEN);
+            }
+        } catch (e) {}
     };
 
     const contextValues = {

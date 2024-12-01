@@ -36,6 +36,29 @@ export const updateLibraryConfig = (values) => {
     return axiosPrivate.put('system-settings/library-config', values);
 };
 
+export const getLibraryInfo = () => {
+    return axiosPrivate.get('system-settings/library-info');
+};
+
+export const updateLibraryInfo = (values) => {
+    const formData = new FormData();
+
+    for (const key in values) {
+        if (values.hasOwnProperty(key)) {
+            const value = values[key];
+            if (value !== null) {
+                formData.append(key, value);
+            }
+        }
+    }
+
+    return axiosPrivate.put('system-settings/library-info', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};
+
 export const addSlide = (values) => {
     const formData = new FormData();
 

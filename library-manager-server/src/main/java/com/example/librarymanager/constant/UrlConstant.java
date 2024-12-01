@@ -290,5 +290,8 @@ public class UrlConstant {
         public static final String UPDATE_SLIDE = PRE_FIX + "/slides/{id}";
         public static final String DELETE_SLIDE = PRE_FIX + "/slides/{id}";
         public static final String TOGGLE_ACTIVE_SLIDE = PRE_FIX + "/slides/{id}/toggle-active";
+
+        public static final String GET_LIBRARY_INFO = PRE_FIX + "/library-info";
+        public static final String UPDATE_LIBRARY_INFO = PRE_FIX + "/library-info";
     }
 }
