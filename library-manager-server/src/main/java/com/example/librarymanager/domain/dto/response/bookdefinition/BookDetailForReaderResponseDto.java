@@ -20,6 +20,8 @@ public class BookDetailForReaderResponseDto {
 
     private final Integer pageCount;
 
+    private final int bookCount;
+
     private final String bookSize;
 
     private final String language;
@@ -66,5 +68,17 @@ public class BookDetailForReaderResponseDto {
         // Set bookSet
         BookSet b = bookDefinition.getBookSet();
         this.bookSet = b != null ? new BaseEntityDto(b.getId(), b.getName()) : null;
+
+        int count = 0;
+        List<Book> books = bookDefinition.getBooks();
+        for (Book book : books) {
+            boolean isReturn = book.getBookBorrows()
+                    .stream()
+                    .allMatch(BookBorrow::isReturned);
+            if (isReturn) {
+                count++;
+            }
+        }
+        this.bookCount = count;
     }
 }

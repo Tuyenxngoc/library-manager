@@ -22,6 +22,8 @@ public class ReaderDetailResponseDto {
 
     private final String address;
 
+    private final String avatar;
+
     private final String status;
 
     private final LocalDate createdDate;
@@ -33,9 +35,10 @@ public class ReaderDetailResponseDto {
         this.fullName = reader.getFullName();
         this.email = MaskingUtils.maskEmail(reader.getEmail());
         this.phoneNumber = MaskingUtils.maskPhoneNumber(reader.getPhoneNumber());
-        this.gender = reader.getGender().getName();
+        this.gender = reader.getGender() != null ? reader.getGender().getName() : "";
         this.dateOfBirth = reader.getDateOfBirth();
         this.address = reader.getAddress();
+        this.avatar = reader.getAvatar();
         this.status = reader.getStatus().getName();
         this.createdDate = LocalDate.now();
         this.expiryDate = reader.getExpiryDate();

@@ -122,7 +122,7 @@ function BookDetail() {
                                     </div>
                                     <div className="col-9">
                                         <ul className={cx('category')}>
-                                            <li>Số lượng sách còn trong thư viện: 1</li>
+                                            <li>Số lượng sách còn trong thư viện: {entityData.bookCount}</li>
                                         </ul>
 
                                         <div className={cx('title')}>

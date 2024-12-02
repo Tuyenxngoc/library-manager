@@ -20,7 +20,8 @@ import java.util.Set;
 public interface CartDetailRepository extends JpaRepository<CartDetail, Long>, JpaSpecificationExecutor<Cart> {
 
     @Query("SELECT new com.example.librarymanager.domain.dto.response.cart.CartDetailResponseDto(cd) " +
-            "FROM CartDetail cd INNER JOIN Cart c ON cd.cart.id = c.id " +
+            "FROM CartDetail cd " +
+            "INNER JOIN cd.cart c " +
             "WHERE c.id = :cartId")
     List<CartDetailResponseDto> getAllByCartId(@Param("cartId") Long cartId);
 

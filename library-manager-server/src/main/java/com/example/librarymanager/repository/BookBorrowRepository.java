@@ -14,8 +14,8 @@ public interface BookBorrowRepository extends JpaRepository<BookBorrow, Long>, J
 
     @Query("SELECT new com.example.librarymanager.domain.dto.response.statistics.PublicationResponseDto(bd.title, COUNT(bb.id)) " +
             "FROM BookBorrow bb " +
-            "INNER JOIN Book b on bb.book.id = b.id " +
-            "INNER JOIN BookDefinition bd on b.bookDefinition.id = bd.id " +
+            "INNER JOIN bb.book b " +
+            "INNER JOIN b.bookDefinition bd " +
             "GROUP BY bd.id " +
             "order by COUNT(bb.id) DESC " +
             "LIMIT 5")

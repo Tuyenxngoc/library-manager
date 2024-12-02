@@ -62,9 +62,30 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public List<CartDetailResponseDto> getCartDetails(String cardNumber) {
+    public List<CartDetailResponseDto> getCartDetails(String cardNumber, String title, String type) {
         Cart cart = getEntity(cardNumber);
-        return cartDetailRepository.getAllByCartId(cart.getId());
+        List<CartDetailResponseDto> responseDto = cartDetailRepository.getAllByCartId(cart.getId());
+
+        if (title != null && !title.isEmpty()) {
+            responseDto = responseDto.stream()
+                    .filter(cartDetail -> cartDetail.getTitle().toLowerCase().contains(title.toLowerCase()))
+                    .toList();
+        }
+
+        if (type != null) {
+            LocalDateTime now = LocalDateTime.now();
+            if (type.equals("1")) {
+                responseDto = responseDto.stream()
+                        .filter(cartDetail -> !cartDetail.getBorrowTo().isBefore(now))
+                        .toList();
+            } else {
+                responseDto = responseDto.stream()
+                        .filter(cartDetail -> cartDetail.getBorrowTo().isBefore(now))
+                        .toList();
+            }
+        }
+
+        return responseDto;
     }
 
     @Override

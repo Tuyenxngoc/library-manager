@@ -1,31 +1,45 @@
-import { Button, Checkbox, Input } from 'antd';
+import { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import queryString from 'query-string';
+import dayjs from 'dayjs';
+import { Button, Input, Space, Table } from 'antd';
 import { Parallax } from 'react-parallax';
 import { FaSearch } from 'react-icons/fa';
 import { backgrounds } from '~/assets';
 import Breadcrumb from '~/components/Breadcrumb';
 import SectionHeader from '~/components/SectionHeader';
-import { useEffect, useState } from 'react';
 import { getCartDetails, removeFromCart } from '~/services/cartService';
 
 function BorrowedItems() {
+    const location = useLocation();
+
+    const [filters, setFilters] = useState({});
+
     const [entityData, setEntityData] = useState(null);
-    const [selectedItems, setSelectedItems] = useState([]);
+    const [searchInput, setSearchInput] = useState('');
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+
+    const [overdueCount, setOverdueCount] = useState(0);
+    const [pendingCount, setPendingCount] = useState(0);
 
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState(null);
 
-    const handleCheckboxChange = (id) => {
-        setSelectedItems((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
-    };
-
     const handleDelete = async () => {
         try {
-            await removeFromCart(selectedItems);
-            setEntityData((prev) => prev.filter((item) => !selectedItems.includes(item.id)));
-            setSelectedItems([]);
-        } catch (error) {
-            setErrorMessage('Could not delete selected items.');
-        }
+            const response = await removeFromCart(selectedRowKeys);
+            if (response.status === 200) {
+                setEntityData((prev) => prev.filter((item) => !selectedRowKeys.includes(item.id)));
+                setSelectedRowKeys([]);
+            }
+        } catch (error) {}
+    };
+
+    const handleSearch = () => {
+        setFilters((prev) => ({
+            ...prev,
+            title: searchInput,
+        }));
     };
 
     useEffect(() => {
@@ -33,8 +47,23 @@ function BorrowedItems() {
             setIsLoading(true);
             setErrorMessage(null);
             try {
-                const response = await getCartDetails();
-                setEntityData(response.data.data);
+                const params = queryString.stringify(filters);
+                const response = await getCartDetails(params);
+                const { data } = response.data;
+                setEntityData(data);
+
+                let overdue = 0;
+                let pending = 0;
+                data.forEach((item) => {
+                    if (dayjs(item.borrowTo).isBefore(dayjs())) {
+                        overdue += 1;
+                    } else {
+                        pending += 1;
+                    }
+                });
+
+                setOverdueCount(overdue);
+                setPendingCount(pending);
             } catch (error) {
                 setErrorMessage(error.message);
             } finally {
@@ -43,7 +72,18 @@ function BorrowedItems() {
         };
 
         fetchEntities();
-    }, []);
+    }, [filters]);
+
+    useEffect(() => {
+        const params = queryString.parse(location.search);
+        if (params.type) {
+            setFilters({
+                type: params.type,
+            });
+        }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [location.search]);
 
     const items = [
         {
@@ -54,6 +94,69 @@ function BorrowedItems() {
             label: 'Thông tin ấn phẩm được đăng ký mượn',
         },
     ];
+
+    const columns = [
+        {
+            title: 'STT',
+            key: 'index',
+            render: (text, record, index) => index + 1,
+        },
+        {
+            title: 'Mã nhan đề',
+            dataIndex: 'bookCode',
+            key: 'bookCode',
+        },
+        {
+            title: 'Nhan đề',
+            dataIndex: 'title',
+            key: 'title',
+        },
+        {
+            title: 'Tên tác giả',
+            dataIndex: 'authors',
+            key: 'authors',
+            render: (authors) => (authors.length > 0 ? authors.join(', ') : 'Không xác định'),
+        },
+        {
+            title: 'Đăng ký mượn từ',
+            dataIndex: 'borrowFrom',
+            key: 'borrowFrom',
+        },
+        {
+            title: 'Đến',
+            dataIndex: 'borrowTo',
+            key: 'borrowTo',
+        },
+        {
+            title: 'Trạng thái',
+            key: 'status',
+            render: (_, record) => {
+                const isOverdue = dayjs(record.borrowTo).isBefore(dayjs());
+                return (
+                    <span style={{ color: isOverdue ? 'red' : 'green' }}>
+                        {isOverdue ? 'Hết thời gian mượn' : 'Đang mượn'}
+                    </span>
+                );
+            },
+        },
+    ];
+
+    const rowSelection = {
+        onChange: (selectedRowKeys) => {
+            setSelectedRowKeys(selectedRowKeys);
+        },
+        getCheckboxProps: (record, index) => ({
+            name: record.id,
+        }),
+    };
+
+    if (errorMessage) {
+        return (
+            <div className="alert alert-danger p-2" role="alert">
+                Lỗi: {errorMessage}
+            </div>
+        );
+    }
 
     return (
         <>
@@ -85,11 +188,14 @@ function BorrowedItems() {
                 <div className="row mb-4 justify-content-end align-items-center">
                     <div className="col-4">
                         <Input
-                            name="search"
                             size="large"
+                            name="search"
                             placeholder="Nhập nhan đề ..."
+                            value={searchInput}
+                            disabled={isLoading}
+                            onChange={(e) => setSearchInput(e.target.value)}
                             addonAfter={
-                                <Button type="text">
+                                <Button type="text" loading={isLoading} onClick={() => handleSearch()}>
                                     <FaSearch />
                                 </Button>
                             }
@@ -97,109 +203,42 @@ function BorrowedItems() {
                     </div>
                 </div>
 
-                {isLoading ? (
-                    <div>Đang tải dữ liệu...</div>
-                ) : errorMessage ? (
-                    <div>Lỗi tải dữ liệu: {errorMessage}</div>
-                ) : (
-                    entityData && (
-                        <>
-                            <div className="row mb-4 justify-content-between align-items-center">
-                                <div className="col-4">
-                                    <div className="d-flex justify-content-start align-items-center">
-                                        <div className="text-success">Chưa xử lý (1)</div>
-                                        <div className="mx-2"> Ι </div>
-                                        <div className="text-danger me-2">Quá hạn mượn (0)</div>
-                                        <Button type="default" onClick={handleDelete} disabled={!selectedItems.length}>
-                                            Xóa
-                                        </Button>
-                                    </div>
-                                </div>
+                <div className="row mb-4 justify-content-between align-items-center">
+                    <div className="col-4">
+                        <Space>
+                            <Link to="?type=1" className="text-success">
+                                Chưa xử lý ({pendingCount})
+                            </Link>
+                            <span> | </span>
+                            <Link to="?type=2" className="text-danger">
+                                Quá hạn mượn ({overdueCount})
+                            </Link>
+                            <Button type="default" onClick={handleDelete} disabled={!selectedRowKeys.length}>
+                                Xóa
+                            </Button>
+                        </Space>
+                    </div>
 
-                                <div className="col-4">
-                                    <div className="text-end">
-                                        <span>1 mục</span>
-                                    </div>
-                                </div>
-                            </div>
+                    <div className="col-4">
+                        <div className="text-end">
+                            <span>1 mục</span>
+                        </div>
+                    </div>
+                </div>
 
-                            <div className="row">
-                                <div className="col-12">
-                                    <table className="table table-striped table-bordered table-hover dataTable no-footer dtr-inline KAP">
-                                        <thead>
-                                            <tr role="row">
-                                                <th style={{ width: 20, textAlign: 'center' }}>
-                                                    <Checkbox
-                                                        name="checkbox"
-                                                        checked={
-                                                            selectedItems.length === entityData.length &&
-                                                            entityData.length > 0
-                                                        }
-                                                        onChange={(e) => {
-                                                            setSelectedItems(
-                                                                e.target.checked
-                                                                    ? entityData.map((item) => item.id)
-                                                                    : [],
-                                                            );
-                                                        }}
-                                                    />
-                                                </th>
-                                                <th style={{ width: 120 }}>Mã nhan đề</th>
-                                                <th style={{ width: 150 }}>Nhan đề</th>
-                                                <th style={{ width: 134 }}>Tên tác giả</th>
-                                                <th style={{ width: 100 }}>Đăng ký mượn từ</th>
-                                                <th style={{ width: 100 }}>Đến</th>
-                                                <th style={{ width: 87 }}>Trạng thái</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {entityData.length > 0 ? (
-                                                entityData.map((item, index) => (
-                                                    <tr key={item.bookCode || index}>
-                                                        <td style={{ textAlign: 'center' }}>
-                                                            <Checkbox
-                                                                name="checkbox"
-                                                                checked={selectedItems.includes(item.id)}
-                                                                onChange={() => handleCheckboxChange(item.id)}
-                                                            />
-                                                        </td>
-                                                        <td>{item.bookCode}</td>
-                                                        <td>{item.title}</td>
-                                                        <td>
-                                                            {item.authors.length > 0
-                                                                ? item.authors.join(', ')
-                                                                : 'Không xác định'}
-                                                        </td>
-                                                        <td>{item.borrowFrom}</td>
-                                                        <td>{item.borrowTo}</td>
-                                                        <td
-                                                            style={{
-                                                                color:
-                                                                    new Date(item.borrowTo) < new Date()
-                                                                        ? 'red'
-                                                                        : 'green',
-                                                            }}
-                                                        >
-                                                            {new Date(item.borrowTo) < new Date()
-                                                                ? 'Hết thời gian mượn'
-                                                                : 'Đang mượn'}
-                                                        </td>
-                                                    </tr>
-                                                ))
-                                            ) : (
-                                                <tr>
-                                                    <td colSpan="7" style={{ textAlign: 'center' }}>
-                                                        Không có dữ liệu để hiển thị
-                                                    </td>
-                                                </tr>
-                                            )}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </>
-                    )
-                )}
+                <div className="row">
+                    <div className="col-12">
+                        <Table
+                            bordered
+                            rowKey="id"
+                            dataSource={entityData}
+                            columns={columns}
+                            loading={isLoading}
+                            rowSelection={rowSelection}
+                            pagination={false}
+                        />
+                    </div>
+                </div>
             </div>
         </>
     );

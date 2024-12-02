@@ -4,8 +4,8 @@ export const addToCart = (bookId) => {
     return axiosPrivate.post(`carts/add?bookId=${bookId}`);
 };
 
-export const getCartDetails = () => {
-    return axiosPrivate.get('carts/details');
+export const getCartDetails = (params) => {
+    return axiosPrivate.get(`carts/details?${params}`);
 };
 
 export const removeFromCart = (id) => {
