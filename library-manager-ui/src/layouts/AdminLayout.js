@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Flex, Layout, Menu, theme } from 'antd';
+import { Dropdown, Flex, Layout, Menu, Space, theme } from 'antd';
 import { AiFillDashboard } from 'react-icons/ai';
-import { IoMdSettings } from 'react-icons/io';
-import { FaUsers, FaUser, FaHistory, FaChartBar, FaRecycle, FaBook } from 'react-icons/fa';
+import { IoMdSettings, IoIosLogOut } from 'react-icons/io';
 import { BsNewspaper } from 'react-icons/bs';
 import { BiCategory } from 'react-icons/bi';
+import { FaUsers, FaUser, FaHistory, FaChartBar, FaRecycle, FaBook, FaAngleDown } from 'react-icons/fa';
 import images from '~/assets';
 import { checkUserHasRequiredRole } from '~/utils/helper';
 import { ROLES } from '~/common/roleConstants';
@@ -124,6 +124,7 @@ function AdminLayout() {
 
     const {
         user: { name, roleNames },
+        logout,
     } = useAuth();
 
     const navigate = useNavigate();
@@ -150,12 +151,12 @@ function AdminLayout() {
         }, []);
     };
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const items = useMemo(() => filterMenuItems(menuConfig), [roleNames]);
-
     const handleMenuItemClick = ({ key }) => {
         navigate(key);
     };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const menuItems = useMemo(() => filterMenuItems(menuConfig), [roleNames]);
 
     return (
         <Layout style={{ minHeight: '100vh' }}>
@@ -170,7 +171,7 @@ function AdminLayout() {
                     theme="dark"
                     selectedKeys={[selectedKey]}
                     mode="inline"
-                    items={items.map((item) => ({
+                    items={menuItems.map((item) => ({
                         key: item.key,
                         icon: item.icon,
                         label: item.label,
@@ -194,9 +195,23 @@ function AdminLayout() {
                 >
                     <Flex justify="space-between" align="center" style={{ margin: '0 16px' }}>
                         <div></div>
-                        <div>
-                            Xin chào <b>{name}</b>
-                        </div>
+                        <Dropdown
+                            menu={{
+                                items: [
+                                    {
+                                        key: '1',
+                                        label: 'Đăng xuất',
+                                        icon: <IoIosLogOut />,
+                                        onClick: logout,
+                                    },
+                                ],
+                            }}
+                        >
+                            <Space>
+                                Xin chào <b>{name}</b>
+                                <FaAngleDown />
+                            </Space>
+                        </Dropdown>
                     </Flex>
                 </Header>
                 {/* Content */}

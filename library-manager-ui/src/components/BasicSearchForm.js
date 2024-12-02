@@ -1,15 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Input } from 'antd';
 import { FaSearch } from 'react-icons/fa';
 
-function BasicSearchForm({ onSearch }) {
-    const [formData, setFormData] = useState({
-        bookCode: '',
-        title: '',
-        keyword: '',
-        publishingYear: '',
-        author: '',
-    });
+const defaultValue = {
+    bookCode: '',
+    title: '',
+    keyword: '',
+    publishingYear: '',
+    author: '',
+};
+
+function BasicSearchForm({ onSearch, init }) {
+    const [formData, setFormData] = useState(defaultValue);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -24,6 +26,15 @@ function BasicSearchForm({ onSearch }) {
 
         onSearch(formData);
     };
+
+    useEffect(() => {
+        if (init?.type && init?.value) {
+            setFormData((prev) => ({
+                ...prev,
+                [init.type]: init.value,
+            }));
+        }
+    }, [init]);
 
     return (
         <form className="w-50" onSubmit={handleSearchSubmit}>

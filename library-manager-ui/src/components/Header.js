@@ -1,15 +1,13 @@
-import { Link } from 'react-router-dom';
-
-import { MdMailOutline, MdHelpOutline } from 'react-icons/md';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { IoIosLogOut } from 'react-icons/io';
 import { FaUser, FaRegUser } from 'react-icons/fa6';
+import { MdMailOutline, MdHelpOutline } from 'react-icons/md';
 import { FaRegEdit, FaHistory, FaAngleDown } from 'react-icons/fa';
-
-import useAuth from '~/hooks/useAuth';
-
 import { Dropdown, Space, Input, Select } from 'antd';
+import useAuth from '~/hooks/useAuth';
 import 'bootstrap/dist/js/bootstrap.bundle';
-
+import queryString from 'query-string';
 import classNames from 'classnames/bind';
 import styles from '~/styles/Header.module.scss';
 import { ROLES } from '~/common/roleConstants';
@@ -28,20 +26,24 @@ const options = [
         value: 'author',
     },
     {
-        label: 'Nhà xuất bản',
-        value: 'publisher',
+        label: 'Từ khóa',
+        value: 'keyword',
     },
     {
         label: 'Năm xuất bản',
-        value: 'publicationYear',
+        value: 'publishingYear',
     },
     {
         label: 'Số ISBN',
-        value: 'isbn',
+        value: 'bookCode',
     },
 ];
 
 function Header() {
+    const navigate = useNavigate();
+    const [searchInput, setSearchInput] = useState('');
+    const [activeFilterOption, setActiveFilterOption] = useState(options[0].value);
+
     const { isAuthenticated, user, logout } = useAuth();
     const hasRequiredRole = isAuthenticated && user.roleNames[0] === ROLES.Reader;
 
@@ -76,6 +78,13 @@ function Header() {
                   icon: <IoIosLogOut />,
               },
           ];
+
+    const handleSearch = (value) => {
+        if (value.trim()) {
+            const params = queryString.stringify({ type: activeFilterOption, value: value.trim() });
+            navigate(`/search?${params}`);
+        }
+    };
 
     return (
         <header>
@@ -122,19 +131,26 @@ function Header() {
                     </div>
                     <div className="col-8">
                         <Space.Compact className="w-100">
-                            <Select size="large" defaultValue="title" options={options} />
+                            <Select
+                                size="large"
+                                defaultValue="title"
+                                options={options}
+                                value={activeFilterOption}
+                                onChange={(value) => setActiveFilterOption(value)}
+                            />
                             <Search
                                 size="large"
                                 name="search"
                                 placeholder="Nhập nội dung tìm kiếm của bạn ở đây"
                                 allowClear
+                                value={searchInput}
+                                onChange={(e) => setSearchInput(e.target.value)}
+                                onSearch={handleSearch}
                             />
                         </Space.Compact>
 
                         <div className="text-lg-end">
-                            <Link to="/search" style={{ color: '#55acee', fontSize: '13px' }}>
-                                + Tìm kiếm nâng cao
-                            </Link>
+                            <Link to="/search">+ Tìm kiếm nâng cao</Link>
                         </div>
                     </div>
                 </div>

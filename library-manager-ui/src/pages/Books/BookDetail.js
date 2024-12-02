@@ -1,25 +1,47 @@
-import { Button } from 'antd';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Button, message } from 'antd';
 import { Parallax } from 'react-parallax';
-import { Link, useParams } from 'react-router-dom';
 import images, { backgrounds } from '~/assets';
 import Breadcrumb from '~/components/Breadcrumb';
 import SectionHeader from '~/components/SectionHeader';
-
 import classNames from 'classnames/bind';
 import styles from '~/styles/BookDetail.module.scss';
 import SocialIcons from '~/components/SocialIcons';
-import { useEffect, useState } from 'react';
 import { getBookDetailForUser } from '~/services/bookDefinitionService';
+import { addToCart } from '~/services/cartService';
+import useAuth from '~/hooks/useAuth';
 
 const cx = classNames.bind(styles);
 
 function BookDetail() {
     const { id } = useParams();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { isAuthenticated } = useAuth();
 
     const [entityData, setEntityData] = useState(null);
 
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState(null);
+
+    const [messageApi, contextHolder] = message.useMessage();
+
+    const handleAddToCart = async (id) => {
+        if (isAuthenticated) {
+            try {
+                const response = await addToCart(id);
+                if (response.status === 201) {
+                    messageApi.success(response.data.data.message);
+                }
+            } catch (error) {
+                const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra mượn sách.';
+                messageApi.error(errorMessage);
+            }
+        } else {
+            navigate('/login', { replace: true, state: { from: location } });
+        }
+    };
 
     useEffect(() => {
         const fetchEntities = async () => {
@@ -55,6 +77,8 @@ function BookDetail() {
 
     return (
         <>
+            {contextHolder}
+
             <Parallax bgImage={backgrounds.bgparallax7} strength={500}>
                 <div className="innerbanner">
                     <div className="container">
@@ -92,7 +116,7 @@ function BookDetail() {
                                             src={entityData.imageUrl || images.placeimg}
                                             alt=""
                                         />
-                                        <Button type="primary" block>
+                                        <Button type="primary" block onClick={() => handleAddToCart(entityData.id)}>
                                             Đăng ký mượn
                                         </Button>
                                     </div>

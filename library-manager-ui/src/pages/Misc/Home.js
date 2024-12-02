@@ -14,7 +14,7 @@ import Slider from '~/components/Slider';
 import classNames from 'classnames/bind';
 import styles from '~/styles/Home.module.scss';
 import PostList from '~/components/PostList';
-import { getLibraryInfo } from '~/services/statisticsService';
+import { getLibraryInfoStats } from '~/services/statisticsService';
 import { useNavigate } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
@@ -39,7 +39,7 @@ function Home() {
             setIsLoading(true);
             setErrorMessage(null);
             try {
-                const response = await getLibraryInfo();
+                const response = await getLibraryInfoStats();
                 const { publications, authors, publishers, readers } = response.data.data;
                 setLibraryStats([
                     { title: 'Số ấn phẩm', icon: <ImBooks />, count: publications, className: 'books' },

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import queryString from 'query-string';
 import { Parallax } from 'react-parallax';
 import { Collapse, Pagination, Tabs } from 'antd';
@@ -10,14 +10,19 @@ import BasicSearchForm from '~/components/BasicSearchForm';
 import AdvancedSearchForm from '~/components/AdvancedSearchForm';
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
 import { advancedSearchBooks, searchBooks } from '~/services/bookDefinitionService';
+import { useLocation } from 'react-router-dom';
+import { getLibraryInfoStats } from '~/services/statisticsService';
 
 function Search() {
+    const location = useLocation();
+
     const [meta, setMeta] = useState(INITIAL_META);
     const [filters, setFilters] = useState(INITIAL_FILTERS);
 
+    const [publications, setPublications] = useState(0);
     const [entityData, setEntityData] = useState(null);
-
     const [activeTabKey, setActiveTabKey] = useState('1');
+    const [searchParams, setSearchParams] = useState(null);
 
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState(null);
@@ -55,6 +60,30 @@ function Search() {
         }
     };
 
+    useEffect(() => {
+        const params = queryString.parse(location.search);
+        if (params.type || params.value) {
+            setSearchParams({
+                type: params.type,
+                value: params.value,
+            });
+        }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [location.search]);
+
+    useEffect(() => {
+        const fetchLibraryInfo = async () => {
+            try {
+                const response = await getLibraryInfoStats();
+                const { publications } = response.data.data;
+                setPublications(publications);
+            } catch (error) {}
+        };
+
+        fetchLibraryInfo();
+    }, []);
+
     const breadcrumbItems = [
         {
             label: 'Trang chủ',
@@ -69,7 +98,7 @@ function Search() {
         {
             key: '1',
             label: 'Cơ bản',
-            children: <BasicSearchForm onSearch={handleSearch} />,
+            children: <BasicSearchForm onSearch={handleSearch} init={searchParams} />,
         },
         {
             key: '2',
@@ -82,7 +111,7 @@ function Search() {
         {
             key: '1',
             label: 'Tổng số ấn phẩm',
-            children: 10659,
+            children: publications,
         },
         {
             key: '2',

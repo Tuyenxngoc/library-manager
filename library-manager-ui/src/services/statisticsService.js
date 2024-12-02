@@ -1,6 +1,6 @@
 import httpRequest, { axiosPrivate } from '~/apis/configHttp';
 
-export const getLibraryInfo = () => {
+export const getLibraryInfoStats = () => {
     return httpRequest.get('stats/library');
 };
 
