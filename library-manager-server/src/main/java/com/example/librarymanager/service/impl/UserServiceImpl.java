@@ -14,6 +14,7 @@ import com.example.librarymanager.domain.entity.User;
 import com.example.librarymanager.domain.entity.UserGroup;
 import com.example.librarymanager.domain.mapper.UserMapper;
 import com.example.librarymanager.domain.specification.EntitySpecification;
+import com.example.librarymanager.exception.BadRequestException;
 import com.example.librarymanager.exception.ConflictException;
 import com.example.librarymanager.exception.ForbiddenException;
 import com.example.librarymanager.exception.NotFoundException;
@@ -22,9 +23,9 @@ import com.example.librarymanager.repository.UserGroupRepository;
 import com.example.librarymanager.repository.UserRepository;
 import com.example.librarymanager.security.CustomUserDetails;
 import com.example.librarymanager.service.LogService;
-import com.example.librarymanager.service.RoleService;
 import com.example.librarymanager.service.UserService;
 import com.example.librarymanager.util.PaginationUtil;
+import com.example.librarymanager.util.UploadFileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
@@ -33,7 +34,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -49,8 +52,6 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    private final RoleService roleService;
-
     private final UserGroupRepository userGroupRepository;
 
     private final PasswordEncoder passwordEncoder;
@@ -60,6 +61,8 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     private final LogService logService;
+
+    private final UploadFileUtil uploadFileUtil;
 
     private User getEntity(String id) {
         return userRepository.findById(id)
@@ -219,5 +222,25 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto findById(String id) {
         User user = getEntity(id);
         return new UserResponseDto(user);
+    }
+
+    @Override
+    public List<String> uploadImages(List<MultipartFile> files, String userId) {
+        if (files == null || files.isEmpty()) {
+            throw new BadRequestException(ErrorMessage.INVALID_FILE_REQUIRED);
+        }
+
+        List<String> uploadedFiles = new ArrayList<>();
+        for (MultipartFile file : files) {
+            String contentType = file.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                throw new BadRequestException(ErrorMessage.INVALID_FILE_TYPE);
+            }
+
+            String newUrl = uploadFileUtil.uploadFile(file);
+            uploadedFiles.add(newUrl);
+        }
+
+        return uploadedFiles;
     }
 }

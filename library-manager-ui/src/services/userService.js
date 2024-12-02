@@ -23,3 +23,16 @@ export const getUserById = (id) => {
 export const getUsers = (params) => {
     return axiosPrivate.get(`users?${params}`);
 };
+
+export const uploadImages = (files) => {
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+        formData.append('files', files[i]);
+    }
+
+    return axiosPrivate.post('users/upload-images', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};

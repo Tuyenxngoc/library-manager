@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button, Input, message, Upload } from 'antd';
 import { MdOutlineFileUpload } from 'react-icons/md';
 import ReactQuill from 'react-quill';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { formats, modules } from '~/common/editorConfig';
 import { handleError } from '~/utils/errorHandler';
+import { formats, modules as defaultModules } from '~/common/editorConfig';
 import { getLibraryInfo, updateLibraryInfo } from '~/services/systemSettingService';
+import { uploadImages } from '~/services/userService';
 const { TextArea } = Input;
 
 const defaultValue = {
@@ -29,17 +30,27 @@ const defaultValue = {
 
 const validationSchema = yup.object({
     librarySymbol: yup.string().required('Vui lòng nhập kí hiệu thư viện.'),
+
     libraryName: yup.string().required('Vui lòng nhập tên thư viện.'),
+
     address: yup.string().required('Vui lòng nhập địa chỉ.'),
+
     countryCode: yup.string().required('Vui lòng nhập mã quốc gia.'),
+
     provinceCity: yup.string().required('Vui lòng nhập tên tỉnh/thành phố.'),
+
     educationOffice: yup.string().required('Vui lòng nhập thông tin phòng giáo dục.'),
+
     school: yup.string().required('Vui lòng nhập tên trường học.'),
+
     email: yup.string().email('Email không hợp lệ, vui lòng kiểm tra lại.').required('Vui lòng nhập email.'),
+
     phoneNumber: yup.string().required('Vui lòng nhập số điện thoại.'),
 });
 
 function LibraryInfo() {
+    const reactQuillRef = useRef(null);
+
     const [fileList, setFileList] = useState([]);
     const [messageApi, contextHolder] = message.useMessage();
 
@@ -75,6 +86,34 @@ function LibraryInfo() {
         enableReinitialize: true,
     });
 
+    const imageHandler = useCallback(() => {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', 'image/*');
+        input.click();
+        input.onchange = async () => {
+            if (input !== null && input.files !== null) {
+                const file = input.files[0];
+                const loadingMessage = message.loading({ content: 'Đang tải ảnh lên...', duration: 0 });
+                try {
+                    const response = await uploadImages([file]);
+                    const quill = reactQuillRef.current;
+                    if (quill && response.data) {
+                        const range = quill.getEditorSelection();
+                        range && quill.getEditor().insertEmbed(range.index, 'image', response.data.data[0]);
+                        message.success({ content: 'Tải ảnh thành công!', duration: 2 });
+                    }
+                } catch (error) {
+                    message.error({ content: 'Đã xảy ra lỗi khi tải ảnh lên.', duration: 2 });
+                } finally {
+                    if (loadingMessage) {
+                        loadingMessage();
+                    }
+                }
+            }
+        };
+    }, []);
+
     useEffect(() => {
         const fetchEntities = async () => {
             try {
@@ -89,6 +128,17 @@ function LibraryInfo() {
         fetchEntities();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const modules = {
+        ...defaultModules,
+        toolbar: {
+            ...defaultModules.toolbar,
+            handlers: {
+                ...defaultModules.toolbar.handlers,
+                image: imageHandler,
+            },
+        },
+    };
 
     return (
         <>
@@ -388,6 +438,7 @@ function LibraryInfo() {
                     </div>
                     <div className="col-md-6">
                         <ReactQuill
+                            ref={reactQuillRef}
                             className="custom-quill"
                             placeholder="Nhập nội dung"
                             value={formik.values.introduction}

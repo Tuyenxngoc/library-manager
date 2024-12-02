@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -11,9 +11,10 @@ import images from '~/assets';
 import { handleError } from '~/utils/errorHandler';
 import { checkIdIsNumber } from '~/utils/helper';
 import FormInput from '~/components/FormInput';
-import { formats, modules } from '~/common/editorConfig';
+import { formats, modules as defaultModules } from '~/common/editorConfig';
 import FormTextArea from '~/components/FormTextArea';
 import { createNewsArticle, getNewsArticleById, updateNewsArticle } from '~/services/newsArticlesService';
+import { uploadImages } from '~/services/userService';
 
 const defaultValue = {
     title: '',
@@ -41,6 +42,8 @@ const validationSchema = yup.object({
 });
 
 function NewsArticlesForm() {
+    const reactQuillRef = useRef(null);
+
     const { id } = useParams();
     const navigate = useNavigate();
     const [messageApi, contextHolder] = message.useMessage();
@@ -61,6 +64,34 @@ function NewsArticlesForm() {
         setPreviousImage(url);
         formik.setFieldValue('image', originFileObj);
     };
+
+    const imageHandler = useCallback(() => {
+        const input = document.createElement('input');
+        input.setAttribute('type', 'file');
+        input.setAttribute('accept', 'image/*');
+        input.click();
+        input.onchange = async () => {
+            if (input !== null && input.files !== null) {
+                const file = input.files[0];
+                const loadingMessage = message.loading({ content: 'Đang tải ảnh lên...', duration: 0 });
+                try {
+                    const response = await uploadImages([file]);
+                    const quill = reactQuillRef.current;
+                    if (quill && response.data) {
+                        const range = quill.getEditorSelection();
+                        range && quill.getEditor().insertEmbed(range.index, 'image', response.data.data[0]);
+                        message.success({ content: 'Tải ảnh thành công!', duration: 2 });
+                    }
+                } catch (error) {
+                    message.error({ content: 'Đã xảy ra lỗi khi tải ảnh lên.', duration: 2 });
+                } finally {
+                    if (loadingMessage) {
+                        loadingMessage();
+                    }
+                }
+            }
+        };
+    }, []);
 
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
@@ -119,6 +150,17 @@ function NewsArticlesForm() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
+    const modules = {
+        ...defaultModules,
+        toolbar: {
+            ...defaultModules.toolbar,
+            handlers: {
+                ...defaultModules.toolbar.handlers,
+                image: imageHandler,
+            },
+        },
+    };
+
     return (
         <>
             {contextHolder}
@@ -175,6 +217,7 @@ function NewsArticlesForm() {
                             <span className="text-danger">*</span>Nội dung:
                         </span>
                         <ReactQuill
+                            ref={reactQuillRef}
                             className="custom-quill"
                             placeholder="Nhập nội dung bài viết"
                             value={formik.values.content}

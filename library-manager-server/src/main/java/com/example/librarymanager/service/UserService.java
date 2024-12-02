@@ -9,6 +9,9 @@ import com.example.librarymanager.domain.dto.response.UserResponseDto;
 import com.example.librarymanager.domain.dto.response.auth.CurrentUserLoginResponseDto;
 import com.example.librarymanager.domain.entity.UserGroup;
 import com.example.librarymanager.security.CustomUserDetails;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 public interface UserService {
 
@@ -25,4 +28,6 @@ public interface UserService {
     PaginationResponseDto<UserResponseDto> findAll(PaginationFullRequestDto requestDto);
 
     UserResponseDto findById(String id);
+
+    List<String> uploadImages(List<MultipartFile> files, String userId);
 }

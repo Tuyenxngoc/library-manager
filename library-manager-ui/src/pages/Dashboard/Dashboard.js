@@ -160,7 +160,7 @@ function Dashboard() {
                             <YAxis />
                             <Tooltip />
                             <Legend />
-                            <Bar dataKey="count" fill="#8884d8" />
+                            <Bar dataKey="count" name="Ấn phẩm" fill="#8884d8" />
                         </BarChart>
                     </ResponsiveContainer>
                 </div>

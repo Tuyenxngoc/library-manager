@@ -16,9 +16,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestApiV1
 @RequiredArgsConstructor
@@ -77,5 +81,14 @@ public class UserController {
     @GetMapping(UrlConstant.User.GET_BY_ID)
     public ResponseEntity<?> getUserById(@PathVariable String id) {
         return VsResponseUtil.success(userService.findById(id));
+    }
+
+    @Operation(summary = "API upload images")
+    @PostMapping(value = UrlConstant.User.UPLOAD_IMAGES, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadImages(
+            @RequestParam("files") List<MultipartFile> files,
+            @CurrentUser CustomUserDetails userDetails
+    ) {
+        return VsResponseUtil.success(userService.uploadImages(files, userDetails.getUserId()));
     }
 }
