@@ -84,6 +84,7 @@ public class UserController {
     }
 
     @Operation(summary = "API upload images")
+    @PreAuthorize("!hasRole('ROLE_READER')")
     @PostMapping(value = UrlConstant.User.UPLOAD_IMAGES, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadImages(
             @RequestParam("files") List<MultipartFile> files,
