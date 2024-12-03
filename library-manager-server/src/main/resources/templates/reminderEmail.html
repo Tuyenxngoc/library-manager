@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng kí thành công</title>
+    <title>Nhắc nhở trả sách</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -23,7 +23,7 @@
         }
 
         .header {
-            background-color: #007BFF;
+            background-color: #28a745;
             color: #ffffff;
             text-align: center;
             padding: 20px;
@@ -33,16 +33,17 @@
             padding: 20px;
         }
 
-        .verify {
+        .highlight {
             font-weight: bold;
-            color: #007BFF;
+            color: #28a745;
         }
 
         .footer {
-            background-color: #007BFF;
+            background-color: #28a745;
             color: #ffffff;
             text-align: center;
             padding: 10px;
+            font-size: 12px;
         }
 
         b {
@@ -72,19 +73,18 @@
 <body>
 <div class="container">
     <div class="header">
-        <h2>Xác Nhận Đăng Ký Thành Công</h2>
+        <h2>Nhắc nhở trả sách</h2>
     </div>
     <div class="content">
-        <p>Xin chào,</p>
-        <p>Cám ơn bạn đã đăng ký tài khoản <b th:text="${username}"></b> với mật khẩu <b th:text="${password}"> </b> tại
-            trang web của chúng tôi.</p>
-        <p>Vui lòng xác nhận tại đây <a class="verify" th:href="${url}" target="_self">TẠI ĐÂY</a></p>
-        <p>Hãy nhớ giữ bí mật mật khẩu của mình và không chia sẻ nó với người khác.</p>
-        <p>Nếu bạn có bất kỳ câu hỏi hoặc cần hỗ trợ thêm, vui lòng liên hệ với chúng tôi.</p>
-        <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
+        <p>Xin chào, <b th:text="${username}"></b>,</p>
+        <p>Chúng tôi muốn nhắc bạn rằng phiếu mượn <b th:text="${receiptNumber}"></b> mà bạn đã mượn có ngày trả là
+            <b th:text="${returnDate}"></b>.</p>
+        <p>Vui lòng đảm bảo trả sách đúng hạn để tránh bất kỳ khoản phạt nào.</p>
+        <p>Nếu bạn cần gia hạn thời gian mượn sách hoặc có câu hỏi, vui lòng liên hệ với chúng tôi.</p>
+        <p>Cám ơn bạn đã sử dụng dịch vụ thư viện của chúng tôi!</p>
     </div>
     <div class="footer">
-        &copy; 2023 đã xác nhận.
+        &copy; 2023 Thư viện. Mọi quyền được bảo lưu.
     </div>
 </div>
 </body>
