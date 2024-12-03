@@ -7,6 +7,7 @@ import { ConfigProvider } from 'antd';
 import viVN from 'antd/es/locale/vi_VN';
 
 import { AuthProvider } from '~/contexts/AuthProvider';
+import { LibraryProvider } from './contexts/LibraryProvider';
 
 import 'normalize.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -23,9 +24,11 @@ root.render(
                 },
             }}
         >
-            <AuthProvider>
-                <App />
-            </AuthProvider>
+            <LibraryProvider>
+                <AuthProvider>
+                    <App />
+                </AuthProvider>
+            </LibraryProvider>
         </ConfigProvider>
     </React.StrictMode>,
 );

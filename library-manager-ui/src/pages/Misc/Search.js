@@ -68,6 +68,9 @@ function Search() {
                 value: params.value,
             });
         }
+        if (params.tab && (params.tab === '1' || params.tab === '2')) {
+            setActiveTabKey(params.tab);
+        }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.search]);
@@ -163,6 +166,7 @@ function Search() {
                             defaultActiveKey="1"
                             size="large"
                             items={searchTabs}
+                            activeKey={activeTabKey}
                             onChange={setActiveTabKey}
                         />
                     </div>
@@ -174,14 +178,21 @@ function Search() {
 
                 <div className="row mb-4">
                     {isLoading ? (
-                        <>Loading</>
+                        <>Đang tải...</>
                     ) : errorMessage ? (
-                        <>{errorMessage}</>
+                        <div className="alert alert-danger">{errorMessage}</div>
                     ) : (
-                        entityData.length > 0 &&
-                        entityData.map((entity, index) => (
-                            <Product key={index} className={'col-2 mx-2 my-1'} data={entity} />
-                        ))
+                        <>
+                            {entityData.length > 0 ? (
+                                entityData.map((entity, index) => (
+                                    <Product key={index} className={'col-2 mx-2 my-1'} data={entity} />
+                                ))
+                            ) : (
+                                <div className="alert alert-info">
+                                    Không tìm thấy kết quả nào phù hợp với tìm kiếm của bạn.
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
                 {entityData && (

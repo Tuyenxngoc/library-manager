@@ -11,10 +11,11 @@ import SectionHeader from './SectionHeader';
 import classNames from 'classnames/bind';
 import styles from '~/styles/ProductList.module.scss';
 import { getBookByBookDefinitionsForUser } from '~/services/bookDefinitionService';
+import queryString from 'query-string';
 
 const cx = classNames.bind(styles);
 
-function ProductList({ messageApi }) {
+function ProductList({ filters, title, subtitle, messageApi }) {
     const sliderRef = useRef(null);
     const navigate = useNavigate();
 
@@ -32,7 +33,7 @@ function ProductList({ messageApi }) {
     };
 
     const handleViewAll = () => {
-        navigate('/all-products');
+        navigate('/books');
     };
 
     const settings = {
@@ -49,7 +50,8 @@ function ProductList({ messageApi }) {
             setIsLoading(true);
             setErrorMessage(null);
             try {
-                const response = await getBookByBookDefinitionsForUser();
+                const params = queryString.stringify(filters);
+                const response = await getBookByBookDefinitionsForUser(params);
                 const { items } = response.data.data;
                 setEntityData(items);
             } catch (error) {
@@ -60,7 +62,7 @@ function ProductList({ messageApi }) {
         };
 
         fetchEntities();
-    }, []);
+    }, [filters]);
 
     return (
         <section className={cx('wrapper', 'sectionspace')}>
@@ -68,8 +70,8 @@ function ProductList({ messageApi }) {
                 <div className="row mb-3">
                     <div className="col-12">
                         <SectionHeader
-                            subtitle="Lựa chọn của mọi người"
-                            title={<h2 className="mb-0">Sách được mượn nhiều nhất</h2>}
+                            subtitle={subtitle}
+                            title={title}
                             onPrev={goToPrevSlide}
                             onNext={goToNextSlide}
                             onViewAll={handleViewAll}

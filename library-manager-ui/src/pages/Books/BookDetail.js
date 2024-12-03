@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Button, message } from 'antd';
 import { Parallax } from 'react-parallax';
@@ -133,9 +133,10 @@ function BookDetail() {
                                             Tác giả:&nbsp;
                                             {entityData.authors && entityData.authors.length > 0
                                                 ? entityData.authors.map((author, index) => (
-                                                      <Link key={index} to={`/author/${author.id}`}>
-                                                          {author.name}
-                                                      </Link>
+                                                      <React.Fragment key={author.id || index}>
+                                                          <Link to={`/author/${author.id}`}>{author.name}</Link>
+                                                          {index < entityData.authors.length - 1 && ', '}
+                                                      </React.Fragment>
                                                   ))
                                                 : 'Không xác định'}
                                         </span>
@@ -146,16 +147,16 @@ function BookDetail() {
                                         </div>
 
                                         <div className={cx('description')}>
-                                            <p>Chưa có mô tả cho cuốn sách này</p>
+                                            <p>
+                                                {entityData.summary
+                                                    ? entityData.summary
+                                                    : 'Chưa có mô tả cho cuốn sách này'}
+                                            </p>
                                         </div>
 
                                         <SectionHeader title={<h5 className="mb-0">Chi tiết sách</h5>} />
 
                                         <ul className={cx('info')}>
-                                            <li>
-                                                <span>Định dạng:</span>
-                                                <span>PDF</span>
-                                            </li>
                                             <li>
                                                 <span>Số trang:</span>
                                                 <span>{entityData.pageCount || 'N/A'}</span>

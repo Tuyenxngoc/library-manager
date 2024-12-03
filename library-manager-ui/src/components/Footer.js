@@ -5,10 +5,13 @@ import { MdMailOutline } from 'react-icons/md';
 import classNames from 'classnames/bind';
 import styles from '~/styles/Footer.module.scss';
 import SocialIcons from './SocialIcons';
+import useLibrary from '~/hooks/useLibrary';
 
 const cx = classNames.bind(styles);
 
 function Footer() {
+    const { address, phoneNumber, email } = useLibrary();
+
     return (
         <footer className={cx('wrapper')}>
             <div className="container mb-5">
@@ -18,15 +21,15 @@ function Footer() {
                         <ul className={cx('contactinfo')}>
                             <li>
                                 <HiOutlineBuildingOffice2 width={24} />
-                                <span>Địa chỉ: Số 298 Đ. Cầu Diễn, Minh Khai, Bắc Từ Liêm, Hà Nội</span>
+                                <span>Địa chỉ: {address}</span>
                             </li>
                             <li>
                                 <LuPhone width={24} />
-                                <span>Điện thoại: 02773851999</span>
+                                <span>Điện thoại: {phoneNumber}</span>
                             </li>
                             <li>
                                 <MdMailOutline width={24} />
-                                <span>Email: c1lequydoncl.dongthap@moet.edu.vn</span>
+                                <span>Email: {email}</span>
                             </li>
                         </ul>
 

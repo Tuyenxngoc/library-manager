@@ -28,6 +28,8 @@ public class BookDetailForReaderResponseDto {
 
     private final String imageUrl;
 
+    private final String summary;
+
     private final String publishingYear;
 
     private final BaseEntityDto publisher;
@@ -46,6 +48,7 @@ public class BookDetailForReaderResponseDto {
         this.bookSize = bookDefinition.getBookSize();
         this.language = bookDefinition.getLanguage();
         this.imageUrl = bookDefinition.getImageUrl();
+        this.summary = bookDefinition.getSummary();
         this.publishingYear = bookDefinition.getPublishingYear();
 
         // Set category

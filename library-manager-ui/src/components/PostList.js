@@ -54,7 +54,7 @@ function PostList() {
     };
 
     const handleViewAll = () => {
-        navigate('/all-products');
+        navigate('/news');
     };
 
     return (

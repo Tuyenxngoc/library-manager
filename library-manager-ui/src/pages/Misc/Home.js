@@ -63,7 +63,15 @@ function Home() {
 
             <Slider />
 
-            <ProductList messageApi={messageApi} />
+            <ProductList
+                filters={{
+                    sortBy: 'title',
+                    sortType: 'DESC',
+                }}
+                title={<h2 className="mb-0">Sách được mượn nhiều nhất</h2>}
+                subtitle={'Lựa chọn của mọi người'}
+                messageApi={messageApi}
+            />
 
             <Parallax bgImage={backgrounds.bgparallax4} strength={500}>
                 <div className="container py-5">
@@ -89,7 +97,15 @@ function Home() {
                 </div>
             </Parallax>
 
-            <ProductList messageApi={messageApi} />
+            <ProductList
+                filters={{
+                    sortBy: 'id',
+                    sortType: 'DESC',
+                }}
+                title={<h2 className="mb-0">Sách mới phát hành</h2>}
+                subtitle={'Sách mới'}
+                messageApi={messageApi}
+            />
 
             <Parallax bgImage={backgrounds.bgparallax5} strength={500}>
                 <div className="container py-5">

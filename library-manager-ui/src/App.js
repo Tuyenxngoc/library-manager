@@ -19,8 +19,6 @@ import Search from './pages/Misc/Search';
 import AdminLayout from './layouts/AdminLayout';
 import AdminLogin from './pages/Auth/AdminLogin';
 import AdminForgotPassword from './pages/Auth/AdminForgotPassword';
-import BookDetail from './pages/Books/BookDetail';
-import InwardBook from './pages/Books/InwardBook';
 import Author from './pages/Authors/Author';
 import AuthorForm from './pages/Authors/AuthorForm';
 import BookSet from './pages/BookSet/BookSet';
@@ -30,12 +28,16 @@ import BookDefinition from './pages/BookDefinition/BookDefinition';
 import BookDefinitionForm from './pages/BookDefinition/BookDefinitionForm';
 import ClassificationSymbol from './pages/ClassificationSymbol/ClassificationSymbol';
 import History from './pages/History/History';
+import BookDetail from './pages/Books/BookDetail';
+import InwardBook from './pages/Books/InwardBook';
 import OutwardBook from './pages/Books/OutwardBook';
 import InwardBookForm from './pages/Books/InwardBookForm';
 import BookList from './pages/Books/BookList';
+import InventoryBook from './pages/Books/InventoryBook';
+import OutwardBookForm from './pages/Books/OutwardBookForm';
+import BookCollection from './pages/Books/BookCollection';
 import NewsArticles from './pages/NewsArticles/NewsArticles';
 import NewsArticlesForm from './pages/NewsArticles/NewsArticlesForm';
-import InventoryBook from './pages/Books/InventoryBook';
 import Dashboard from './pages/Dashboard/Dashboard';
 import LibraryInfo from './pages/settings/LibraryInfo';
 import LibraryRules from './pages/settings/LibraryRules';
@@ -45,7 +47,6 @@ import SlideConfig from './pages/settings/SlideConfig';
 import UserManagement from './pages/UserManagement/UserManagement';
 import UserManagementForm from './pages/UserManagement/UserManagementForm';
 import UserGroupManagement from './pages/UserGroupManagement/UserGroupManagement';
-import OutwardBookForm from './pages/Books/OutwardBookForm';
 import Reader from './pages/Reader/Reader';
 import LibraryVisit from './pages/LibraryVisit/LibraryVisit';
 import VisitorStatistics from './pages/LibraryVisit/VisitorStatistics';
@@ -74,7 +75,8 @@ function App() {
                     <Route path="rules" element={<Rules />} />
                     <Route path="report" element={<Report />} />
                     <Route path="search" element={<Search />} />
-                    <Route path="book/:id" element={<BookDetail />} />
+                    <Route path="books" element={<BookCollection />} />
+                    <Route path="books/:id" element={<BookDetail />} />
                     <Route path="news-articles/:id" element={<NewsArticleDetail />} />
 
                     {/* Đường dẫn yêu cầu đăng nhập */}

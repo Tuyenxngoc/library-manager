@@ -150,7 +150,7 @@ function Header() {
                         </Space.Compact>
 
                         <div className="text-lg-end">
-                            <Link to="/search">+ Tìm kiếm nâng cao</Link>
+                            <Link to="/search?tab=2">+ Tìm kiếm nâng cao</Link>
                         </div>
                     </div>
                 </div>
@@ -187,18 +187,8 @@ function Header() {
                                 </Link>
                                 <ul className="dropdown-menu" aria-labelledby="libraryDropdown">
                                     <li>
-                                        <Link className="dropdown-item" to="/library/books">
+                                        <Link className="dropdown-item" to="/books">
                                             Sách
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link className="dropdown-item" to="/library/journals">
-                                            Tạp chí
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link className="dropdown-item" to="/library/reports">
-                                            Báo cáo
                                         </Link>
                                     </li>
                                 </ul>

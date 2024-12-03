@@ -1,12 +1,11 @@
-import { useEffect, useState } from 'react';
 import { Parallax } from 'react-parallax';
 import { backgrounds } from '~/assets';
 import Breadcrumb from '~/components/Breadcrumb';
 import SectionHeader from '~/components/SectionHeader';
-import { getLibraryInfo } from '~/services/systemSettingService';
+import useLibrary from '~/hooks/useLibrary';
 
 function About() {
-    const [libraryInfo, setLibraryInfo] = useState({});
+    const { introduction } = useLibrary();
 
     const items = [
         {
@@ -17,21 +16,6 @@ function About() {
             label: 'Thông tin về chúng tôi',
         },
     ];
-
-    useEffect(() => {
-        const fetchEntities = async () => {
-            try {
-                const response = await getLibraryInfo();
-                const { data } = response.data;
-                if (data) {
-                    setLibraryInfo(data);
-                }
-            } catch (error) {}
-        };
-
-        fetchEntities();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     return (
         <>
@@ -62,7 +46,7 @@ function About() {
                         <div
                             className="ql-snow ql-editor p-0 mt-4"
                             style={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}
-                            dangerouslySetInnerHTML={{ __html: libraryInfo.introduction }}
+                            dangerouslySetInnerHTML={{ __html: introduction }}
                         />
                     </div>
                 </div>
