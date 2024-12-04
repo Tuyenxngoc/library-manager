@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import queryString from 'query-string';
 import dayjs from 'dayjs';
 import { Button, Input, Space, Table } from 'antd';
@@ -11,7 +11,7 @@ import SectionHeader from '~/components/SectionHeader';
 import { getCartDetails, removeFromCart } from '~/services/cartService';
 
 function BorrowedItems() {
-    const location = useLocation();
+    const [searchParams] = useSearchParams();
 
     const [filters, setFilters] = useState({});
 
@@ -71,19 +71,19 @@ function BorrowedItems() {
             }
         };
 
-        fetchEntities();
-    }, [filters]);
+        const type = searchParams.get('type');
 
-    useEffect(() => {
-        const params = queryString.parse(location.search);
-        if (params.type) {
-            setFilters({
-                type: params.type,
-            });
+        const updatedFilters = {
+            ...filters,
+            type: type,
+        };
+
+        if (JSON.stringify(filters) !== JSON.stringify(updatedFilters)) {
+            setFilters(updatedFilters);
+        } else {
+            fetchEntities();
         }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [location.search]);
+    }, [filters, searchParams]);
 
     const items = [
         {
@@ -115,7 +115,15 @@ function BorrowedItems() {
             title: 'Tên tác giả',
             dataIndex: 'authors',
             key: 'authors',
-            render: (authors) => (authors.length > 0 ? authors.join(', ') : 'Không xác định'),
+            render: (authors) =>
+                authors.length > 0
+                    ? authors.map((author, index) => (
+                          <React.Fragment key={author.id || index}>
+                              <Link to={`/books?authorId=${author.id}`}>{author.name}</Link>
+                              {index < authors.length - 1 && ', '}
+                          </React.Fragment>
+                      ))
+                    : 'Không xác định',
         },
         {
             title: 'Đăng ký mượn từ',

@@ -134,7 +134,7 @@ function BookDetail() {
                                             {entityData.authors && entityData.authors.length > 0
                                                 ? entityData.authors.map((author, index) => (
                                                       <React.Fragment key={author.id || index}>
-                                                          <Link to={`/author/${author.id}`}>{author.name}</Link>
+                                                          <Link to={`/books?authorId=${author.id}`}>{author.name}</Link>
                                                           {index < entityData.authors.length - 1 && ', '}
                                                       </React.Fragment>
                                                   ))

@@ -395,12 +395,13 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
     }
 
     @Override
-    public PaginationResponseDto<BookForReaderResponseDto> getBooksForUser(PaginationFullRequestDto requestDto, Long categoryGroupId, Long categoryId) {
+    public PaginationResponseDto<BookForReaderResponseDto> getBooksForUser(PaginationFullRequestDto requestDto, Long categoryGroupId, Long categoryId, Long authorId) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BOOK_DEFINITION);
 
         Specification<BookDefinition> spec = Specification.where(baseFilterBookDefinitions(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag()))
                 .and(filterByCategoryId(categoryId))
                 .and(filterByCategoryGroupId(categoryGroupId))
+                .and(filterByAuthorId(authorId))
                 .and(filterByBooksCountGreaterThanZero());
 
         Page<BookDefinition> page = bookDefinitionRepository.findAll(spec, pageable);

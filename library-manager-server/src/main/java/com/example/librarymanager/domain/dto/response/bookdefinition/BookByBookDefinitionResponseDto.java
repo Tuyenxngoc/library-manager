@@ -1,10 +1,7 @@
 package com.example.librarymanager.domain.dto.response.bookdefinition;
 
 import com.example.librarymanager.domain.dto.common.BaseEntityDto;
-import com.example.librarymanager.domain.entity.BookAuthor;
-import com.example.librarymanager.domain.entity.BookDefinition;
-import com.example.librarymanager.domain.entity.ClassificationSymbol;
-import com.example.librarymanager.domain.entity.Publisher;
+import com.example.librarymanager.domain.entity.*;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -20,13 +17,13 @@ public class BookByBookDefinitionResponseDto {
 
     private final String publishingYear;
 
-    private final int totalBooks; // Tổng số sách
+    private final long totalBooks; // Tổng số sách
 
-    private final int availableBooks; // Số sách đang trong thư viện
+    private final long availableBooks; // Số sách đang trong thư viện
 
-    private final int borrowedBooks; // Số sách đang mượn
+    private final long borrowedBooks; // Số sách đang mượn
 
-    private final int lostBooks; // Số sách đã mất
+    private final long lostBooks; // Số sách đã mất
 
     private final BaseEntityDto classificationSymbol;
 
@@ -39,13 +36,17 @@ public class BookByBookDefinitionResponseDto {
         this.title = bookDefinition.getTitle();
         this.bookCode = bookDefinition.getBookCode();
         this.publishingYear = bookDefinition.getPublishingYear();
-        this.availableBooks = 0;
-        this.borrowedBooks = 0;
-        this.lostBooks = 0;
 
-        this.totalBooks = (int) bookDefinition.getBooks().stream()
+        List<Book> books = bookDefinition.getBooks().stream()
                 .filter(book -> book.getExportReceipt() == null)
-                .count();
+                .toList();
+        this.totalBooks = books.size();
+        this.availableBooks = books.stream().filter(book -> {
+            List<BookBorrow> bookBorrows = book.getBookBorrows();
+            return bookBorrows.stream().allMatch(BookBorrow::isReturned);
+        }).count();
+        this.borrowedBooks = totalBooks - availableBooks;
+        this.lostBooks = 0;
 
         // Set authors
         List<BookAuthor> au = bookDefinition.getBookAuthors();

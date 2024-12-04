@@ -171,6 +171,17 @@ public class EntitySpecification {
         };
     }
 
+    public static Specification<BookDefinition> filterByAuthorId(Long authorId) {
+        return (root, query, builder) -> {
+            if (authorId != null) {
+                ListJoin<BookDefinition, BookAuthor> bookAuthorListJoin = root.join(BookDefinition_.bookAuthors, JoinType.INNER);
+                Join<BookAuthor, Author> authorJoin = bookAuthorListJoin.join(BookAuthor_.author, JoinType.INNER);
+                return builder.equal(authorJoin.get(Author_.id), authorId);
+            }
+            return builder.conjunction();
+        };
+    }
+
     public static Specification<BookDefinition> filterByBooksCountGreaterThanZero() {
         return (root, query, builder) -> {
             Join<BookDefinition, Book> bookJoin = root.join(BookDefinition_.books, JoinType.LEFT);

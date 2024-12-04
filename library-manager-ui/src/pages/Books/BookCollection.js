@@ -1,12 +1,13 @@
-import { Button, message, Pagination, Select } from 'antd';
-import queryString from 'query-string';
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { Button, message, Pagination, Select, Spin } from 'antd';
+import queryString from 'query-string';
 import { Parallax } from 'react-parallax';
 import { backgrounds } from '~/assets';
-import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
 import Breadcrumb from '~/components/Breadcrumb';
 import Product from '~/components/Product';
 import SectionHeader from '~/components/SectionHeader';
+import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
 import { getBookByBookDefinitionsForUser } from '~/services/bookDefinitionService';
 
 const options = [
@@ -15,6 +16,8 @@ const options = [
 ];
 
 function BookCollection() {
+    const [searchParams] = useSearchParams();
+
     const [meta, setMeta] = useState(INITIAL_META);
     const [filters, setFilters] = useState(INITIAL_FILTERS);
 
@@ -63,8 +66,23 @@ function BookCollection() {
             }
         };
 
-        fetchEntities();
-    }, [filters]);
+        const authorId = searchParams.get('authorId');
+        const categoryGroupId = searchParams.get('categoryGroupId');
+        const categoryId = searchParams.get('categoryId');
+
+        const updatedFilters = {
+            ...filters,
+            authorId: authorId || filters.authorId || null,
+            categoryGroupId: categoryGroupId || filters.categoryGroupId || null,
+            categoryId: categoryId || filters.categoryId || null,
+        };
+
+        if (JSON.stringify(filters) !== JSON.stringify(updatedFilters)) {
+            setFilters(updatedFilters);
+        } else {
+            fetchEntities();
+        }
+    }, [filters, searchParams]);
 
     const items = [
         {
@@ -135,7 +153,9 @@ function BookCollection() {
                             </div>
                         </div>
                         <div className="row mb-4">
-                            {!isLoading && entityData.length > 0 ? (
+                            {isLoading ? (
+                                <Spin />
+                            ) : entityData.length > 0 ? (
                                 entityData.map((data, index) => (
                                     <div key={index} className="col-12 col-sm-6 col-md-4 col-lg-3">
                                         <Product data={data} messageApi={messageApi} />
@@ -147,6 +167,7 @@ function BookCollection() {
                                 </div>
                             )}
                         </div>
+
                         <div className="row">
                             <div className="col-12 d-flex justify-content-center">
                                 <Pagination

@@ -78,7 +78,7 @@ public class CartServiceImpl implements CartService {
                 responseDto = responseDto.stream()
                         .filter(cartDetail -> !cartDetail.getBorrowTo().isBefore(now))
                         .toList();
-            } else {
+            } else if (type.equals("2")) {
                 responseDto = responseDto.stream()
                         .filter(cartDetail -> cartDetail.getBorrowTo().isBefore(now))
                         .toList();

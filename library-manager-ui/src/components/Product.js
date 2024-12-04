@@ -45,7 +45,7 @@ function Product({ className, data, messageApi }) {
                     {data.authors.length > 0
                         ? data.authors.map((author, index) => (
                               <React.Fragment key={author.id || index}>
-                                  <Link to={`/author/${author.id}`}>{author.name}</Link>
+                                  <Link to={`/books?authorId=${author.id}`}>{author.name}</Link>
                                   {index < data.authors.length - 1 && ', '}
                               </React.Fragment>
                           ))

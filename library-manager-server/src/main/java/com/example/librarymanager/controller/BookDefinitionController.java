@@ -108,9 +108,10 @@ public class BookDefinitionController {
     public ResponseEntity<?> getBooksForUser(
             @ParameterObject PaginationFullRequestDto requestDto,
             @RequestParam(value = "categoryGroupId", required = false) Long categoryGroupId,
-            @RequestParam(value = "categoryId", required = false) Long categoryId
+            @RequestParam(value = "categoryId", required = false) Long categoryId,
+            @RequestParam(value = "authorId", required = false) Long authorId
     ) {
-        return VsResponseUtil.success(bookDefinitionService.getBooksForUser(requestDto, categoryGroupId, categoryId));
+        return VsResponseUtil.success(bookDefinitionService.getBooksForUser(requestDto, categoryGroupId, categoryId, authorId));
     }
 
     @Operation(summary = "API Get Book Detail For User")
