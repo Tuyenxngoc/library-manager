@@ -1,19 +1,14 @@
 package com.example.librarymanager.security;
 
-import com.example.librarymanager.constant.RoleConstant;
-import com.example.librarymanager.domain.entity.Reader;
-import com.example.librarymanager.domain.entity.User;
-import com.example.librarymanager.domain.entity.UserGroupRole;
+import com.example.librarymanager.constant.AccountStatus;
+import com.example.librarymanager.constant.CardStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 public class CustomUserDetails implements UserDetails {
 
@@ -23,6 +18,15 @@ public class CustomUserDetails implements UserDetails {
     @Getter
     private final String cardNumber;
 
+    @Getter
+    private final LocalDate expiryDate;
+
+    @Getter
+    private final AccountStatus accountStatus;
+
+    @Getter
+    private final CardStatus cardStatus;
+
     @JsonIgnore
     private final String username;
 
@@ -31,29 +35,15 @@ public class CustomUserDetails implements UserDetails {
 
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public CustomUserDetails(String userId, String cardNumber, String username, String password, Collection<? extends GrantedAuthority> authorities) {
-        this.userId = userId;
-        this.cardNumber = cardNumber;
-        this.username = username;
-        this.password = password;
-        this.authorities = authorities;
-    }
-
-    public static CustomUserDetails create(User user) {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-
-        Set<UserGroupRole> roles = user.getUserGroup().getUserGroupRoles();
-        for (UserGroupRole role : roles) {
-            authorities.add(new SimpleGrantedAuthority(role.getRole().getCode().name()));
-        }
-
-        return new CustomUserDetails(user.getId(), null, user.getUsername(), user.getPassword(), authorities);
-    }
-
-    public static CustomUserDetails create(Reader reader) {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(RoleConstant.ROLE_READER.name()));
-        return new CustomUserDetails(null, reader.getCardNumber(), reader.getFullName(), reader.getPassword(), authorities);
+    public CustomUserDetails(CustomUserDetailsBuilder builder) {
+        this.userId = builder.getUserId();
+        this.cardNumber = builder.getCardNumber();
+        this.expiryDate = builder.getExpiryDate();
+        this.accountStatus = builder.getAccountStatus();
+        this.cardStatus = builder.getCardStatus();
+        this.username = builder.getUsername();
+        this.password = builder.getPassword();
+        this.authorities = builder.getAuthorities();
     }
 
     @Override

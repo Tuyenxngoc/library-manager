@@ -67,6 +67,8 @@ public class ErrorMessage {
         public static final String EXPIRED_REFRESH_TOKEN = "exception.auth.expired.refresh.token";
         public static final String INVALID_ACCESS_TOKEN = "exception.auth.invalid.access.token";
         public static final String USER_NOT_FOUND = "exception.auth.user.not.found";
+        public static final String ERR_ACCOUNT_NOT_ACTIVE = "exception.auth.account.not.active";
+        public static final String ERR_ACCOUNT_EXPIRED = "exception.auth.account.exp";
     }
 
     public static class Role {

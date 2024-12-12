@@ -1,5 +1,7 @@
 package com.example.librarymanager.service.impl;
 
+import com.example.librarymanager.constant.AccountStatus;
+import com.example.librarymanager.constant.CardStatus;
 import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.SuccessMessage;
 import com.example.librarymanager.domain.dto.common.CommonResponseDto;
@@ -15,6 +17,7 @@ import com.example.librarymanager.exception.UnauthorizedException;
 import com.example.librarymanager.repository.ReaderRepository;
 import com.example.librarymanager.repository.UserRepository;
 import com.example.librarymanager.security.CustomUserDetails;
+import com.example.librarymanager.security.UserDetailsFactory;
 import com.example.librarymanager.security.jwt.JwtTokenProvider;
 import com.example.librarymanager.service.AuthService;
 import com.example.librarymanager.service.EmailRateLimiterService;
@@ -40,6 +43,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -81,7 +85,15 @@ public class AuthServiceImpl implements AuthService {
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
             if (customUserDetails.getCardNumber() == null) {
-                throw new UnauthorizedException();
+                throw new UnauthorizedException(ErrorMessage.Auth.ERR_INCORRECT_USERNAME_PASSWORD);
+            }
+
+            if (customUserDetails.getCardStatus() != CardStatus.ACTIVE) {
+                throw new UnauthorizedException(ErrorMessage.Auth.ERR_ACCOUNT_NOT_ACTIVE);
+            }
+
+            if (customUserDetails.getExpiryDate() != null && customUserDetails.getExpiryDate().isBefore(LocalDate.now())) {
+                throw new UnauthorizedException(ErrorMessage.Auth.ERR_ACCOUNT_EXPIRED);
             }
 
             String accessToken = jwtTokenProvider.generateToken(customUserDetails, Boolean.FALSE);
@@ -91,8 +103,10 @@ public class AuthServiceImpl implements AuthService {
                     accessToken,
                     refreshToken
             );
-        } catch (AuthenticationException | UnauthorizedException e) {
+        } catch (AuthenticationException e) {
             throw new UnauthorizedException(ErrorMessage.Auth.ERR_INCORRECT_USERNAME_PASSWORD);
+        } catch (UnauthorizedException e) {
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException(ErrorMessage.ERR_EXCEPTION_GENERAL);
         }
@@ -109,7 +123,15 @@ public class AuthServiceImpl implements AuthService {
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
             if (customUserDetails.getUserId() == null) {
-                throw new UnauthorizedException();
+                throw new UnauthorizedException(ErrorMessage.Auth.ERR_INCORRECT_USERNAME_PASSWORD);
+            }
+
+            if (customUserDetails.getAccountStatus() != AccountStatus.ACTIVATED) {
+                throw new UnauthorizedException(ErrorMessage.Auth.ERR_ACCOUNT_NOT_ACTIVE);
+            }
+
+            if (customUserDetails.getExpiryDate() != null && customUserDetails.getExpiryDate().isBefore(LocalDate.now())) {
+                throw new UnauthorizedException(ErrorMessage.Auth.ERR_ACCOUNT_EXPIRED);
             }
 
             String accessToken = jwtTokenProvider.generateToken(customUserDetails, Boolean.FALSE);
@@ -119,8 +141,10 @@ public class AuthServiceImpl implements AuthService {
                     accessToken,
                     refreshToken
             );
-        } catch (AuthenticationException | UnauthorizedException e) {
+        } catch (AuthenticationException e) {
             throw new UnauthorizedException(ErrorMessage.Auth.ERR_INCORRECT_USERNAME_PASSWORD);
+        } catch (UnauthorizedException e) {
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException(ErrorMessage.ERR_EXCEPTION_GENERAL);
         }
@@ -163,7 +187,7 @@ public class AuthServiceImpl implements AuthService {
             if (userId != null && jwtTokenService.isTokenAllowed(refreshToken)) {
                 User user = userRepository.findById(userId)
                         .orElseThrow(() -> new BadRequestException(ErrorMessage.Auth.ERR_INVALID_REFRESH_TOKEN));
-                CustomUserDetails userDetails = CustomUserDetails.create(user);
+                CustomUserDetails userDetails = UserDetailsFactory.fromUser(user);
 
                 String newAccessToken = jwtTokenProvider.generateToken(userDetails, Boolean.FALSE);
                 String newRefreshToken = jwtTokenProvider.generateToken(userDetails, Boolean.TRUE);
@@ -178,7 +202,7 @@ public class AuthServiceImpl implements AuthService {
                     Reader reader = readerRepository.findByCardNumber(cardNumber)
                             .orElseThrow(() -> new BadRequestException(ErrorMessage.Auth.ERR_INVALID_REFRESH_TOKEN));
 
-                    CustomUserDetails userDetails = CustomUserDetails.create(reader);
+                    CustomUserDetails userDetails = UserDetailsFactory.fromReader(reader);
 
                     String newAccessToken = jwtTokenProvider.generateToken(userDetails, Boolean.FALSE);
                     String newRefreshToken = jwtTokenProvider.generateToken(userDetails, Boolean.TRUE);
