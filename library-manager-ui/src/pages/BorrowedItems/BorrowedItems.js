@@ -142,7 +142,7 @@ function BorrowedItems() {
                 const isOverdue = dayjs(record.borrowTo).isBefore(dayjs());
                 return (
                     <span style={{ color: isOverdue ? 'red' : 'green' }}>
-                        {isOverdue ? 'Hết thời gian mượn' : 'Đang mượn'}
+                        {isOverdue ? 'Hết thời gian chờ' : 'Đang chờ xử lý'}
                     </span>
                 );
             },

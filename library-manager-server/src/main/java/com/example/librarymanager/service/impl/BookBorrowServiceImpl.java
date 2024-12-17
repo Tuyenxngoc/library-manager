@@ -6,12 +6,14 @@ import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
 import com.example.librarymanager.domain.dto.response.bookborrow.BookBorrowResponseDto;
+import com.example.librarymanager.domain.entity.Book;
 import com.example.librarymanager.domain.entity.BookBorrow;
 import com.example.librarymanager.domain.entity.BorrowReceipt;
 import com.example.librarymanager.domain.specification.EntitySpecification;
 import com.example.librarymanager.exception.ConflictException;
 import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.BookBorrowRepository;
+import com.example.librarymanager.repository.BookRepository;
 import com.example.librarymanager.repository.BorrowReceiptRepository;
 import com.example.librarymanager.service.BookBorrowService;
 import com.example.librarymanager.service.LogService;
@@ -38,6 +40,8 @@ public class BookBorrowServiceImpl implements BookBorrowService {
     private final MessageSource messageSource;
 
     private final LogService logService;
+
+    private final BookRepository bookRepository;
 
     private final BookBorrowRepository bookBorrowRepository;
 
@@ -67,8 +71,15 @@ public class BookBorrowServiceImpl implements BookBorrowService {
     public CommonResponseDto returnBooksByIds(Set<Long> ids, String userId) {
         Set<BookBorrow> bookBorrows = ids.stream().map(this::getBookBorrow).collect(Collectors.toSet());
         bookBorrows.forEach(bookBorrow -> {
+            //Cập nhật trạng thái của sách
+            Book book = bookBorrow.getBook();
+            book.setBookCondition(BookCondition.AVAILABLE);
+            bookRepository.save(book);
+
+            //Cập nhật trạng thái của bookBorrow
             bookBorrow.setReturned(true);
 
+            //Cập nhật trạng thái của phiếu mượn
             BorrowReceipt borrowReceipt = bookBorrow.getBorrowReceipt();
             if (allBooksReturned(borrowReceipt)) {
                 borrowReceipt.setReturnDate(LocalDate.now());

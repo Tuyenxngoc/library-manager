@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Checkbox, Input, message } from 'antd';
 
@@ -30,7 +30,7 @@ const defaultValue = {
 function AdminLogin() {
     const navigate = useNavigate();
     const location = useLocation();
-
+    const [rememberMe, setRememberMe] = useState(true);
     const [messageApi, contextHolder] = message.useMessage();
     const { isAuthenticated, login } = useAuth();
 
@@ -41,7 +41,11 @@ function AdminLogin() {
             const response = await adminLogin(values);
             if (response.status === 200) {
                 const { accessToken, refreshToken } = response.data.data;
-                login({ accessToken, refreshToken });
+                if (rememberMe) {
+                    login({ accessToken, refreshToken });
+                } else {
+                    login({ accessToken });
+                }
                 navigate(from, { replace: true });
             }
         } catch (error) {
@@ -112,7 +116,7 @@ function AdminLogin() {
                                     </div>
                                 </div>
                                 <div className="mb-3">
-                                    <Checkbox name="rememberMe" checked>
+                                    <Checkbox checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)}>
                                         Nhớ mật khẩu
                                     </Checkbox>
                                 </div>

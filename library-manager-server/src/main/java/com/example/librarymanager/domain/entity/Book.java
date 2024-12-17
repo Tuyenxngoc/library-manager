@@ -30,7 +30,7 @@ public class Book {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "book_condition")
-    private BookCondition bookCondition; // Tình trạng sách
+    private BookCondition bookCondition = BookCondition.AVAILABLE; // Tình trạng sách
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore

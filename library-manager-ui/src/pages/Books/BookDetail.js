@@ -163,7 +163,7 @@ function BookDetail() {
                                             </li>
                                             <li>
                                                 <span>Kích thước:</span>
-                                                <span>{entityData.bookSize ? entityData.bookSize + 'cmm' : 'N/A'}</span>
+                                                <span>{entityData.bookSize ? entityData.bookSize : 'N/A'}</span>
                                             </li>
                                             <li>
                                                 <span>Năm xuất bản:</span>

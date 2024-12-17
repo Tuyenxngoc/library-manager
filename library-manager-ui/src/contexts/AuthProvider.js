@@ -55,8 +55,12 @@ const AuthProvider = ({ children }) => {
     };
 
     const login = ({ accessToken, refreshToken }) => {
-        localStorage.setItem(ACCESS_TOKEN, accessToken);
-        localStorage.setItem(REFRESH_TOKEN, refreshToken);
+        if (accessToken) {
+            localStorage.setItem(ACCESS_TOKEN, accessToken);
+        }
+        if (refreshToken) {
+            localStorage.setItem(REFRESH_TOKEN, refreshToken);
+        }
         validateToken();
     };
 

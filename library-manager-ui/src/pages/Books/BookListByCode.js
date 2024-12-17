@@ -10,6 +10,11 @@ const options = [
     { value: 'title', label: 'Nhan đề' },
 ];
 
+const bookConditionMapping = {
+    AVAILABLE: 'Sách có sẵn',
+    ON_LOAN: 'Sách đang mượn',
+};
+
 function BookListByCode() {
     const [meta, setMeta] = useState(INITIAL_META);
     const [filters, setFilters] = useState(INITIAL_FILTERS);
@@ -135,7 +140,7 @@ function BookListByCode() {
             key: 'bookCondition',
             sorter: true,
             showSorterTooltip: false,
-            render: (text, record) => text || '',
+            render: (text, record) => bookConditionMapping[text] || '',
         },
     ];
 

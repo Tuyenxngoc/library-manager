@@ -89,10 +89,8 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.Book.ERR_NOT_FOUND_CODE, bookCode));
 
         //Kiểm tra sách đã được mượn hay chưa
-        for (BookBorrow bookBorrow : book.getBookBorrows()) {
-            if (!bookBorrow.isReturned()) {
-                throw new ConflictException(ErrorMessage.Book.ERR_BOOK_ALREADY_BORROWED, bookCode);
-            }
+        if (!book.getBookCondition().equals(BookCondition.AVAILABLE)) {
+            throw new ConflictException(ErrorMessage.Book.ERR_BOOK_ALREADY_BORROWED, bookCode);
         }
 
         //Kiểm tra sách xem có ai khác đã đăng ký mượn từ trước hay chưa
@@ -103,6 +101,10 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
                 throw new ConflictException(ErrorMessage.Book.ERR_BOOK_RESERVED_BY_ANOTHER_READER, bookCode);
             }
         }
+
+        //Cập nhật trạng thái sách là đang mượn
+        book.setBookCondition(BookCondition.ON_LOAN);
+        bookRepository.save(book);
 
         BookBorrow bookBorrow = new BookBorrow();
         bookBorrow.setBook(book);
@@ -191,6 +193,13 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
             Set<BookBorrow> booksToRemove = borrowReceipt.getBookBorrows().stream()
                     .filter(bookBorrow -> bookCodesToRemove.contains(bookBorrow.getBook().getBookCode()))
                     .collect(Collectors.toSet());
+
+            //Cập nhật trạng thái của sách bị xóa khỏi phiếu mượn
+            for (BookBorrow bookBorrow : booksToRemove) {
+                Book book = bookBorrow.getBook();
+                book.setBookCondition(BookCondition.AVAILABLE);
+                bookRepository.save(book);
+            }
 
             bookBorrowRepository.deleteAll(booksToRemove);
 
