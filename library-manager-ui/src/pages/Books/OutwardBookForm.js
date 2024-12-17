@@ -17,7 +17,7 @@ import FormTextArea from '~/components/FormTextArea';
 
 const defaultValue = {
     receiptNumber: '',
-    exportDate: new Date(),
+    exportDate: dayjs(),
     exportReason: '',
     bookIds: [],
 };
@@ -141,7 +141,31 @@ function OutwardBookForm() {
 
     const columns = [
         {
-            title: 'Id',
+            title: 'Số ĐKCB',
+            dataIndex: 'bookCode',
+            key: 'bookCode',
+            align: 'center',
+        },
+        {
+            title: 'Nhan đề',
+            dataIndex: 'title',
+            key: 'title',
+            align: 'center',
+        },
+        {
+            title: 'Năm xuất bản',
+            dataIndex: 'bookId',
+            key: 'bookId',
+            align: 'center',
+        },
+        {
+            title: 'Giá bìa',
+            dataIndex: 'bookId',
+            key: 'bookId',
+            align: 'center',
+        },
+        {
+            title: 'Tình trạng',
             dataIndex: 'bookId',
             key: 'bookId',
             align: 'center',
@@ -163,7 +187,14 @@ function OutwardBookForm() {
 
             <form onSubmit={formik.handleSubmit}>
                 <div className="row g-3">
-                    <FormInput id="receiptNumber" label="Số phiếu xuất" className="col-md-6" formik={formik} required />
+                    <FormInput
+                        id="receiptNumber"
+                        label="Số phiếu xuất"
+                        className="col-md-6"
+                        helperText="Số phiếu xuất nên nhập theo định dạng PX + số, ví dụ PX0001"
+                        formik={formik}
+                        required
+                    />
 
                     <div className="col-md-3">
                         <label htmlFor="exportDate">
@@ -182,9 +213,9 @@ function OutwardBookForm() {
                         <div className="text-danger">{formik.touched.exportDate && formik.errors.exportDate}</div>
                     </div>
 
-                    <FormTextArea id="exportReason" label="Lý do xuất" className="col-md-12" formik={formik} />
+                    <FormTextArea id="exportReason" label="Lý do xuất" className="col-md-9" rows={3} formik={formik} />
 
-                    <div className="col-md-9">
+                    <div className="col-md-6">
                         <Select
                             showSearch
                             allowClear
@@ -228,9 +259,10 @@ function OutwardBookForm() {
                     <div className="col-md-12">
                         <Table
                             bordered
+                            rowKey="bookId"
+                            scroll={{ x: 'max-content' }}
                             columns={columns}
                             dataSource={formik.values.bookIds.map((bookId) => ({ bookId }))}
-                            rowKey="bookId"
                             pagination={false}
                         />
                         <div className="text-danger">{formik.touched.bookIds && formik.errors.bookIds}</div>

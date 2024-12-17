@@ -17,7 +17,7 @@ const { Option } = Select;
 
 const defaultValue = {
     receiptNumber: '',
-    importDate: new Date(),
+    importDate: dayjs(),
     generalRecordNumber: '',
     fundingSource: '',
     importReason: '',
@@ -162,15 +162,51 @@ function InwardBookForm() {
 
     const columns = [
         {
-            title: 'Id',
+            title: 'Nhan đề',
             dataIndex: 'bookDefinitionId',
             key: 'bookDefinitionId',
             align: 'center',
         },
         {
-            title: 'Số lượng',
+            title: 'Loại sách',
+            dataIndex: 'bookDefinitionId',
+            key: 'bookDefinitionId',
+            align: 'center',
+        },
+        {
+            title: 'Nhóm loại sách',
+            dataIndex: 'bookDefinitionId',
+            key: 'bookDefinitionId',
+            align: 'center',
+        },
+        {
+            title: 'Nhà xuất bản',
+            dataIndex: 'bookDefinitionId',
+            key: 'bookDefinitionId',
+            align: 'center',
+        },
+        {
+            title: 'Năm xuất bản',
+            dataIndex: 'bookDefinitionId',
+            key: 'bookDefinitionId',
+            align: 'center',
+        },
+        {
+            title: 'Giá bìa',
+            dataIndex: 'bookDefinitionId',
+            key: 'bookDefinitionId',
+            align: 'center',
+        },
+        {
+            title: 'Số bản',
             dataIndex: 'quantity',
             key: 'quantity',
+            align: 'center',
+        },
+        {
+            title: 'Thành tiền',
+            dataIndex: 'bookDefinitionId',
+            key: 'bookDefinitionId',
             align: 'center',
         },
         {
@@ -195,7 +231,14 @@ function InwardBookForm() {
 
             <form onSubmit={formik.handleSubmit}>
                 <div className="row g-3">
-                    <FormInput id="receiptNumber" label="Số phiếu nhập" className="col-md-6" formik={formik} required />
+                    <FormInput
+                        id="receiptNumber"
+                        label="Số phiếu nhập"
+                        className="col-md-6"
+                        helperText="Số phiếu nhập nên nhập theo định dạng PN + số, ví dụ PN0001"
+                        formik={formik}
+                        required
+                    />
 
                     <div className="col-md-3">
                         <label htmlFor="importDate">
@@ -289,7 +332,7 @@ function InwardBookForm() {
                         />
                     </div>
 
-                    <div className="col-md-3">
+                    <div className="col-lg-3">
                         <Button type="primary" icon={<FaPlusCircle />} onClick={handleAddNewColum}>
                             Thêm dòng mới
                         </Button>
@@ -298,9 +341,10 @@ function InwardBookForm() {
                     <div className="col-md-12">
                         <Table
                             bordered
+                            rowKey="bookDefinitionId"
+                            scroll={{ x: 'max-content' }}
                             columns={columns}
                             dataSource={formik.values.bookRequestDtos}
-                            rowKey="bookDefinitionId"
                             pagination={false}
                         />
                         <div className="text-danger">

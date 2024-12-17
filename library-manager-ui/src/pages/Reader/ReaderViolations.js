@@ -602,6 +602,7 @@ function ReaderViolations() {
             <Table
                 bordered
                 rowKey="id"
+                scroll={{ x: 'max-content' }}
                 dataSource={entityData}
                 columns={columns}
                 loading={isLoading}

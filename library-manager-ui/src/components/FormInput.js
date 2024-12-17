@@ -1,6 +1,6 @@
 import { Input } from 'antd';
 
-const FormInput = ({ id, label, className, formik, required = false, ...rest }) => (
+const FormInput = ({ id, label, className, formik, required = false, helperText = '', ...rest }) => (
     <div className={className}>
         <label htmlFor={id}>
             {required && <span className="text-danger">*</span>} {label}:
@@ -14,7 +14,11 @@ const FormInput = ({ id, label, className, formik, required = false, ...rest }) 
             onBlur={formik.handleBlur}
             status={formik.touched[id] && formik.errors[id] ? 'error' : undefined}
         />
-        <div className="text-danger">{formik.touched[id] && formik.errors[id]}</div>
+        {formik.touched[id] && formik.errors[id] ? (
+            <div className="text-danger">{formik.errors[id]}</div>
+        ) : (
+            helperText && <div className="text-muted">{helperText}</div>
+        )}
     </div>
 );
 

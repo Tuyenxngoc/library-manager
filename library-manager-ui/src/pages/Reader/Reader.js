@@ -365,8 +365,9 @@ function Reader() {
 
     const items = [
         {
-            label: <span onClick={handleCreateCard}>In thẻ bạn đọc</span>,
             key: '0',
+            label: 'In thẻ bạn đọc',
+            onClick: handleCreateCard,
         },
     ];
 
@@ -886,6 +887,7 @@ function Reader() {
             <Table
                 bordered
                 rowKey="id"
+                scroll={{ x: 'max-content' }}
                 dataSource={entityData}
                 columns={columns}
                 loading={isLoading}

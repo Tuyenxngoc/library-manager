@@ -1,13 +1,13 @@
 import { Input } from 'antd';
 const { TextArea } = Input;
 
-const FormTextArea = ({ id, label, className, formik, required }) => (
+const FormTextArea = ({ id, label, className, formik, required, rows = 4 }) => (
     <div className={className}>
         <label htmlFor={id}>
             {required && <span className="text-danger">*</span>} {label}:
         </label>
         <TextArea
-            rows={4}
+            rows={rows}
             id={id}
             name={id}
             value={formik.values[id]}

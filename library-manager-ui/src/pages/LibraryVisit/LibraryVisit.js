@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
 import queryString from 'query-string';
 import { Button, Col, Descriptions, Flex, Form, Image, Input, message, Row, Space, Table } from 'antd';
 import { IoMdPersonAdd } from 'react-icons/io';
@@ -24,15 +25,7 @@ function LibraryVisit() {
 
     const [form] = Form.useForm();
 
-    const currentDate = useMemo(
-        () =>
-            new Date().toLocaleDateString('vi-VN', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-            }),
-        [],
-    );
+    const currentDate = useMemo(() => dayjs().locale('vi').format('DD [tháng] MM, YYYY'), []);
 
     const handleChangePage = (newPage) => {
         setFilters((prev) => ({ ...prev, pageNum: newPage }));
@@ -247,6 +240,7 @@ function LibraryVisit() {
             <Table
                 bordered
                 rowKey="id"
+                scroll={{ x: 'max-content' }}
                 dataSource={entityData}
                 columns={columns}
                 loading={isLoading}

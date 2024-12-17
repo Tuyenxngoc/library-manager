@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Button, Input, Select, Space, Table, Tree } from 'antd';
+import { Button, Dropdown, Input, Select, Space, Table, Tree } from 'antd';
 import { FaPrint } from 'react-icons/fa';
+import { GrPrint } from 'react-icons/gr';
 import queryString from 'query-string';
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
 import { getBookByBookDefinitions } from '~/services/bookDefinitionService';
 import { getCategoryGroupsTree } from '~/services/categoryGroupService';
+import { getBookLabelType1Pdf, getBookLabelType2Pdf, getBookListPdf, getBookPdf } from '~/services/bookService';
 
 const options = [
     { value: 'title', label: 'Nhan đề' },
@@ -18,6 +20,7 @@ function BookListByCategory() {
     const [entityData, setEntityData] = useState(null);
     const [treeData, setTreeData] = useState([]);
     const [expandedKeys, setExpandedKeys] = useState([]);
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
     const [searchInput, setSearchInput] = useState('');
     const [activeFilterOption, setActiveFilterOption] = useState(options[0].value);
@@ -105,6 +108,50 @@ function BookListByCategory() {
                 key: `category-${category.id}`,
             })),
         }));
+    };
+
+    const openBookPdf = async (ids) => {
+        try {
+            const response = await getBookPdf(ids);
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+        } catch (error) {
+            console.error('Error getting book PDF:', error);
+        }
+    };
+
+    const openBookLabelType1Pdf = async (ids) => {
+        try {
+            const response = await getBookLabelType1Pdf(ids);
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+        } catch (error) {
+            console.error('Error getting book label type 1 PDF:', error);
+        }
+    };
+
+    const openBookLabelType2Pdf = async (ids) => {
+        try {
+            const response = await getBookLabelType2Pdf(ids);
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+        } catch (error) {
+            console.error('Error getting book label type 2 PDF:', error);
+        }
+    };
+
+    const openBookListPdf = async () => {
+        try {
+            const response = await getBookListPdf();
+            const blob = new Blob([response.data], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+        } catch (error) {
+            console.error('Error getting book list PDF:', error);
+        }
     };
 
     useEffect(() => {
@@ -231,6 +278,46 @@ function BookListByCategory() {
         },
     ];
 
+    const rowSelection = {
+        onChange: (selectedRowKeys) => {
+            setSelectedRowKeys(selectedRowKeys);
+        },
+        getCheckboxProps: (record, index) => ({
+            name: record.id,
+        }),
+    };
+
+    const items = [
+        {
+            key: '1',
+            icon: <GrPrint />,
+            label: 'Phích chuẩn ISBD',
+            disabled: selectedRowKeys.length === 0,
+            onClick: () => openBookPdf(selectedRowKeys),
+        },
+        {
+            key: '2',
+            icon: <GrPrint />,
+            label: 'Dán bìa, gáy - dọc A4',
+            disabled: selectedRowKeys.length === 0,
+            onClick: () => openBookLabelType1Pdf(selectedRowKeys),
+        },
+        {
+            key: '3',
+            icon: <GrPrint />,
+            label: 'Nhãn dán từ gáy đến bìa A4',
+            disabled: selectedRowKeys.length === 0,
+            onClick: () => openBookLabelType2Pdf(selectedRowKeys),
+        },
+        {
+            key: '4',
+            icon: <GrPrint />,
+            label: 'Danh mục sách',
+            disabled: selectedRowKeys.length === 0,
+            onClick: openBookListPdf,
+        },
+    ];
+
     if (errorMessage) {
         return (
             <div className="alert alert-danger p-2" role="alert">
@@ -261,9 +348,11 @@ function BookListByCategory() {
                     </Button>
                 </Space.Compact>
 
-                <Button type="primary" icon={<FaPrint />}>
-                    In
-                </Button>
+                <Dropdown menu={{ items }}>
+                    <Button type="primary" icon={<FaPrint />}>
+                        In
+                    </Button>
+                </Dropdown>
             </Space>
 
             <div className="row">
@@ -279,10 +368,12 @@ function BookListByCategory() {
                     <Table
                         bordered
                         rowKey="id"
+                        scroll={{ x: 'max-content' }}
                         dataSource={entityData}
                         columns={columns}
                         loading={isLoading}
                         onChange={handleSortChange}
+                        rowSelection={rowSelection}
                         pagination={{
                             current: filters.pageNum,
                             pageSize: filters.pageSize,

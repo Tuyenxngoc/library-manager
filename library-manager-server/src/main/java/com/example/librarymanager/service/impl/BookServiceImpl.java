@@ -55,4 +55,25 @@ public class BookServiceImpl implements BookService {
     public BookResponseDto findById(Long id) {
         return null;
     }
+
+    @Override
+    public byte[] getBooksPdfContent(List<Long> bookIds) {
+        return new byte[0];
+    }
+
+    @Override
+    public byte[] getBooksLabelType1PdfContent(List<Long> bookIds) {
+        return new byte[0];
+    }
+
+    @Override
+    public byte[] getBooksLabelType2PdfContent(List<Long> bookIds) {
+        return new byte[0];
+    }
+
+    @Override
+    public byte[] generateBookListPdf() {
+        return new byte[0];
+    }
+
 }

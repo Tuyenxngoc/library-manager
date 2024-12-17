@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import dayjs from 'dayjs';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import queryString from 'query-string';
@@ -68,7 +69,7 @@ const validationSchema = yup.object({
         .nullable()
         .typeError('Năm xuất bản phải là số hợp lệ')
         .min(1900, 'Năm xuất bản phải lớn hơn 1900')
-        .max(new Date().getFullYear(), `Năm xuất bản không được lớn hơn ${new Date().getFullYear()}`),
+        .max(dayjs().year(), `Năm xuất bản không được lớn hơn ${dayjs().year()}`),
 
     edition: yup.string().nullable(),
 

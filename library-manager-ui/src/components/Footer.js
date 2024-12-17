@@ -1,7 +1,7 @@
 import { HiOutlineBuildingOffice2 } from 'react-icons/hi2';
 import { LuPhone } from 'react-icons/lu';
 import { MdMailOutline } from 'react-icons/md';
-
+import dayjs from 'dayjs';
 import classNames from 'classnames/bind';
 import styles from '~/styles/Footer.module.scss';
 import SocialIcons from './SocialIcons';
@@ -42,7 +42,7 @@ function Footer() {
                 <div className="container">
                     <div className="row">
                         <div className="col">
-                            <span>{new Date().getFullYear()} All Rights Reserved By © NHÓM 16</span>
+                            <span>{dayjs().year()} All Rights Reserved By © NHÓM 16</span>
                         </div>
                     </div>
                 </div>

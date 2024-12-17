@@ -142,6 +142,7 @@ function BorrowRequests() {
             <Table
                 bordered
                 rowKey="cartId"
+                scroll={{ x: 'max-content' }}
                 dataSource={entityData}
                 columns={columns}
                 loading={isLoading}

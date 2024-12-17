@@ -336,6 +336,7 @@ function BorrowBookForm() {
                             columns={columns}
                             dataSource={formik.values.books}
                             rowKey="bookCode"
+                            scroll={{ x: 'max-content' }}
                             pagination={false}
                         />
                         <div className="text-danger">{formik.touched.books && formik.errors.books}</div>

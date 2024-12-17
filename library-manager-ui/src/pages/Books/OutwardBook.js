@@ -9,8 +9,8 @@ import { deleteExportReceipt, getExportReceipts } from '~/services/exportReceipt
 
 const options = [
     { value: 'receiptNumber', label: 'Số phiếu xuất' },
-    { label: 'Số vào sổ tổng quát', value: 'generalRecordNumber' },
-    { value: 'fundingSource', label: 'Nguồn cấp phát' },
+    { value: 'ID', label: 'ID' },
+    { value: 'exportReason', label: 'Lý do xuất' },
 ];
 
 function OutwardBook() {
@@ -177,6 +177,7 @@ function OutwardBook() {
             <Table
                 bordered
                 rowKey="id"
+                scroll={{ x: 'max-content' }}
                 dataSource={entityData}
                 columns={columns}
                 loading={isLoading}

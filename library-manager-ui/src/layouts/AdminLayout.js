@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Dropdown, Flex, Layout, Menu, Space, theme } from 'antd';
+import dayjs from 'dayjs';
 import { AiFillDashboard } from 'react-icons/ai';
 import { IoMdSettings, IoIosLogOut } from 'react-icons/io';
 import { BsNewspaper } from 'react-icons/bs';
 import { BiCategory } from 'react-icons/bi';
-import { FaUsers, FaUser, FaHistory, FaChartBar, FaRecycle, FaBook, FaAngleDown } from 'react-icons/fa';
+import { FaUsers, FaUser, FaHistory, FaRecycle, FaBook, FaAngleDown } from 'react-icons/fa';
 import images from '~/assets';
 import { checkUserHasRequiredRole } from '~/utils/helper';
 import { ROLES } from '~/common/roleConstants';
@@ -83,7 +84,7 @@ const menuConfig = [
         children: [
             { label: 'Danh sách sách', key: '/admin/books/list', roles: [ROLES.ManageBook] },
             { label: 'Nhập sách', key: '/admin/books/inward', roles: [ROLES.ManageImportReceipt] },
-            { label: 'Kiểm kê sách', key: '/admin/books/inventory', roles: [ROLES.ManageBook] },
+            // { label: 'Kiểm kê sách', key: '/admin/books/inventory', roles: [ROLES.ManageBook] },
             { label: 'Xuất sách', key: '/admin/books/outward', roles: [ROLES.ManageBook] },
         ],
     },
@@ -97,12 +98,12 @@ const menuConfig = [
             { label: 'Trả-Gia hạn sách', key: '/admin/circulation/return-renew' },
         ],
     },
-    {
-        label: 'Thống kê báo cáo',
-        key: '/admin/reports',
-        icon: <FaChartBar />,
-        children: [{ label: 'Báo cáo', key: '/admin/reports/statistics' }],
-    },
+    // {
+    //     label: 'Thống kê báo cáo',
+    //     key: '/admin/reports',
+    //     icon: <FaChartBar />,
+    //     children: [{ label: 'Báo cáo', key: '/admin/reports/statistics' }],
+    // },
     {
         label: 'Quản lý tin tức',
         key: '/admin/news-articles',
@@ -228,9 +229,7 @@ function AdminLayout() {
                     </div>
                 </Content>
                 {/* Footer */}
-                <Footer style={{ textAlign: 'center' }}>
-                    {new Date().getFullYear()} All Rights Reserved By © NHÓM 16
-                </Footer>
+                <Footer style={{ textAlign: 'center' }}>{dayjs().year()} All Rights Reserved By © NHÓM 16</Footer>
             </Layout>
         </Layout>
     );
