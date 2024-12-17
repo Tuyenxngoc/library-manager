@@ -129,6 +129,7 @@ public class UrlConstant {
 
         public static final String CREATE = ADMIN_URL + PRE_FIX;
         public static final String GET_ALL = ADMIN_URL + PRE_FIX;
+        public static final String GET_BY_IDS = ADMIN_URL + PRE_FIX + "/by-ids";
         public static final String GET_BY_ID = ADMIN_URL + PRE_FIX + "/{id}";
         public static final String UPDATE = ADMIN_URL + PRE_FIX + "/{id}";
         public static final String DELETE = ADMIN_URL + PRE_FIX + "/{id}";

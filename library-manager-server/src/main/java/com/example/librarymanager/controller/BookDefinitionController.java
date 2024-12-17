@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Set;
 
 @RestApiV1
 @RequiredArgsConstructor
@@ -73,6 +74,13 @@ public class BookDefinitionController {
     @GetMapping(UrlConstant.BookDefinition.GET_ALL)
     public ResponseEntity<?> getAllBookDefinitions(@ParameterObject PaginationFullRequestDto requestDto) {
         return VsResponseUtil.success(bookDefinitionService.findAll(requestDto));
+    }
+
+    @Operation(summary = "API Get Book Definitions By List of IDs")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGE_BOOK_DEFINITION', 'ROLE_MANAGE_IMPORT_RECEIPT')")
+    @PostMapping(value = UrlConstant.BookDefinition.GET_BY_IDS, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getBookDefinitionsByIds(@RequestBody Set<Long> ids) {
+        return VsResponseUtil.success(bookDefinitionService.findByIds(ids));
     }
 
     @Operation(summary = "API Get Book Definition By Id")

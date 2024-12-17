@@ -8,6 +8,10 @@ export const getBookDefinitions = (params) => {
     return axiosPrivate.get(`admin/book-definitions?${params}`);
 };
 
+export const getBookDefinitionsByIds = () => {
+    return axiosPrivate.post('admin/book-definitions/by-ids');
+};
+
 export const getBookByBookDefinitions = (params) => {
     return axiosPrivate.get(`admin/book-definitions/books?${params}`);
 };

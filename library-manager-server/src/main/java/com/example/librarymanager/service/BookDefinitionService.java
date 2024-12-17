@@ -14,6 +14,7 @@ import com.example.librarymanager.domain.dto.response.bookdefinition.BookForRead
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Set;
 
 public interface BookDefinitionService {
     void initBookDefinitionsFromCsv(String bookDefinitionsCsvPath);
@@ -25,6 +26,8 @@ public interface BookDefinitionService {
     CommonResponseDto delete(Long id, String userId);
 
     PaginationResponseDto<BookDefinitionResponseDto> findAll(PaginationFullRequestDto requestDto);
+
+    List<BookDefinitionResponseDto> findByIds(Set<Long> ids);
 
     BookDefinitionResponseDto findById(Long id);
 

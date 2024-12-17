@@ -346,6 +346,11 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
     }
 
     @Override
+    public List<BookDefinitionResponseDto> findByIds(Set<Long> ids) {
+        return bookDefinitionRepository.findBookDefinitionsByIds(ids);
+    }
+
+    @Override
     public BookDefinitionResponseDto findById(Long id) {
         BookDefinition bookDefinition = findEntityById(id);
 
