@@ -119,7 +119,7 @@ function BorrowBookForm() {
     const fetchBooks = async (keyword = '') => {
         setIsBooksLoading(true);
         try {
-            const params = queryString.stringify({ keyword, searchBy: 'bookCode' });
+            const params = queryString.stringify({ keyword, searchBy: 'title' });
             const response = await getBooks(params);
             const { items } = response.data.data;
             setBooks(items);
@@ -251,7 +251,14 @@ function BorrowBookForm() {
                         <div className="text-danger">{formik.touched.readerId && formik.errors.readerId}</div>
                     </div>
 
-                    <FormInput id="receiptNumber" label="Số phiếu mượn" className="col-md-6" formik={formik} required />
+                    <FormInput
+                        id="receiptNumber"
+                        label="Số phiếu mượn"
+                        className="col-md-6"
+                        helperText="Số phiếu mượn nên nhập theo định dạng PM + số, ví dụ PM0001"
+                        formik={formik}
+                        required
+                    />
 
                     <div className="col-md-6">
                         <label htmlFor="borrowDate">
@@ -299,7 +306,7 @@ function BorrowBookForm() {
                             placeholder="Chọn sách"
                             style={{ width: '100%' }}
                             options={books.map((book) => ({
-                                label: book.bookCode,
+                                label: book.bookCode + ' - ' + book.bookDefinition.title,
                                 value: book.bookCode,
                             }))}
                             loading={isBooksLoading}

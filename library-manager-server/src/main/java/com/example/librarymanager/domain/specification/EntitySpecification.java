@@ -548,11 +548,11 @@ public class EntitySpecification {
         };
     }
 
-    public static Specification<BookBorrow> filterBookBorrows() {
+    public static Specification<BookBorrow> filterBookBorrows(Boolean isReturn) {
         return (root, query, builder) -> {
             query.distinct(true);
             Predicate predicate = builder.conjunction();
-            predicate = builder.and(predicate, builder.equal(root.get(BookBorrow_.returned), Boolean.FALSE));
+            predicate = builder.and(predicate, builder.equal(root.get(BookBorrow_.returned), isReturn));
             return predicate;
         };
     }

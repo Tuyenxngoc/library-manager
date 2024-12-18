@@ -14,13 +14,14 @@ import lombok.Setter;
 @AllArgsConstructor
 public class NewsArticleRequestDto {
     @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)
-    @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
+    @Size(max = 255, message = ErrorMessage.INVALID_TEXT_LENGTH)
     private String title;
 
     @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)
-    @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
+    @Size(max = 255, message = ErrorMessage.INVALID_TEXT_LENGTH)
     private String newsType;
 
+    @Size(max = 255, message = ErrorMessage.INVALID_TEXT_LENGTH)
     private String description;
 
     @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)

@@ -5,6 +5,7 @@ import com.example.librarymanager.annotation.RestApiV1;
 import com.example.librarymanager.base.VsResponseUtil;
 import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.UrlConstant;
+import com.example.librarymanager.domain.dto.filter.TimeFilter;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.security.CustomUserDetails;
 import com.example.librarymanager.service.BookBorrowService;
@@ -20,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Set;
 
@@ -46,8 +48,12 @@ public class BookBorrowController {
     @Operation(summary = "API Get All Book Borrows")
     @PreAuthorize("hasRole('ROLE_MANAGE_BORROW_RECEIPT')")
     @GetMapping(UrlConstant.BookBorrow.GET_ALL)
-    public ResponseEntity<?> getAllBookBorrows(@ParameterObject PaginationFullRequestDto requestDto) {
-        return VsResponseUtil.success(bookBorrowService.findAll(requestDto));
+    public ResponseEntity<?> getAllBookBorrows(
+            @ParameterObject PaginationFullRequestDto requestDto,
+            @ParameterObject TimeFilter timeFilter,
+            @RequestParam(value = "isReturn", required = false, defaultValue = "false") Boolean isReturn
+    ) {
+        return VsResponseUtil.success(bookBorrowService.findAll(requestDto, timeFilter, isReturn));
     }
 
 }

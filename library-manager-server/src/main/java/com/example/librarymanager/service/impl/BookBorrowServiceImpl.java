@@ -2,6 +2,7 @@ package com.example.librarymanager.service.impl;
 
 import com.example.librarymanager.constant.*;
 import com.example.librarymanager.domain.dto.common.CommonResponseDto;
+import com.example.librarymanager.domain.dto.filter.TimeFilter;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
@@ -48,10 +49,10 @@ public class BookBorrowServiceImpl implements BookBorrowService {
     private final BorrowReceiptRepository borrowReceiptRepository;
 
     @Override
-    public PaginationResponseDto<BookBorrowResponseDto> findAll(PaginationFullRequestDto requestDto) {
+    public PaginationResponseDto<BookBorrowResponseDto> findAll(PaginationFullRequestDto requestDto, TimeFilter timeFilter, Boolean isReturn) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BOOK_BORROW);
 
-        Specification<BookBorrow> spec = EntitySpecification.filterBookBorrows().and(EntitySpecification.filterBookBorrows(requestDto.getKeyword(), requestDto.getSearchBy()));
+        Specification<BookBorrow> spec = EntitySpecification.filterBookBorrows(isReturn).and(EntitySpecification.filterBookBorrows(requestDto.getKeyword(), requestDto.getSearchBy()));
         Page<BookBorrow> page = bookBorrowRepository.findAll(spec, pageable);
 
         List<BookBorrowResponseDto> items = page.getContent().stream()
@@ -74,7 +75,6 @@ public class BookBorrowServiceImpl implements BookBorrowService {
             //Cập nhật trạng thái của sách
             Book book = bookBorrow.getBook();
             book.setBookCondition(BookCondition.AVAILABLE);
-            bookRepository.save(book);
 
             //Cập nhật trạng thái của bookBorrow
             bookBorrow.setReturned(true);
@@ -90,6 +90,7 @@ public class BookBorrowServiceImpl implements BookBorrowService {
                 borrowReceipt.setStatus(BorrowStatus.OVERDUE);  // Nếu quá hạn
             }
 
+            bookRepository.save(book);
             borrowReceiptRepository.save(borrowReceipt);
             bookBorrowRepository.save(bookBorrow);
 

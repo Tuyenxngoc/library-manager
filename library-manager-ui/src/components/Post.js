@@ -9,7 +9,7 @@ import images from '~/assets';
 
 const cx = classNames.bind(styles);
 
-function Post({ className, data, layout = 'vertical' }) {
+function Post({ className, data, layout = 'vertical', contentVisible = true }) {
     const isNew = () => {
         const currentDate = dayjs();
         const postDate = dayjs(data.createdDate);
@@ -48,12 +48,16 @@ function Post({ className, data, layout = 'vertical' }) {
                     <Link to={`/news-articles/${data.titleSlug}`}>{data.title}</Link>
                 </div>
 
-                <span className={cx('bookwriter')}>
-                    <FaUser />
-                    Tác giả:&nbsp;{data.author}
-                </span>
+                {contentVisible && (
+                    <>
+                        <span className={cx('bookwriter')}>
+                            <FaUser />
+                            Tác giả:&nbsp;{data.author}
+                        </span>
 
-                <div className={cx('postdes')}>{data.description}</div>
+                        <div className={cx('postdes')}>{data.description}</div>
+                    </>
+                )}
             </div>
         </div>
     );

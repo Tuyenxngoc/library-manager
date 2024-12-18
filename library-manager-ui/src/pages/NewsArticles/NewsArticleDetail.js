@@ -5,37 +5,47 @@ import { Parallax } from 'react-parallax';
 import { Button, Skeleton } from 'antd';
 import images, { backgrounds } from '~/assets';
 import Breadcrumb from '~/components/Breadcrumb';
-import { getNewsArticleByTitleSlugForUser } from '~/services/newsArticlesService';
+import { getNewsArticleByTitleSlugForUser, getNewsArticlesForUser } from '~/services/newsArticlesService';
 import classNames from 'classnames/bind';
 import styles from '~/styles/NewsArticleDetail.module.scss';
 import SocialIcons from '~/components/SocialIcons';
+import Post from '~/components/Post';
 
 const cx = classNames.bind(styles);
 
 function NewsArticleDetail() {
     const { id } = useParams();
 
-    const [entityData, setEntityData] = useState(null);
+    const [articleDetail, setArticleDetail] = useState(null);
+    const [relatedArticles, setRelatedArticles] = useState([]);
 
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState(null);
 
     useEffect(() => {
-        const fetchEntities = async () => {
+        const fetchArticleDetail = async () => {
             setIsLoading(true);
             setErrorMessage(null);
             try {
                 const response = await getNewsArticleByTitleSlugForUser(id);
                 const { data } = response.data;
-                setEntityData(data);
+                setArticleDetail(data);
             } catch (error) {
                 setErrorMessage(error.response.data.message || error.message);
             } finally {
                 setIsLoading(false);
             }
         };
+        const fetchRelatedArticles = async () => {
+            try {
+                const response = await getNewsArticlesForUser();
+                const { items } = response.data.data;
+                setRelatedArticles(items);
+            } catch (error) {}
+        };
 
-        fetchEntities();
+        fetchArticleDetail();
+        fetchRelatedArticles();
     }, [id]);
 
     const items = [
@@ -70,10 +80,25 @@ function NewsArticleDetail() {
 
             <div className="container sectionspace">
                 <div className="row mb-4">
-                    <div className="col-3">
-                        <Button block>Phân loại tin tức</Button>
+                    <div className="col-4">
+                        <div className="row">
+                            <div className="col-12">
+                                <Button block>Các bài đã đăng</Button>
+                            </div>
+                            {relatedArticles.map((data, index) => (
+                                <div className="col-12">
+                                    <Post
+                                        className="mx-2 my-1"
+                                        key={index}
+                                        data={data}
+                                        layout="horizontal"
+                                        contentVisible={false}
+                                    />
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                    <div className="col-9">
+                    <div className="col-8">
                         {isLoading ? (
                             <>
                                 <Skeleton active paragraph={{ rows: 5 }} />
@@ -85,14 +110,14 @@ function NewsArticleDetail() {
                         ) : (
                             <>
                                 <figure className={cx('newsdetailimg')}>
-                                    <img src={entityData.imageUrl || images.placeimg} alt="description" />
+                                    <img src={articleDetail.imageUrl || images.placeimg} alt="description" />
 
                                     <figcaption className={cx('author')}>
                                         <span className="bookwriter">Tác giả: Admin</span>
                                         <ul className="postmetadata">
                                             <li>
                                                 <FaRegCalendarAlt />
-                                                <i className="ms-2">{entityData.createdDate}</i>
+                                                <i className="ms-2">{articleDetail.createdDate}</i>
                                             </li>
                                         </ul>
                                     </figcaption>
@@ -100,15 +125,15 @@ function NewsArticleDetail() {
 
                                 <div className={cx('newsdetail')}>
                                     <div className={cx('posttitle')}>
-                                        <h3>{entityData.title}</h3>
+                                        <h3>{articleDetail.title}</h3>
                                     </div>
 
                                     <div className={cx('description')}>
-                                        <q>{entityData.description}</q>
+                                        <q>{articleDetail.description}</q>
                                         <div
                                             className="ql-snow ql-editor p-0 mt-4"
                                             style={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}
-                                            dangerouslySetInnerHTML={{ __html: entityData.content }}
+                                            dangerouslySetInnerHTML={{ __html: articleDetail.content }}
                                         />
                                     </div>
                                     <div className={cx('tagsshare')}>

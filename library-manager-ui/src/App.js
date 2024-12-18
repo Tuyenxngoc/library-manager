@@ -59,6 +59,7 @@ import UserProfile from './pages/UserProfile/UserProfile';
 import BorrowedItems from './pages/BorrowedItems/BorrowedItems';
 import BorrowHistory from './pages/BorrowHistory/BorrowHistory';
 import BorrowRequests from './pages/BorrowRequests/BorrowRequests';
+import ReturnHistory from './pages/ReturnRenewBook/ReturnHistory';
 
 function App() {
     return (
@@ -186,6 +187,7 @@ function App() {
                             </Route>
 
                             <Route path="return-renew" element={<ReturnRenewBook />} />
+                            <Route path="return-history" element={<ReturnHistory />} />
                         </Route>
 
                         {/* Tác giả */}

@@ -1,5 +1,4 @@
-import { useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button, Input, message } from 'antd';
 import { FaUser } from 'react-icons/fa';
 
@@ -59,7 +58,9 @@ function AdminForgotPassword() {
                     <div className={cx('login-panel')}>
                         <div className={cx('panel-heading')}>
                             <h3 className="panel-title text-center mb-0">
-                                <img src={images.logo} alt="logo" style={{ height: 40 }} />
+                                <Link to="/" className="d-block">
+                                    <img src={images.logo} alt="logo" style={{ height: 40 }} />
+                                </Link>
                             </h3>
                         </div>
 
