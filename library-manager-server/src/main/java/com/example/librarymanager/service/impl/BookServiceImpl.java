@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +50,11 @@ public class BookServiceImpl implements BookService {
         responseDto.setMeta(pagingMeta);
 
         return responseDto;
+    }
+
+    @Override
+    public List<BookResponseDto> findByIds(Set<Long> ids) {
+        return bookRepository.findBooksByIds(ids);
     }
 
     @Override

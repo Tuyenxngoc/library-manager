@@ -9,7 +9,7 @@ import { FaPlus } from 'react-icons/fa6';
 import queryString from 'query-string';
 import dayjs from 'dayjs';
 import FormInput from '~/components/FormInput';
-import { getBookDefinitions } from '~/services/bookDefinitionService';
+import { getBookDefinitions, getBookDefinitionsByIds } from '~/services/bookDefinitionService';
 import { createImportReceipt, getImportReceiptById, updateImportReceipt } from '~/services/importReceiptService';
 import { handleError } from '~/utils/errorHandler';
 import { checkIdIsNumber } from '~/utils/helper';
@@ -25,28 +25,18 @@ const defaultValue = {
 };
 
 const validationSchema = yup.object({
-    receiptNumber: yup.string().required('Số phiếu nhập là bắt buộc'),
+    receiptNumber: yup.string().required('Vui lòng nhập số phiếu nhập'),
 
-    importDate: yup.date().nullable().required('Ngày nhập là bắt buộc').typeError('Ngày nhập không hợp lệ'),
+    importDate: yup.date().nullable().required('Vui lòng chọn ngày nhập').typeError('Ngày nhập không hợp lệ'),
 
-    fundingSource: yup.string().required('Nguồn cấp là bắt buộc'),
+    fundingSource: yup.string().required('Vui lòng chọn nguồn cấp phát'),
 
-    bookRequestDtos: yup
-        .array()
-        .of(
-            yup.object().shape({
-                bookDefinitionId: yup.number().min(1, 'Bạn phải chọn một cuốn sách'),
-                quantity: yup.number().min(1, 'Số lượng phải lớn hơn 0').required('Số lượng là bắt buộc'),
-            }),
-        )
-        .min(1, 'Bạn phải chọn ít nhất một cuốn sách để nhập'),
+    bookRequestDtos: yup.array().min(1, 'Bạn phải chọn ít nhất một biên mục để nhập'),
 });
 
 function InwardBookForm() {
     const { id } = useParams();
     const navigate = useNavigate();
-
-    const [messageApi, contextHolder] = message.useMessage();
 
     const [bookDefinitions, setBookDefinitions] = useState([]);
     const [isBookDefinitionsLoading, setIsBookDefinitionsLoading] = useState(true);
@@ -54,13 +44,23 @@ function InwardBookForm() {
     const [quantity, setQuantity] = useState(1);
     const [selectedBookDefinitionId, setSelectedBookDefinitionId] = useState(null);
 
+    const [messageApi, contextHolder] = message.useMessage();
+
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
+            const formattedValues = {
+                ...values,
+                bookRequestDtos: values.bookRequestDtos.map((book) => ({
+                    bookDefinitionId: book.bookDefinitionId,
+                    quantity: book.quantity,
+                })),
+            };
+
             let response;
             if (id) {
-                response = await updateImportReceipt(id, values);
+                response = await updateImportReceipt(id, formattedValues);
             } else {
-                response = await createImportReceipt(values);
+                response = await createImportReceipt(formattedValues);
             }
 
             if (response.status === 200) {
@@ -98,7 +98,7 @@ function InwardBookForm() {
 
     const handleAddNewColum = () => {
         if (!selectedBookDefinitionId) {
-            messageApi.error('Bạn phải chọn một cuốn sách');
+            messageApi.error('Bạn phải chọn một biên mục');
             return;
         }
         if (quantity < 1) {
@@ -109,11 +109,30 @@ function InwardBookForm() {
         const currentBooks = formik.values.bookRequestDtos;
 
         if (currentBooks.some((book) => book.bookDefinitionId === selectedBookDefinitionId)) {
-            messageApi.error('Cuốn sách đã tồn tại trong danh sách');
+            messageApi.error('Biên mục đã tồn tại trong danh sách');
             return;
         }
 
-        const updatedBooks = [...currentBooks, { bookDefinitionId: selectedBookDefinitionId, quantity }];
+        const bookDefinitionDetail = bookDefinitions.find((book) => book.id === selectedBookDefinitionId);
+        if (!bookDefinitionDetail) {
+            messageApi.error('Không tìm thấy thông tin của biên mục');
+            return;
+        }
+
+        const updatedBooks = [
+            ...currentBooks,
+            {
+                quantity,
+                bookDefinitionId: selectedBookDefinitionId,
+                title: bookDefinitionDetail.title,
+                authors: bookDefinitionDetail.authors,
+                price: bookDefinitionDetail.price,
+                category: bookDefinitionDetail.category,
+                publisher: bookDefinitionDetail.publisher,
+                publishingYear: bookDefinitionDetail.publishingYear,
+            },
+        ];
+
         formik.setFieldValue('bookRequestDtos', updatedBooks);
 
         setSelectedBookDefinitionId(null);
@@ -132,17 +151,39 @@ function InwardBookForm() {
     }, []);
 
     useEffect(() => {
-        if (id) {
+        const fetchData = async () => {
+            if (!id) {
+                return;
+            }
             if (!checkIdIsNumber(id)) {
                 navigate('/admin/books/inward');
                 return;
             }
 
-            // Nếu có id, lấy thông tin phiếu nhập
-            getImportReceiptById(id)
-                .then((response) => {
-                    const { receiptNumber, importDate, generalRecordNumber, fundingSource, importReason, books } =
-                        response.data.data;
+            try {
+                const response = await getImportReceiptById(id);
+                const { receiptNumber, importDate, generalRecordNumber, fundingSource, importReason, books } =
+                    response.data.data;
+
+                const bookDefinitionIds = books.map((book) => book.bookDefinitionId);
+
+                try {
+                    const responseBooks = await getBookDefinitionsByIds(bookDefinitionIds);
+                    const bookDetails = responseBooks.data.data;
+
+                    const updatedBooks = books.map((book) => {
+                        const bookDetail = bookDetails.find((detail) => detail.id === book.bookDefinitionId);
+
+                        return {
+                            ...book,
+                            title: bookDetail.title,
+                            authors: bookDetail.authors,
+                            price: bookDetail.price,
+                            category: bookDetail.category,
+                            publisher: bookDetail.publisher,
+                            publishingYear: bookDetail.publishingYear,
+                        };
+                    });
 
                     formik.setValues({
                         receiptNumber,
@@ -150,64 +191,81 @@ function InwardBookForm() {
                         generalRecordNumber,
                         fundingSource,
                         importReason,
-                        bookRequestDtos: books,
+                        bookRequestDtos: updatedBooks,
                     });
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
-        }
+                } catch (error) {
+                    messageApi.error('Không thể tải thông tin biên mục sách');
+                }
+            } catch (error) {
+                messageApi.error('Không thể tải thông tin phiếu nhập');
+            }
+        };
+
+        fetchData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
     const columns = [
         {
             title: 'Nhan đề',
-            dataIndex: 'bookDefinitionId',
-            key: 'bookDefinitionId',
-            align: 'center',
+            dataIndex: 'title',
+            key: 'title',
         },
         {
             title: 'Loại sách',
-            dataIndex: 'bookDefinitionId',
-            key: 'bookDefinitionId',
-            align: 'center',
+            dataIndex: 'category',
+            key: 'category',
+            render: (category) => category?.name || 'N/A',
         },
         {
-            title: 'Nhóm loại sách',
-            dataIndex: 'bookDefinitionId',
-            key: 'bookDefinitionId',
-            align: 'center',
+            title: 'Tên tác giả',
+            dataIndex: 'authors',
+            key: 'authors',
+            render: (authors) =>
+                authors.length > 0
+                    ? authors.map((author, index) => (
+                          <span key={author.id || index}>
+                              {author.name}
+                              {index < authors.length - 1 && ', '}
+                          </span>
+                      ))
+                    : 'N/A',
         },
         {
             title: 'Nhà xuất bản',
-            dataIndex: 'bookDefinitionId',
-            key: 'bookDefinitionId',
-            align: 'center',
+            dataIndex: 'publisher',
+            key: 'publisher',
+            render: (publisher) => publisher?.name || 'N/A',
         },
         {
             title: 'Năm xuất bản',
-            dataIndex: 'bookDefinitionId',
-            key: 'bookDefinitionId',
-            align: 'center',
+            dataIndex: 'publishingYear',
+            key: 'publishingYear',
+            render: (publishingYear) => publishingYear || 'N/A',
         },
         {
             title: 'Giá bìa',
-            dataIndex: 'bookDefinitionId',
-            key: 'bookDefinitionId',
-            align: 'center',
+            dataIndex: 'price',
+            key: 'price',
+            render: (price) => (price !== null ? `${price.toLocaleString()} đ` : 'N/A'),
         },
         {
             title: 'Số bản',
             dataIndex: 'quantity',
             key: 'quantity',
-            align: 'center',
         },
         {
             title: 'Thành tiền',
-            dataIndex: 'bookDefinitionId',
-            key: 'bookDefinitionId',
-            align: 'center',
+            key: 'totalPrice',
+            render: (record) => {
+                const price = record.price;
+                const quantity = record.quantity || 0;
+                if (price === null) {
+                    return 'Không xác định';
+                }
+                const total = price * quantity;
+                return total.toLocaleString() + ' đ';
+            },
         },
         {
             title: '',

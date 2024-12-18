@@ -12,6 +12,10 @@ export const getBooks = (params) => {
     return axiosPrivate.get(`books?${params}`);
 };
 
+export const getBooksByIds = (values) => {
+    return axiosPrivate.post('books/by-ids', values);
+};
+
 export const getBookPdf = (values) => {
     return axiosPrivate.post('books/pdf', values);
 };

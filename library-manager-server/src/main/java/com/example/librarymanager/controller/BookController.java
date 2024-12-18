@@ -22,6 +22,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestApiV1
 @RequiredArgsConstructor
@@ -47,6 +48,13 @@ public class BookController {
     @GetMapping(UrlConstant.Book.GET_ALL)
     public ResponseEntity<?> getAllBooks(@ParameterObject PaginationFullRequestDto requestDto) {
         return VsResponseUtil.success(bookService.findAll(requestDto));
+    }
+
+    @Operation(summary = "API Get Book By List of IDs")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGE_BOOK', 'ROLE_MANAGE_EXPORT_RECEIPT')")
+    @PostMapping(UrlConstant.Book.GET_BY_IDS)
+    public ResponseEntity<?> getBooksByIds(@RequestBody Set<Long> ids) {
+        return VsResponseUtil.success(bookService.findByIds(ids));
     }
 
     @Operation(summary = "API Get Book By Id")

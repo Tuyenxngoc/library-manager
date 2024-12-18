@@ -7,11 +7,14 @@ import com.example.librarymanager.domain.dto.request.BookRequestDto;
 import com.example.librarymanager.domain.dto.response.book.BookResponseDto;
 
 import java.util.List;
+import java.util.Set;
 
 public interface BookService {
     CommonResponseDto update(Long id, BookRequestDto requestDto, String userId);
 
     PaginationResponseDto<BookResponseDto> findAll(PaginationFullRequestDto requestDto);
+
+    List<BookResponseDto> findByIds(Set<Long> ids);
 
     BookResponseDto findById(Long id);
 

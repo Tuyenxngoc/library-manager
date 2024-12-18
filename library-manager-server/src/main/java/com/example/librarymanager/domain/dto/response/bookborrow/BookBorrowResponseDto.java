@@ -15,6 +15,8 @@ public class BookBorrowResponseDto {
 
     private final String title;
 
+    private final long receiptId;
+
     private final String receiptNumber;
 
     private final String cardNumber;
@@ -30,6 +32,7 @@ public class BookBorrowResponseDto {
         this.id = bookBorrow.getId();
         this.bookCode = bookBorrow.getBook().getBookCode();
         this.title = bookBorrow.getBook().getBookDefinition().getTitle();
+        this.receiptId = borrowReceipt.getId();
         this.receiptNumber = borrowReceipt.getReceiptNumber();
         this.cardNumber = borrowReceipt.getReader().getCardNumber();
         this.fullName = borrowReceipt.getReader().getFullName();

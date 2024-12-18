@@ -91,8 +91,8 @@ function ReturnRenewBook() {
         }
     };
 
-    const handleRenewBook = () => {
-        navigate(`/admin/circulation/borrow`);
+    const handleRenewBook = (receiptId) => {
+        navigate(`/admin/circulation/borrow/edit/${receiptId}`);
     };
 
     useEffect(() => {
@@ -183,7 +183,7 @@ function ReturnRenewBook() {
                     <Button type="link" onClick={() => handleReturnBook(record.id)}>
                         Trả sách
                     </Button>
-                    <Button type="link" onClick={() => handleRenewBook()}>
+                    <Button type="link" onClick={() => handleRenewBook(record.receiptId)}>
                         Gia hạn
                     </Button>
                 </Space>

@@ -100,9 +100,10 @@ function BorrowedItems() {
             title: 'STT',
             key: 'index',
             render: (text, record, index) => index + 1,
+            align: 'center',
         },
         {
-            title: 'Mã nhan đề',
+            title: 'Mã ĐKCB',
             dataIndex: 'bookCode',
             key: 'bookCode',
         },

@@ -12,7 +12,7 @@ import FormInput from '~/components/FormInput';
 import { handleError } from '~/utils/errorHandler';
 import { checkIdIsNumber } from '~/utils/helper';
 import { createExportReceipt, getExportReceiptById, updateExportReceipt } from '~/services/exportReceiptService';
-import { getBooks } from '~/services/bookService';
+import { getBooks, getBooksByIds } from '~/services/bookService';
 import FormTextArea from '~/components/FormTextArea';
 
 const defaultValue = {
@@ -23,34 +23,36 @@ const defaultValue = {
 };
 
 const validationSchema = yup.object({
-    receiptNumber: yup.string().required('Số phiếu xuất là bắt buộc'),
+    receiptNumber: yup.string().required('Vui lòng nhập số phiếu xuất'),
 
-    exportDate: yup.date().nullable().required('Ngày xuất là bắt buộc').typeError('Ngày xuất không hợp lệ'),
+    exportDate: yup.date().nullable().required('Vui lòng chọn ngày xuất').typeError('Ngày xuất không hợp lệ'),
 
-    bookIds: yup
-        .array()
-        .of(yup.number().required('Mã sách là bắt buộc'))
-        .min(1, 'Bạn phải chọn ít nhất một cuốn sách để xuất'),
+    bookIds: yup.array().min(1, 'Bạn phải chọn ít nhất một cuốn sách'),
 });
 
 function OutwardBookForm() {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    const [messageApi, contextHolder] = message.useMessage();
+    const [selectedBookId, setSelectedBookId] = useState(null);
 
     const [books, setBooks] = useState([]);
     const [isBooksLoading, setIsBooksLoading] = useState(true);
 
-    const [selectedBookId, setSelectedBookId] = useState(null);
+    const [messageApi, contextHolder] = message.useMessage();
 
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
+            const formattedValues = {
+                ...values,
+                bookIds: values.bookIds.map((book) => book.bookId),
+            };
+
             let response;
             if (id) {
-                response = await updateExportReceipt(id, values);
+                response = await updateExportReceipt(id, formattedValues);
             } else {
-                response = await createExportReceipt(values);
+                response = await createExportReceipt(formattedValues);
             }
 
             if (response.status === 200 || response.status === 201) {
@@ -97,14 +99,34 @@ function OutwardBookForm() {
             return;
         }
 
-        const updatedBooks = [...currentBooks, selectedBookId];
+        const bookDetail = books.find((book) => book.id === selectedBookId);
+        if (!bookDetail) {
+            messageApi.error('Không tìm thấy thông tin của cuốn sách');
+            return;
+        }
+
+        const { bookDefinition } = bookDetail;
+
+        const updatedBooks = [
+            ...currentBooks,
+            {
+                bookId: selectedBookId,
+                bookCode: bookDetail.bookCode,
+                title: bookDefinition.title,
+                publishingYear: bookDefinition.publishingYear,
+                price: bookDefinition.price,
+                bookCondition: bookDetail.bookCondition,
+            },
+        ];
+
         formik.setFieldValue('bookIds', updatedBooks);
 
         setSelectedBookId(null);
     };
 
     const handleDeleteColum = (id) => {
-        const updatedBooks = formik.values.bookIds.filter((bookId) => bookId !== id);
+        const currentBooks = formik.values.bookIds;
+        const updatedBooks = currentBooks.filter((book) => book.bookId !== id);
         formik.setFieldValue('bookIds', updatedBooks);
     };
 
@@ -114,28 +136,51 @@ function OutwardBookForm() {
     }, []);
 
     useEffect(() => {
-        if (id) {
+        const fetchData = async () => {
+            if (!id) {
+                return;
+            }
             if (!checkIdIsNumber(id)) {
                 navigate('/admin/books/outward');
                 return;
             }
 
-            // Nếu có id, lấy thông tin phiếu xuất
-            getExportReceiptById(id)
-                .then((response) => {
-                    const { receiptNumber, exportDate, exportReason, bookIds } = response.data.data;
+            try {
+                const response = await getExportReceiptById(id);
+                const { receiptNumber, exportDate, exportReason, bookIds } = response.data.data;
+
+                try {
+                    const responseBooks = await getBooksByIds(bookIds);
+                    const bookDetails = responseBooks.data.data;
+
+                    const updatedBooks = bookIds.map((bookId) => {
+                        const bookDetail = bookDetails.find((detail) => detail.id === bookId);
+                        const { bookDefinition } = bookDetail;
+
+                        return {
+                            bookId,
+                            bookCode: bookDetail.bookCode,
+                            title: bookDefinition.title,
+                            publishingYear: bookDefinition.publishingYear,
+                            price: bookDefinition.price,
+                            bookCondition: bookDetail.bookCondition,
+                        };
+                    });
 
                     formik.setValues({
                         receiptNumber,
                         exportDate: exportDate ? dayjs(exportDate) : null,
                         exportReason,
-                        bookIds: bookIds,
+                        bookIds: updatedBooks,
                     });
-                })
-                .catch((error) => {
-                    messageApi.error(error.message || 'Có lỗi xảy ra khi tải dữ liệu phiếu xuất.');
-                });
-        }
+                } catch (error) {
+                    messageApi.error('Không thể tải thông tin sách');
+                }
+            } catch (error) {
+                messageApi.error('Có lỗi xảy ra khi tải dữ liệu phiếu xuất.');
+            }
+        };
+        fetchData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 
@@ -144,31 +189,28 @@ function OutwardBookForm() {
             title: 'Số ĐKCB',
             dataIndex: 'bookCode',
             key: 'bookCode',
-            align: 'center',
         },
         {
             title: 'Nhan đề',
             dataIndex: 'title',
             key: 'title',
-            align: 'center',
         },
         {
             title: 'Năm xuất bản',
-            dataIndex: 'bookId',
-            key: 'bookId',
-            align: 'center',
+            dataIndex: 'publishingYear',
+            key: 'publishingYear',
+            render: (publishingYear) => publishingYear || 'N/A',
         },
         {
             title: 'Giá bìa',
-            dataIndex: 'bookId',
-            key: 'bookId',
-            align: 'center',
+            dataIndex: 'price',
+            key: 'price',
+            render: (price) => (price !== null ? `${price.toLocaleString()} đ` : 'N/A'),
         },
         {
             title: 'Tình trạng',
-            dataIndex: 'bookId',
-            key: 'bookId',
-            align: 'center',
+            dataIndex: 'bookCondition',
+            key: 'bookCondition',
         },
         {
             title: '',
@@ -225,7 +267,7 @@ function OutwardBookForm() {
                             placeholder="Chọn sách"
                             style={{ width: '100%' }}
                             options={books.map((book) => ({
-                                label: book.bookCode,
+                                label: book.bookCode + ' - ' + book.bookDefinition.title,
                                 value: book.id,
                             }))}
                             loading={isBooksLoading}
@@ -262,7 +304,7 @@ function OutwardBookForm() {
                             rowKey="bookId"
                             scroll={{ x: 'max-content' }}
                             columns={columns}
-                            dataSource={formik.values.bookIds.map((bookId) => ({ bookId }))}
+                            dataSource={formik.values.bookIds}
                             pagination={false}
                         />
                         <div className="text-danger">{formik.touched.bookIds && formik.errors.bookIds}</div>
