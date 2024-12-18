@@ -1,25 +1,34 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from 'antd';
 import { FaShare } from 'react-icons/fa';
 import classNames from 'classnames/bind';
 import styles from '~/styles/Product.module.scss';
 import images from '~/assets';
 import { addToCart } from '~/services/cartService';
+import useAuth from '~/hooks/useAuth';
 
 const cx = classNames.bind(styles);
 function Product({ className, data, messageApi }) {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { isAuthenticated } = useAuth();
+
     const bookUrl = `/books/${data.id}`;
 
     const handleAddToCart = async (id) => {
-        try {
-            const response = await addToCart(id);
-            if (response.status === 201) {
-                messageApi.success(response.data.data.message);
+        if (isAuthenticated) {
+            try {
+                const response = await addToCart(id);
+                if (response.status === 201) {
+                    messageApi.success(response.data.data.message);
+                }
+            } catch (error) {
+                const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi mượn sách.';
+                messageApi.error(errorMessage);
             }
-        } catch (error) {
-            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra mượn sách.';
-            messageApi.error(errorMessage);
+        } else {
+            navigate('/login', { replace: true, state: { from: location } });
         }
     };
 

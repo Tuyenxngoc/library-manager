@@ -12,6 +12,10 @@ export const readerChangePassword = (values) => {
     return axiosPrivate.patch('auth/change-password', values);
 };
 
+export const refreshTokenAPI = (values) => {
+    return httpRequest.post('auth/refresh-token', values);
+};
+
 export const logoutToken = (refreshToken) => {
     return axiosPrivate.post(
         'auth/logout',

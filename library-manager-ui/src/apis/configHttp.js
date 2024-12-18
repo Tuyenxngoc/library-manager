@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { refreshTokenAPI } from '~/services/authService';
 import { ACCESS_TOKEN, API_URL, REFRESH_TOKEN } from '~/common/commonConstants';
 
 const httpRequest = axios.create({
@@ -37,7 +38,9 @@ axiosPrivate.interceptors.response.use(
 
             try {
                 const newAccessToken = await refresh();
-                prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+                if (newAccessToken) {
+                    prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+                }
                 return axiosPrivate(prevRequest);
             } catch (refreshError) {
                 console.error('Error retrying request after token refresh:', refreshError);
@@ -50,17 +53,17 @@ axiosPrivate.interceptors.response.use(
 
 const refresh = async () => {
     try {
-        const response = await axiosPrivate.post('auth/refresh-token', {
-            refreshToken: localStorage.getItem(REFRESH_TOKEN),
-        });
+        const refresh = localStorage.getItem(REFRESH_TOKEN);
+        if (refresh) {
+            const response = await refreshTokenAPI({ refreshToken: refresh });
 
-        const { accessToken, refreshToken } = response.data.data;
-        localStorage.setItem(ACCESS_TOKEN, accessToken);
-        localStorage.setItem(REFRESH_TOKEN, refreshToken);
+            const { accessToken, refreshToken } = response.data.data;
+            localStorage.setItem(ACCESS_TOKEN, accessToken);
+            localStorage.setItem(REFRESH_TOKEN, refreshToken);
 
-        return accessToken;
+            return accessToken;
+        }
     } catch (error) {
-        console.error('Error refreshing token: ', error);
         throw error;
     }
 };

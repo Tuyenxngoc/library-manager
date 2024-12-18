@@ -35,7 +35,7 @@ function BookDetail() {
                     messageApi.success(response.data.data.message);
                 }
             } catch (error) {
-                const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra mượn sách.';
+                const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi mượn sách.';
                 messageApi.error(errorMessage);
             }
         } else {
