@@ -24,6 +24,7 @@ import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.*;
 import com.example.librarymanager.service.BookDefinitionService;
 import com.example.librarymanager.service.LogService;
+import com.example.librarymanager.service.PdfService;
 import com.example.librarymanager.util.PaginationUtil;
 import com.example.librarymanager.util.UploadFileUtil;
 import lombok.RequiredArgsConstructor;
@@ -73,7 +74,11 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
 
     private final ClassificationSymbolRepository classificationSymbolRepository;
 
+    private final BookRepository bookRepository;
+
     private final LogService logService;
+
+    private final PdfService pdfService;
 
     @Override
     public void initBookDefinitionsFromCsv(String bookDefinitionsCsvPath) {
@@ -478,4 +483,27 @@ public class BookDefinitionServiceImpl implements BookDefinitionService {
         return responseDto;
     }
 
+    @Override
+    public byte[] getBooksPdfContent(Set<Long> ids) {
+        List<Book> books = bookRepository.findAllByBookDefinitionIdIn(ids);
+        return pdfService.createPdfFromBooks(books);
+    }
+
+    @Override
+    public byte[] getBooksLabelType1PdfContent(Set<Long> ids) {
+        List<Book> books = bookRepository.findAllByBookDefinitionIdIn(ids);
+        return pdfService.createLabelType1Pdf(books);
+    }
+
+    @Override
+    public byte[] getBooksLabelType2PdfContent(Set<Long> ids) {
+        List<Book> books = bookRepository.findAllByBookDefinitionIdIn(ids);
+        return pdfService.createLabelType2Pdf(books);
+    }
+
+    @Override
+    public byte[] generateBookListPdf() {
+        List<Book> books = bookRepository.findAll();
+        return pdfService.createBookListPdf(books);
+    }
 }

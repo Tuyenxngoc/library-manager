@@ -1,14 +1,14 @@
 package com.example.librarymanager.service.impl;
 
+import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.SortByDataConstant;
-import com.example.librarymanager.domain.dto.common.CommonResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
-import com.example.librarymanager.domain.dto.request.BookRequestDto;
 import com.example.librarymanager.domain.dto.response.book.BookResponseDto;
 import com.example.librarymanager.domain.entity.Book;
 import com.example.librarymanager.domain.specification.EntitySpecification;
+import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.BookRepository;
 import com.example.librarymanager.service.BookService;
 import com.example.librarymanager.util.PaginationUtil;
@@ -26,9 +26,9 @@ public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
 
-    @Override
-    public CommonResponseDto update(Long id, BookRequestDto requestDto, String userId) {
-        return null;
+    private Book getEntity(long id) {
+        return bookRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.Book.ERR_NOT_FOUND_ID, id));
     }
 
     @Override
@@ -59,27 +59,6 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookResponseDto findById(Long id) {
-        return null;
+        return new BookResponseDto(getEntity(id));
     }
-
-    @Override
-    public byte[] getBooksPdfContent(List<Long> bookIds) {
-        return new byte[0];
-    }
-
-    @Override
-    public byte[] getBooksLabelType1PdfContent(List<Long> bookIds) {
-        return new byte[0];
-    }
-
-    @Override
-    public byte[] getBooksLabelType2PdfContent(List<Long> bookIds) {
-        return new byte[0];
-    }
-
-    @Override
-    public byte[] generateBookListPdf() {
-        return new byte[0];
-    }
-
 }

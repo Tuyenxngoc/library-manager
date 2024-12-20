@@ -77,3 +77,27 @@ export const searchBooks = (params, values) => {
 export const advancedSearchBooks = (params, values) => {
     return axiosPrivate.post(`book-definitions/advanced-search?${params}`, values);
 };
+
+export const getBookPdf = (values) => {
+    return axiosPrivate.post('book-definitions/pdf', values, {
+        responseType: 'arraybuffer',
+    });
+};
+
+export const getBookLabelType1Pdf = (values) => {
+    return axiosPrivate.post('book-definitions/pdf/label-type-1', values, {
+        responseType: 'arraybuffer',
+    });
+};
+
+export const getBookLabelType2Pdf = (values) => {
+    return axiosPrivate.post('book-definitions/pdf/label-type-2', values, {
+        responseType: 'arraybuffer',
+    });
+};
+
+export const getBookListPdf = () => {
+    return axiosPrivate.get('book-definitions/pdf/book-list', {
+        responseType: 'arraybuffer',
+    });
+};

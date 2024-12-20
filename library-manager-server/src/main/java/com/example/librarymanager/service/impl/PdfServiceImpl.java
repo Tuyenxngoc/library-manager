@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -346,6 +347,186 @@ public class PdfServiceImpl implements PdfService {
         }
 
         return outputStream.toByteArray();
+    }
+
+    @Override
+    public byte[] createPdfFromBooks(List<Book> books) {
+        return new byte[0];
+    }
+
+    @Override
+    public byte[] createLabelType1Pdf(List<Book> books) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        Document document = new Document(PageSize.A4, 10, 10, 10, 10);
+
+        try {
+            PdfWriter writer = PdfWriter.getInstance(document, outputStream);
+            document.open();
+
+            int labelsPerRow = 6;
+            int totalLabels = books.size();
+
+            PdfPTable table = new PdfPTable(labelsPerRow);
+            table.setWidthPercentage(100);
+            table.setSpacingBefore(5f);
+            table.setSpacingAfter(5f);
+
+            float[] columnWidths = new float[labelsPerRow];
+            Arrays.fill(columnWidths, 1f);
+            table.setWidths(columnWidths);
+
+            for (int i = 0; i < totalLabels; i++) {
+                Book book = books.get(i);
+
+                PdfPTable labelTable = new PdfPTable(1);
+                labelTable.setWidthPercentage(100);
+
+                PdfPCell nameCell = new PdfPCell(new Phrase("HAUI", boldFontMedium));
+                nameCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                nameCell.setBorder(Rectangle.BOX);
+                labelTable.addCell(nameCell);
+
+                ClassificationSymbol classificationSymbol = book.getBookDefinition().getClassificationSymbol();
+                PdfPCell khplCell = new PdfPCell(new Phrase(classificationSymbol != null ? classificationSymbol.getCode() : "KHPL", boldFontMedium));
+                khplCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                khplCell.setBorder(Rectangle.BOX);
+                labelTable.addCell(khplCell);
+
+                PdfPCell sdkcbCell = new PdfPCell(new Phrase(book.getBookCode(), boldFontMedium));
+                sdkcbCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                sdkcbCell.setBorder(Rectangle.BOX);
+                labelTable.addCell(sdkcbCell);
+
+                PdfPCell barcodeCell = new PdfPCell();
+                barcodeCell.setBorder(Rectangle.BOX);
+                barcodeCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+                Barcode128 barcode = new Barcode128();
+                barcode.setCode(book.getBookCode());
+                barcode.setFont(null);
+                barcode.setBarHeight(30f);
+                barcode.setX(1f);
+
+                Image barcodeImage = barcode.createImageWithBarcode(writer.getDirectContent(), null, null);
+                barcodeImage.scalePercent(60);
+                barcodeImage.setAlignment(Image.ALIGN_CENTER);
+                barcodeCell.addElement(barcodeImage);
+                labelTable.addCell(barcodeCell);
+
+                table.addCell(labelTable);
+            }
+
+            int remainingCells = labelsPerRow - (totalLabels % labelsPerRow);
+            if (remainingCells != labelsPerRow) {
+                for (int i = 0; i < remainingCells; i++) {
+                    PdfPCell emptyCell = new PdfPCell();
+                    emptyCell.setBorder(Rectangle.NO_BORDER);
+                    table.addCell(emptyCell);
+                }
+            }
+
+            document.add(table);
+            document.close();
+        } catch (DocumentException e) {
+            log.error("Error creating LabelType1 PDF: {}", e.getMessage(), e);
+        }
+
+        return outputStream.toByteArray();
+    }
+
+    @Override
+    public byte[] createLabelType2Pdf(List<Book> books) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        Document document = new Document(PageSize.A4, 10, 10, 10, 10);
+
+        try {
+            PdfWriter writer = PdfWriter.getInstance(document, outputStream);
+            document.open();
+
+            int labelsPerRow = 5;
+            int totalLabels = books.size();
+
+            PdfPTable table = new PdfPTable(labelsPerRow);
+            table.setWidthPercentage(100);
+            table.setSpacingBefore(5f);
+            table.setSpacingAfter(5f);
+
+            float[] columnWidths = new float[labelsPerRow];
+            Arrays.fill(columnWidths, 1f);
+            table.setWidths(columnWidths);
+
+            for (int i = 0; i < totalLabels; i++) {
+                Book book = books.get(i);
+
+                PdfPTable labelTable = new PdfPTable(2);
+                labelTable.setWidths(new int[]{1, 3});
+                labelTable.setWidthPercentage(100);
+
+                PdfPCell sdkcbCell = new PdfPCell(new Phrase(book.getBookCode(), boldFontMedium));
+                sdkcbCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                sdkcbCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                sdkcbCell.setBorder(Rectangle.BOX);
+                sdkcbCell.setRowspan(4);
+                sdkcbCell.setRotation(90);
+                labelTable.addCell(sdkcbCell);
+
+                PdfPCell khksCell = new PdfPCell(new Phrase("KHKS", boldFontMedium));
+                khksCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                khksCell.setBorder(Rectangle.BOX);
+                labelTable.addCell(khksCell);
+
+                ClassificationSymbol classificationSymbol = book.getBookDefinition().getClassificationSymbol();
+                PdfPCell khplCell = new PdfPCell(new Phrase(classificationSymbol != null ? classificationSymbol.getCode() : "KHPL", boldFontMedium));
+                khplCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                khplCell.setBorder(Rectangle.BOX);
+                labelTable.addCell(khplCell);
+
+                String code = book.getBookDefinition().getBookCode();
+                PdfPCell khtsCell = new PdfPCell(new Phrase(code != null && !code.isEmpty() ? code : "KHTS", boldFontMedium));
+                khtsCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                khtsCell.setBorder(Rectangle.BOX);
+                labelTable.addCell(khtsCell);
+
+                PdfPCell barcodeCell = new PdfPCell();
+                barcodeCell.setBorder(Rectangle.BOX);
+                barcodeCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+                Barcode128 barcode = new Barcode128();
+                barcode.setCode(book.getBookCode());
+                barcode.setFont(null);
+                barcode.setBarHeight(30f);
+                barcode.setX(1f);
+
+                Image barcodeImage = barcode.createImageWithBarcode(writer.getDirectContent(), null, null);
+                barcodeImage.scalePercent(60);
+                barcodeImage.setAlignment(Image.ALIGN_CENTER);
+                barcodeCell.addElement(barcodeImage);
+                labelTable.addCell(barcodeCell);
+
+                table.addCell(labelTable);
+            }
+
+            int remainingCells = labelsPerRow - (totalLabels % labelsPerRow);
+            if (remainingCells != labelsPerRow) {
+                for (int i = 0; i < remainingCells; i++) {
+                    PdfPCell emptyCell = new PdfPCell();
+                    emptyCell.setBorder(Rectangle.NO_BORDER);
+                    table.addCell(emptyCell);
+                }
+            }
+
+            document.add(table);
+            document.close();
+        } catch (DocumentException e) {
+            log.error("Error creating LabelType2 PDF: {}", e.getMessage(), e);
+        }
+
+        return outputStream.toByteArray();
+    }
+
+    @Override
+    public byte[] createBookListPdf(List<Book> books) {
+        return new byte[0];
     }
 
 }

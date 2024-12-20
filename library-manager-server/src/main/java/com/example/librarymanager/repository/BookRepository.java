@@ -17,6 +17,8 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
 
     Optional<Book> findByBookCode(String code);
 
+    List<Book> findAllByBookDefinitionIdIn(Set<Long> ids);
+
     @Query("SELECT new com.example.librarymanager.domain.dto.response.book.BookResponseDto(b) " +
             "FROM Book b " +
             "WHERE b.id IN :ids")

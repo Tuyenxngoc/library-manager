@@ -6,7 +6,12 @@ import queryString from 'query-string';
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
 import { getBookByBookDefinitions } from '~/services/bookDefinitionService';
 import { getCategoryGroupsTree } from '~/services/categoryGroupService';
-import { getBookLabelType1Pdf, getBookLabelType2Pdf, getBookListPdf, getBookPdf } from '~/services/bookService';
+import {
+    getBookLabelType1Pdf,
+    getBookLabelType2Pdf,
+    getBookListPdf,
+    getBookPdf,
+} from '~/services/bookDefinitionService';
 
 const options = [
     { value: 'title', label: 'Nhan đề' },
@@ -113,9 +118,15 @@ function BookListByCategory() {
     const openBookPdf = async (ids) => {
         try {
             const response = await getBookPdf(ids);
-            const blob = new Blob([response.data], { type: 'application/pdf' });
-            const url = URL.createObjectURL(blob);
-            window.open(url, '_blank');
+            if (response.status === 200) {
+                const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+                const url = URL.createObjectURL(pdfBlob);
+
+                const newTab = window.open(url, '_blank');
+                newTab.focus();
+
+                URL.revokeObjectURL(url);
+            }
         } catch (error) {
             console.error('Error getting book PDF:', error);
         }
@@ -124,9 +135,15 @@ function BookListByCategory() {
     const openBookLabelType1Pdf = async (ids) => {
         try {
             const response = await getBookLabelType1Pdf(ids);
-            const blob = new Blob([response.data], { type: 'application/pdf' });
-            const url = URL.createObjectURL(blob);
-            window.open(url, '_blank');
+            if (response.status === 200) {
+                const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+                const url = URL.createObjectURL(pdfBlob);
+
+                const newTab = window.open(url, '_blank');
+                newTab.focus();
+
+                URL.revokeObjectURL(url);
+            }
         } catch (error) {
             console.error('Error getting book label type 1 PDF:', error);
         }
@@ -135,9 +152,15 @@ function BookListByCategory() {
     const openBookLabelType2Pdf = async (ids) => {
         try {
             const response = await getBookLabelType2Pdf(ids);
-            const blob = new Blob([response.data], { type: 'application/pdf' });
-            const url = URL.createObjectURL(blob);
-            window.open(url, '_blank');
+            if (response.status === 200) {
+                const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+                const url = URL.createObjectURL(pdfBlob);
+
+                const newTab = window.open(url, '_blank');
+                newTab.focus();
+
+                URL.revokeObjectURL(url);
+            }
         } catch (error) {
             console.error('Error getting book label type 2 PDF:', error);
         }
@@ -146,9 +169,15 @@ function BookListByCategory() {
     const openBookListPdf = async () => {
         try {
             const response = await getBookListPdf();
-            const blob = new Blob([response.data], { type: 'application/pdf' });
-            const url = URL.createObjectURL(blob);
-            window.open(url, '_blank');
+            if (response.status === 200) {
+                const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+                const url = URL.createObjectURL(pdfBlob);
+
+                const newTab = window.open(url, '_blank');
+                newTab.focus();
+
+                URL.revokeObjectURL(url);
+            }
         } catch (error) {
             console.error('Error getting book list PDF:', error);
         }

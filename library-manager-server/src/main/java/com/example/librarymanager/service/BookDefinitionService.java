@@ -42,4 +42,12 @@ public interface BookDefinitionService {
     PaginationResponseDto<BookForReaderResponseDto> advancedSearchBooks(List<QueryFilter> queryFilters, PaginationSortRequestDto requestDto);
 
     PaginationResponseDto<BookForReaderResponseDto> searchBooks(BookDefinitionFilter filters, PaginationSortRequestDto requestDto);
+
+    byte[] getBooksPdfContent(Set<Long> ids);
+
+    byte[] getBooksLabelType1PdfContent(Set<Long> ids);
+
+    byte[] getBooksLabelType2PdfContent(Set<Long> ids);
+
+    byte[] generateBookListPdf();
 }

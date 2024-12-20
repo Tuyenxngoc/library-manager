@@ -18,6 +18,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -144,5 +145,49 @@ public class BookDefinitionController {
             @ParameterObject PaginationSortRequestDto requestDto
     ) {
         return VsResponseUtil.success(bookDefinitionService.searchBooks(filters, requestDto));
+    }
+
+    @Operation(summary = "API Get Book PDF")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BOOK')")
+    @PostMapping(UrlConstant.BookDefinition.BOOK_PDF)
+    public ResponseEntity<byte[]> getBookPdf(@RequestBody Set<Long> ids) {
+        byte[] pdfContent = bookDefinitionService.getBooksPdfContent(ids);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=book.pdf")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE)
+                .body(pdfContent);
+    }
+
+    @Operation(summary = "API Get Book Label Type 1 PDF")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BOOK')")
+    @PostMapping(UrlConstant.BookDefinition.BOOK_LABEL_TYPE_1_PDF)
+    public ResponseEntity<byte[]> getBookLabelType1Pdf(@RequestBody Set<Long> ids) {
+        byte[] pdfContent = bookDefinitionService.getBooksLabelType1PdfContent(ids);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=book_label_type1.pdf")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE)
+                .body(pdfContent);
+    }
+
+    @Operation(summary = "API Get Book Label Type 2 PDF")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BOOK')")
+    @PostMapping(UrlConstant.BookDefinition.BOOK_LABEL_TYPE_2_PDF)
+    public ResponseEntity<byte[]> getBookLabelType2Pdf(@RequestBody Set<Long> ids) {
+        byte[] pdfContent = bookDefinitionService.getBooksLabelType2PdfContent(ids);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=book_label_type2.pdf")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE)
+                .body(pdfContent);
+    }
+
+    @Operation(summary = "API Get Book List PDF")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BOOK')")
+    @GetMapping(UrlConstant.BookDefinition.GET_BOOK_LIST_PDF)
+    public ResponseEntity<byte[]> getBookListPdf() {
+        byte[] pdfContent = bookDefinitionService.generateBookListPdf();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=book_list.pdf")
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE)
+                .body(pdfContent);
     }
 }
