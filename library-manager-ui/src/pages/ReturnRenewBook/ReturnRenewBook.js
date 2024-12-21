@@ -95,6 +95,8 @@ function ReturnRenewBook() {
         navigate(`/admin/circulation/borrow/edit/${receiptId}`);
     };
 
+    const handleViolationProcessing = (receiptId) => {};
+
     useEffect(() => {
         const fetchEntities = async () => {
             setIsLoading(true);
@@ -185,6 +187,9 @@ function ReturnRenewBook() {
                     </Button>
                     <Button type="link" onClick={() => handleRenewBook(record.receiptId)}>
                         Gia hạn
+                    </Button>
+                    <Button danger type="link" onClick={() => handleViolationProcessing(record.receiptId)}>
+                        Xử lý vi phạm
                     </Button>
                 </Space>
             ),

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Button, Col, DatePicker, Flex, Form, Table, Tag } from 'antd';
-import { Input, InputNumber, message, Modal, Popconfirm, Row, Select, Space } from 'antd';
+import { Button, Flex, Form, Table, Tag } from 'antd';
+import { Input, message, Popconfirm, Select, Space } from 'antd';
 import { MdOutlineModeEdit } from 'react-icons/md';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import queryString from 'query-string';
@@ -9,7 +9,8 @@ import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
 import { getReaders } from '~/services/readerService';
 import { createReaderViolation, deleteReaderViolation } from '~/services/readerViolationsService';
 import { getReaderViolations, updateReaderViolation } from '~/services/readerViolationsService';
-import { cardPenaltyForm } from '~/common/cardConstants';
+import AddViolationForm from './AddViolationForm';
+import EditViolationForm from './EditViolationForm';
 
 const options = [
     { value: 'cardNumber', label: 'Số thẻ' },
@@ -299,275 +300,28 @@ function ReaderViolations() {
             {contextHolder}
 
             {/* Modal thêm mới */}
-            <Modal
-                title="Thêm mới xử lý vi phạm"
-                open={isAddModalOpen}
-                onOk={addForm.submit}
-                onCancel={closeAddModal}
-                width={600}
-                footer={[
-                    <Button key="back" onClick={closeAddModal}>
-                        Hủy
-                    </Button>,
-                    <Button key="submit" type="primary" loading={isLoading} onClick={addForm.submit}>
-                        {isLoading ? 'Đang xử lý...' : 'Thêm mới'}
-                    </Button>,
-                ]}
-            >
-                <Form
-                    form={addForm}
-                    layout="vertical"
-                    onFinish={handleCreateEntity}
-                    initialValues={{
-                        penaltyForm: cardPenaltyForm[0].value,
-                        penaltyDate: dayjs(),
-                        endDate: dayjs().add(1, 'month'),
-                    }}
-                >
-                    <Row gutter={16}>
-                        {/* Bạn đọc */}
-                        <Col span={12}>
-                            <Form.Item
-                                label="Bạn đọc"
-                                name="readerId"
-                                hasFeedback
-                                rules={[{ required: true, message: 'Vui lòng chọn bạn đọc' }]}
-                            >
-                                <Select
-                                    showSearch
-                                    placeholder="Chọn bạn đọc"
-                                    filterOption={false}
-                                    onSearch={fetchReaders}
-                                    loading={isReadersLoading}
-                                    options={readers.map((reader) => ({
-                                        value: reader.id,
-                                        label: `${reader.cardNumber} - ${reader.fullName}`,
-                                    }))}
-                                    className="w-100"
-                                />
-                            </Form.Item>
-                        </Col>
-
-                        {/* Nội dung vi phạm */}
-                        <Col span={12}>
-                            <Form.Item
-                                label="Nội dung vi phạm"
-                                name="violationDetails"
-                                hasFeedback
-                                rules={[
-                                    { required: true, message: 'Vui lòng nhập nội dung vi phạm' },
-                                    { max: 100, message: 'Nội dung vi phạm quá dài' },
-                                ]}
-                            >
-                                <Input.TextArea
-                                    rows={1}
-                                    placeholder="Nhập nội dung vi phạm"
-                                    maxLength={100}
-                                    showCount
-                                />
-                            </Form.Item>
-                        </Col>
-
-                        {/* Hình thức phạt */}
-                        <Col span={12}>
-                            <Form.Item
-                                label="Hình thức phạt"
-                                name="penaltyForm"
-                                hasFeedback
-                                rules={[{ required: true, message: 'Vui lòng chọn hình thức phạt' }]}
-                            >
-                                <Select placeholder="Chọn hình thức phạt">
-                                    {cardPenaltyForm.map((card) => (
-                                        <Select.Option key={card.value} value={card.value}>
-                                            {card.label}
-                                        </Select.Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
-                        </Col>
-
-                        {/* Hình thức khác */}
-                        <Col span={12}>
-                            <Form.Item
-                                label="Hình thức khác"
-                                name="otherPenaltyForm"
-                                hasFeedback
-                                rules={[{ max: 100, message: 'Độ dài tối đa 100 ký tự' }]}
-                            >
-                                <Input placeholder="Nhập hình thức khác" />
-                            </Form.Item>
-                        </Col>
-
-                        {/* Ngày phạt */}
-                        <Col span={12}>
-                            <Form.Item
-                                label="Ngày phạt"
-                                name="penaltyDate"
-                                hasFeedback
-                                rules={[{ required: true, message: 'Vui lòng chọn ngày phạt' }]}
-                            >
-                                <DatePicker format="YYYY-MM-DD" placeholder="Chọn ngày phạt" className="w-100" />
-                            </Form.Item>
-                        </Col>
-
-                        {/* Ngày hết hạn */}
-                        <Col span={12}>
-                            <Form.Item label="Ngày hết hạn" name="endDate">
-                                <DatePicker format="YYYY-MM-DD" placeholder="Chọn ngày hết hạn" className="w-100" />
-                            </Form.Item>
-                        </Col>
-
-                        {/* Số tiền phạt */}
-                        <Col span={12}>
-                            <Form.Item label="Số tiền phạt" name="fineAmount">
-                                <InputNumber min={0} placeholder="Nhập số tiền phạt" className="w-100" addonAfter="đ" />
-                            </Form.Item>
-                        </Col>
-
-                        {/* Ghi chú */}
-                        <Col span={12}>
-                            <Form.Item
-                                label="Ghi chú"
-                                name="notes"
-                                rules={[{ max: 255, message: 'Độ dài tối đa 255 ký tự' }]}
-                            >
-                                <Input.TextArea rows={1} placeholder="Nhập ghi chú" maxLength={255} showCount />
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                </Form>
-            </Modal>
+            <AddViolationForm
+                isOpen={isAddModalOpen}
+                form={addForm}
+                onClose={closeAddModal}
+                isLoading={isLoading}
+                onSubmit={handleCreateEntity}
+                fetchReaders={fetchReaders}
+                isReadersLoading={isReadersLoading}
+                readers={readers}
+            />
 
             {/* Modal chỉnh sửa */}
-            <Modal
-                title="Chỉnh sửa xử lý vi phạm"
-                open={isEditModalOpen}
-                onOk={editForm.submit}
-                onCancel={closeEditModal}
-                width={600}
-                footer={[
-                    <Button key="back" onClick={closeEditModal}>
-                        Hủy
-                    </Button>,
-                    <Button key="submit" type="primary" loading={isLoading} onClick={editForm.submit}>
-                        {isLoading ? 'Đang xử lý...' : 'Lưu thay đổi'}
-                    </Button>,
-                ]}
-            >
-                <Form form={editForm} layout="vertical" onFinish={handleUpdateEntity}>
-                    <Row gutter={16}>
-                        {/* Bạn đọc */}
-                        <Col span={12}>
-                            <Form.Item
-                                label="Bạn đọc"
-                                name="readerId"
-                                hasFeedback
-                                rules={[{ required: true, message: 'Vui lòng chọn bạn đọc' }]}
-                            >
-                                <Select
-                                    showSearch
-                                    placeholder="Chọn bạn đọc"
-                                    filterOption={false}
-                                    onSearch={fetchReaders}
-                                    loading={isReadersLoading}
-                                    options={readers.map((reader) => ({
-                                        value: reader.id,
-                                        label: `${reader.cardNumber} - ${reader.fullName}`,
-                                    }))}
-                                    className="w-100"
-                                />
-                            </Form.Item>
-                        </Col>
-
-                        {/* Nội dung vi phạm */}
-                        <Col span={12}>
-                            <Form.Item
-                                label="Nội dung vi phạm"
-                                name="violationDetails"
-                                hasFeedback
-                                rules={[
-                                    { required: true, message: 'Vui lòng nhập nội dung vi phạm' },
-                                    { max: 100, message: 'Nội dung vi phạm quá dài' },
-                                ]}
-                            >
-                                <Input.TextArea
-                                    rows={1}
-                                    placeholder="Nhập nội dung vi phạm"
-                                    maxLength={100}
-                                    showCount
-                                />
-                            </Form.Item>
-                        </Col>
-
-                        {/* Hình thức phạt */}
-                        <Col span={12}>
-                            <Form.Item
-                                label="Hình thức phạt"
-                                name="penaltyForm"
-                                hasFeedback
-                                rules={[{ required: true, message: 'Vui lòng chọn hình thức phạt' }]}
-                            >
-                                <Select placeholder="Chọn hình thức phạt">
-                                    {cardPenaltyForm.map((card) => (
-                                        <Select.Option key={card.value} value={card.value}>
-                                            {card.label}
-                                        </Select.Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
-                        </Col>
-
-                        {/* Hình thức khác */}
-                        <Col span={12}>
-                            <Form.Item
-                                label="Hình thức khác"
-                                name="otherPenaltyForm"
-                                hasFeedback
-                                rules={[{ max: 100, message: 'Độ dài tối đa 100 ký tự' }]}
-                            >
-                                <Input placeholder="Nhập hình thức khác" />
-                            </Form.Item>
-                        </Col>
-
-                        {/* Ngày phạt */}
-                        <Col span={12}>
-                            <Form.Item
-                                label="Ngày phạt"
-                                name="penaltyDate"
-                                hasFeedback
-                                rules={[{ required: true, message: 'Vui lòng chọn ngày phạt' }]}
-                            >
-                                <DatePicker format="YYYY-MM-DD" placeholder="Chọn ngày phạt" className="w-100" />
-                            </Form.Item>
-                        </Col>
-
-                        {/* Ngày hết hạn */}
-                        <Col span={12}>
-                            <Form.Item label="Ngày hết hạn" name="endDate">
-                                <DatePicker format="YYYY-MM-DD" placeholder="Chọn ngày hết hạn" className="w-100" />
-                            </Form.Item>
-                        </Col>
-
-                        {/* Số tiền phạt */}
-                        <Col span={12}>
-                            <Form.Item label="Số tiền phạt" name="fineAmount">
-                                <InputNumber min={0} placeholder="Nhập số tiền phạt" className="w-100" addonAfter="đ" />
-                            </Form.Item>
-                        </Col>
-
-                        {/* Ghi chú */}
-                        <Col span={12}>
-                            <Form.Item
-                                label="Ghi chú"
-                                name="notes"
-                                rules={[{ max: 255, message: 'Độ dài tối đa 255 ký tự' }]}
-                            >
-                                <Input.TextArea rows={1} placeholder="Nhập ghi chú" maxLength={255} showCount />
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                </Form>
-            </Modal>
+            <EditViolationForm
+                isOpen={isEditModalOpen}
+                form={editForm}
+                onClose={closeEditModal}
+                isLoading={isLoading}
+                onSubmit={handleUpdateEntity}
+                fetchReaders={fetchReaders}
+                isReadersLoading={isReadersLoading}
+                readers={readers}
+            />
 
             <Flex className="py-2" wrap justify="space-between" align="center">
                 <h2>Xử lý vi phạm</h2>
