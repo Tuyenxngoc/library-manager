@@ -10,7 +10,12 @@ import queryString from 'query-string';
 import dayjs from 'dayjs';
 import FormInput from '~/components/FormInput';
 import { getBookDefinitions, getBookDefinitionsByIds } from '~/services/bookDefinitionService';
-import { createImportReceipt, getImportReceiptById, updateImportReceipt } from '~/services/importReceiptService';
+import {
+    createImportReceipt,
+    generateReceiptNumber,
+    getImportReceiptById,
+    updateImportReceipt,
+} from '~/services/importReceiptService';
 import { handleError } from '~/utils/errorHandler';
 import { checkIdIsNumber } from '~/utils/helper';
 const { Option } = Select;
@@ -154,6 +159,12 @@ function InwardBookForm() {
     useEffect(() => {
         const fetchData = async () => {
             if (!id) {
+                try {
+                    const response = await generateReceiptNumber();
+                    if (response.status === 200) {
+                        formik.setFieldValue('receiptNumber', response.data.data);
+                    }
+                } catch (error) {}
                 return;
             }
             if (!checkIdIsNumber(id)) {

@@ -1,5 +1,9 @@
 import { axiosPrivate } from '~/apis/configHttp';
 
+export const generateReceiptNumber = async () => {
+    return axiosPrivate.get('import-receipts/generate-receipt-number');
+};
+
 export const createImportReceipt = (values) => {
     return axiosPrivate.post('import-receipts', values);
 };

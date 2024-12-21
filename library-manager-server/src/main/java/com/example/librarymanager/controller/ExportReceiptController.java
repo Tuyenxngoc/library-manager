@@ -28,6 +28,13 @@ public class ExportReceiptController {
 
     ExportReceiptService exportReceiptService;
 
+    @Operation(summary = "API Generate New Receipt Number")
+    @PreAuthorize("hasRole('ROLE_MANAGE_EXPORT_RECEIPT')")
+    @GetMapping(UrlConstant.ExportReceipt.GENERATE_RECEIPT_NUMBER)
+    public ResponseEntity<?> generateReceiptNumber() {
+        return VsResponseUtil.success(exportReceiptService.generateReceiptNumber());
+    }
+
     @Operation(summary = "API Create Export Receipt")
     @PreAuthorize("hasRole('ROLE_MANAGE_EXPORT_RECEIPT')")
     @PostMapping(UrlConstant.ExportReceipt.CREATE)

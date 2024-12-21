@@ -11,7 +11,12 @@ import dayjs from 'dayjs';
 import FormInput from '~/components/FormInput';
 import { handleError } from '~/utils/errorHandler';
 import { checkIdIsNumber } from '~/utils/helper';
-import { createExportReceipt, getExportReceiptById, updateExportReceipt } from '~/services/exportReceiptService';
+import {
+    createExportReceipt,
+    generateReceiptNumber,
+    getExportReceiptById,
+    updateExportReceipt,
+} from '~/services/exportReceiptService';
 import { getBooks, getBooksByIds } from '~/services/bookService';
 import FormTextArea from '~/components/FormTextArea';
 
@@ -139,6 +144,12 @@ function OutwardBookForm() {
     useEffect(() => {
         const fetchData = async () => {
             if (!id) {
+                try {
+                    const response = await generateReceiptNumber();
+                    if (response.status === 200) {
+                        formik.setFieldValue('receiptNumber', response.data.data);
+                    }
+                } catch (error) {}
                 return;
             }
             if (!checkIdIsNumber(id)) {

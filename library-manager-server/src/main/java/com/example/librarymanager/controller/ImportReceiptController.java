@@ -28,6 +28,13 @@ public class ImportReceiptController {
 
     ImportReceiptService importReceiptService;
 
+    @Operation(summary = "API Generate New Receipt Number")
+    @PreAuthorize("hasRole('ROLE_MANAGE_IMPORT_RECEIPT')")
+    @GetMapping(UrlConstant.ImportReceipt.GENERATE_RECEIPT_NUMBER)
+    public ResponseEntity<?> generateReceiptNumber() {
+        return VsResponseUtil.success(importReceiptService.generateReceiptNumber());
+    }
+
     @Operation(summary = "API Create Import Receipt")
     @PreAuthorize("hasRole('ROLE_MANAGE_IMPORT_RECEIPT')")
     @PostMapping(UrlConstant.ImportReceipt.CREATE)

@@ -94,6 +94,12 @@ public class ImportReceiptServiceImpl implements ImportReceiptService {
         }
     }
 
+    public String generateReceiptNumber() {
+        long currentCount = importReceiptRepository.count();
+        long nextNumber = currentCount + 1;
+        return String.format("PN%05d", nextNumber);
+    }
+
     @Override
     public CommonResponseDto save(ImportReceiptRequestDto requestDto, String userId) {
         //Kiểm tra trùng số phiếu nhập

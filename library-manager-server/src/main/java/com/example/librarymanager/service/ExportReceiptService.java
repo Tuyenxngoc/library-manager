@@ -7,6 +7,8 @@ import com.example.librarymanager.domain.dto.request.ExportReceiptRequestDto;
 import com.example.librarymanager.domain.dto.response.ExportReceiptResponseDto;
 
 public interface ExportReceiptService {
+    String generateReceiptNumber();
+
     CommonResponseDto save(ExportReceiptRequestDto requestDto, String userId);
 
     CommonResponseDto update(Long id, ExportReceiptRequestDto requestDto, String userId);

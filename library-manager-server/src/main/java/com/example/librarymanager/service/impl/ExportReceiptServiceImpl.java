@@ -67,6 +67,13 @@ public class ExportReceiptServiceImpl implements ExportReceiptService {
     }
 
     @Override
+    public String generateReceiptNumber() {
+        long currentCount = exportReceiptRepository.count();
+        long nextNumber = currentCount + 1;
+        return String.format("PX%05d", nextNumber);
+    }
+
+    @Override
     public CommonResponseDto save(ExportReceiptRequestDto requestDto, String userId) {
         // Kiểm tra trùng số phiếu
         if (exportReceiptRepository.existsByReceiptNumber(requestDto.getReceiptNumber())) {

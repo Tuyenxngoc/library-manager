@@ -172,6 +172,7 @@ public class UrlConstant {
         public static final String GET_BY_ID = PRE_FIX + "/{id}";
         public static final String UPDATE = PRE_FIX + "/{id}";
         public static final String DELETE = PRE_FIX + "/{id}";
+        public static final String GENERATE_RECEIPT_NUMBER = PRE_FIX + "/generate-receipt-number";
     }
 
     public static class ExportReceipt {
@@ -182,6 +183,7 @@ public class UrlConstant {
         public static final String GET_BY_ID = PRE_FIX + "/{id}";
         public static final String UPDATE = PRE_FIX + "/{id}";
         public static final String DELETE = PRE_FIX + "/{id}";
+        public static final String GENERATE_RECEIPT_NUMBER = PRE_FIX + "/generate-receipt-number";
     }
 
     public static class Book {
