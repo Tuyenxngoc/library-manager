@@ -1,12 +1,23 @@
 import { Button, Col, DatePicker, Form } from 'antd';
 import { Input, InputNumber, Modal, Row, Select } from 'antd';
-import dayjs from 'dayjs';
 import { cardPenaltyForm } from '~/common/cardConstants';
 
-function AddViolationForm({ isOpen, form, onClose, isLoading, onSubmit, fetchReaders, isReadersLoading, readers }) {
+function ViolationForm({
+    title,
+    isOpen,
+    onClose,
+    form,
+    isLoading,
+    initialValues = {},
+    submitText = 'Lưu thay đổi',
+    onSubmit,
+    fetchReaders,
+    isReadersLoading,
+    readers,
+}) {
     return (
         <Modal
-            title="Thêm mới xử lý vi phạm"
+            title={title}
             open={isOpen}
             onOk={form.submit}
             onCancel={onClose}
@@ -16,20 +27,11 @@ function AddViolationForm({ isOpen, form, onClose, isLoading, onSubmit, fetchRea
                     Hủy
                 </Button>,
                 <Button key="submit" type="primary" loading={isLoading} onClick={form.submit}>
-                    {isLoading ? 'Đang xử lý...' : 'Thêm mới'}
+                    {isLoading ? 'Đang xử lý...' : submitText}
                 </Button>,
             ]}
         >
-            <Form
-                form={form}
-                layout="vertical"
-                onFinish={onSubmit}
-                initialValues={{
-                    penaltyForm: cardPenaltyForm[0].value,
-                    penaltyDate: dayjs(),
-                    endDate: dayjs().add(1, 'month'),
-                }}
-            >
+            <Form form={form} layout="vertical" onFinish={onSubmit} initialValues={initialValues}>
                 <Row gutter={16}>
                     {/* Bạn đọc */}
                     <Col span={12}>
@@ -141,4 +143,4 @@ function AddViolationForm({ isOpen, form, onClose, isLoading, onSubmit, fetchRea
     );
 }
 
-export default AddViolationForm;
+export default ViolationForm;

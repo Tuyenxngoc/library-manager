@@ -9,8 +9,7 @@ import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
 import { getReaders } from '~/services/readerService';
 import { createReaderViolation, deleteReaderViolation } from '~/services/readerViolationsService';
 import { getReaderViolations, updateReaderViolation } from '~/services/readerViolationsService';
-import AddViolationForm from './AddViolationForm';
-import EditViolationForm from './EditViolationForm';
+import ViolationForm from './ViolationForm';
 
 const options = [
     { value: 'cardNumber', label: 'Số thẻ' },
@@ -300,22 +299,25 @@ function ReaderViolations() {
             {contextHolder}
 
             {/* Modal thêm mới */}
-            <AddViolationForm
+            <ViolationForm
+                title="Thêm mới xử lý vi phạm"
                 isOpen={isAddModalOpen}
-                form={addForm}
                 onClose={closeAddModal}
+                form={addForm}
                 isLoading={isLoading}
                 onSubmit={handleCreateEntity}
                 fetchReaders={fetchReaders}
                 isReadersLoading={isReadersLoading}
                 readers={readers}
+                submitText="Thêm mới"
             />
 
             {/* Modal chỉnh sửa */}
-            <EditViolationForm
+            <ViolationForm
+                title="Chỉnh sửa xử lý vi phạm"
                 isOpen={isEditModalOpen}
-                form={editForm}
                 onClose={closeEditModal}
+                form={editForm}
                 isLoading={isLoading}
                 onSubmit={handleUpdateEntity}
                 fetchReaders={fetchReaders}
