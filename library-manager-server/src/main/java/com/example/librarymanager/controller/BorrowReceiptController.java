@@ -31,6 +31,13 @@ public class BorrowReceiptController {
 
     BorrowReceiptService borrowReceiptService;
 
+    @Operation(summary = "API Generate New Receipt Number")
+    @PreAuthorize("hasRole('ROLE_MANAGE_IMPORT_RECEIPT')")
+    @GetMapping(UrlConstant.BorrowReceipt.GENERATE_RECEIPT_NUMBER)
+    public ResponseEntity<?> generateReceiptNumber() {
+        return VsResponseUtil.success(borrowReceiptService.generateReceiptNumber());
+    }
+
     @Operation(summary = "API Create Borrow Receipt")
     @PreAuthorize("hasRole('ROLE_MANAGE_BORROW_RECEIPT')")
     @PostMapping(UrlConstant.BorrowReceipt.CREATE)

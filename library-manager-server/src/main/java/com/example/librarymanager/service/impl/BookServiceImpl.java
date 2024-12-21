@@ -1,5 +1,6 @@
 package com.example.librarymanager.service.impl;
 
+import com.example.librarymanager.constant.BookCondition;
 import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
@@ -32,11 +33,11 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public PaginationResponseDto<BookResponseDto> findAll(PaginationFullRequestDto requestDto) {
+    public PaginationResponseDto<BookResponseDto> findAll(PaginationFullRequestDto requestDto, BookCondition bookCondition) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BOOK);
 
         Page<Book> page = bookRepository.findAll(
-                EntitySpecification.filterBooks(requestDto.getKeyword(), requestDto.getSearchBy()),
+                EntitySpecification.filterBooks(requestDto.getKeyword(), requestDto.getSearchBy(), bookCondition),
                 pageable);
 
         List<BookResponseDto> items = page.getContent().stream()

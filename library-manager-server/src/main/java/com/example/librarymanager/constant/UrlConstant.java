@@ -99,6 +99,7 @@ public class UrlConstant {
         public static final String PRINT = ADMIN_URL + PRE_FIX + "/print";
         public static final String GET_BY_CART_ID = ADMIN_URL + PRE_FIX + "/cart/{id}";
         public static final String GET_DETAILS_BY_ID = ADMIN_URL + PRE_FIX + "/details/{id}";
+        public static final String GENERATE_RECEIPT_NUMBER = ADMIN_URL + PRE_FIX + "/generate-receipt-number";
     }
 
     public static class BookBorrow {

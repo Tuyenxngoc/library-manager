@@ -1,5 +1,6 @@
 package com.example.librarymanager.domain.specification;
 
+import com.example.librarymanager.constant.BookCondition;
 import com.example.librarymanager.constant.CardStatus;
 import com.example.librarymanager.constant.PenaltyForm;
 import com.example.librarymanager.domain.dto.filter.LibraryVisitFilter;
@@ -299,13 +300,22 @@ public class EntitySpecification {
         };
     }
 
-    public static Specification<Book> filterBooks(String keyword, String searchBy) {
+    public static Specification<Book> filterBooks(String keyword, String searchBy, BookCondition bookCondition) {
         return (root, query, builder) -> {
             query.distinct(true);
 
             Predicate predicate = builder.conjunction();
 
             predicate = builder.and(predicate, builder.isNull(root.get(Book_.exportReceipt)));
+
+            if (bookCondition != null) {
+                switch (bookCondition) {
+                    case AVAILABLE ->
+                            predicate = builder.and(predicate, builder.equal(root.get(Book_.BOOK_CONDITION), BookCondition.AVAILABLE.name()));
+                    case ON_LOAN ->
+                            predicate = builder.and(predicate, builder.equal(root.get(Book_.BOOK_CONDITION), BookCondition.ON_LOAN.name()));
+                }
+            }
 
             if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(searchBy)) {
                 switch (searchBy) {

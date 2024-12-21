@@ -179,6 +179,7 @@ public class ErrorMessage {
         public static final String ERR_HAS_LINKED_EXPORT_RECEPTION = "exception.book.has.linked.exported";
         public static final String ERR_BOOK_ALREADY_BORROWED = "exception.book.already.borrowed";
         public static final String ERR_BOOK_RESERVED_BY_ANOTHER_READER = "exception.book.reserved.by.another.reader";
+        public static final String ERR_BOOK_ALREADY_ON_LOAN = "exception.book.already.on-loan";
     }
 
     public static class BorrowReceipt {

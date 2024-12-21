@@ -2,6 +2,7 @@ package com.example.librarymanager.controller;
 
 import com.example.librarymanager.annotation.RestApiV1;
 import com.example.librarymanager.base.VsResponseUtil;
+import com.example.librarymanager.constant.BookCondition;
 import com.example.librarymanager.constant.UrlConstant;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.service.BookService;
@@ -13,10 +14,7 @@ import lombok.experimental.FieldDefaults;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
 
@@ -31,8 +29,11 @@ public class BookController {
     @Operation(summary = "API Get All Books")
     @PreAuthorize("hasAnyRole('ROLE_MANAGE_BOOK', 'ROLE_MANAGE_EXPORT_RECEIPT')")
     @GetMapping(UrlConstant.Book.GET_ALL)
-    public ResponseEntity<?> getAllBooks(@ParameterObject PaginationFullRequestDto requestDto) {
-        return VsResponseUtil.success(bookService.findAll(requestDto));
+    public ResponseEntity<?> getAllBooks(
+            @ParameterObject PaginationFullRequestDto requestDto,
+            @RequestParam(name = "bookCondition", required = false) BookCondition bookCondition
+    ) {
+        return VsResponseUtil.success(bookService.findAll(requestDto, bookCondition));
     }
 
     @Operation(summary = "API Get Book By List of IDs")

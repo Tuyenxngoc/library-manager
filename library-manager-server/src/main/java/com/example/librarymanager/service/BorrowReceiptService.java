@@ -11,6 +11,8 @@ import com.example.librarymanager.domain.dto.response.borrowreceipt.BorrowReceip
 import com.example.librarymanager.domain.dto.response.borrowreceipt.BorrowReceiptResponseDto;
 
 public interface BorrowReceiptService {
+    String generateReceiptNumber();
+
     CommonResponseDto save(BorrowReceiptRequestDto requestDto, String userId);
 
     CommonResponseDto update(Long id, BorrowReceiptRequestDto requestDto, String userId);

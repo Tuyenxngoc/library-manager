@@ -20,6 +20,11 @@ import {
 import { getBooks, getBooksByIds } from '~/services/bookService';
 import FormTextArea from '~/components/FormTextArea';
 
+const bookConditionMapping = {
+    AVAILABLE: 'Sách có sẵn',
+    ON_LOAN: 'Sách đang mượn',
+};
+
 const defaultValue = {
     receiptNumber: '',
     exportDate: dayjs(),
@@ -81,7 +86,7 @@ function OutwardBookForm() {
     const fetchBooks = async (keyword = '') => {
         setIsBooksLoading(true);
         try {
-            const params = queryString.stringify({ keyword, searchBy: 'bookCode' });
+            const params = queryString.stringify({ keyword, searchBy: 'bookCode', bookCondition: 'AVAILABLE' });
             const response = await getBooks(params);
             const { items } = response.data.data;
             setBooks(items);
@@ -223,6 +228,7 @@ function OutwardBookForm() {
             title: 'Tình trạng',
             dataIndex: 'bookCondition',
             key: 'bookCondition',
+            render: (text) => bookConditionMapping[text],
         },
         {
             title: '',

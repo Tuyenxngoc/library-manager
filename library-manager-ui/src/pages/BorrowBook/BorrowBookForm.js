@@ -14,6 +14,7 @@ import { handleError } from '~/utils/errorHandler';
 import { getBooks } from '~/services/bookService';
 import {
     createBorrowReceipt,
+    generateReceiptNumber,
     getBorrowReceiptByCartId,
     getBorrowReceiptById,
     updateBorrowReceipt,
@@ -161,15 +162,15 @@ function BorrowBookForm() {
     }, []);
 
     useEffect(() => {
-        if (id) {
-            if (!checkIdIsNumber(id)) {
-                navigate('/admin/circulation/borrow');
-                return;
-            }
+        const fetchData = async () => {
+            try {
+                if (id) {
+                    if (!checkIdIsNumber(id)) {
+                        navigate('/admin/circulation/borrow');
+                        return;
+                    }
 
-            // Nếu có id, lấy thông tin phiếu mượn
-            getBorrowReceiptById(id)
-                .then((response) => {
+                    const response = await getBorrowReceiptById(id);
                     const { receiptNumber, borrowDate, dueDate, note, readerId, books } = response.data.data;
                     formik.setValues({
                         receiptNumber,
@@ -179,24 +180,28 @@ function BorrowBookForm() {
                         readerId,
                         books: books.map((bookCode) => ({ bookCode })),
                     });
-                })
-                .catch((error) => {
-                    messageApi.error(error.message || 'Có lỗi xảy ra khi tải dữ liệu phiếu mượn.');
-                });
-        } else if (cartId) {
-            getBorrowReceiptByCartId(cartId)
-                .then((response) => {
-                    const { readerId, books } = response.data.data;
-                    formik.setValues({
-                        ...formik.values,
-                        readerId,
-                        books: books.map((bookCode) => ({ bookCode })),
-                    });
-                })
-                .catch((error) => {
-                    messageApi.error(error.message || 'Có lỗi xảy ra khi tải dữ liệu phiếu mượn.');
-                });
-        }
+                } else {
+                    if (cartId) {
+                        const response = await getBorrowReceiptByCartId(cartId);
+                        const { readerId, books } = response.data.data;
+                        formik.setValues({
+                            ...formik.values,
+                            readerId,
+                            books: books.map((bookCode) => ({ bookCode })),
+                        });
+                    }
+
+                    const response = await generateReceiptNumber();
+                    if (response.status === 200) {
+                        formik.setFieldValue('receiptNumber', response.data.data);
+                    }
+                }
+            } catch (error) {
+                messageApi.error(error.message || 'Có lỗi xảy ra khi tải dữ liệu phiếu mượn.');
+            }
+        };
+
+        fetchData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
 

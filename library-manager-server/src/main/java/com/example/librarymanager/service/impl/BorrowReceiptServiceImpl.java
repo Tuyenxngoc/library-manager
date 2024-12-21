@@ -113,6 +113,13 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
     }
 
     @Override
+    public String generateReceiptNumber() {
+        long currentCount = borrowReceiptRepository.count();
+        long nextNumber = currentCount + 1;
+        return String.format("PM%05d", nextNumber);
+    }
+
+    @Override
     @Transactional
     public CommonResponseDto save(BorrowReceiptRequestDto requestDto, String userId) {
         //Kiểm tra số phiếu mượn

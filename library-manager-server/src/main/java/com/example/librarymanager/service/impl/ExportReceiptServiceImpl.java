@@ -1,9 +1,6 @@
 package com.example.librarymanager.service.impl;
 
-import com.example.librarymanager.constant.ErrorMessage;
-import com.example.librarymanager.constant.EventConstants;
-import com.example.librarymanager.constant.SortByDataConstant;
-import com.example.librarymanager.constant.SuccessMessage;
+import com.example.librarymanager.constant.*;
 import com.example.librarymanager.domain.dto.common.CommonResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
@@ -14,6 +11,7 @@ import com.example.librarymanager.domain.entity.Book;
 import com.example.librarymanager.domain.entity.ExportReceipt;
 import com.example.librarymanager.domain.mapper.ExportReceiptMapper;
 import com.example.librarymanager.domain.specification.EntitySpecification;
+import com.example.librarymanager.exception.BadRequestException;
 import com.example.librarymanager.exception.ConflictException;
 import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.BookRepository;
@@ -60,6 +58,9 @@ public class ExportReceiptServiceImpl implements ExportReceiptService {
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.Book.ERR_NOT_FOUND_ID, bookId));
         if (book.getExportReceipt() != null) {
             throw new ConflictException(ErrorMessage.Book.ERR_HAS_LINKED_EXPORT_RECEPTION, book.getBookCode());
+        }
+        if (book.getBookCondition().equals(BookCondition.ON_LOAN)) {
+            throw new BadRequestException(ErrorMessage.Book.ERR_BOOK_ALREADY_ON_LOAN, book.getBookCode());
         }
 
         book.setExportReceipt(exportReceipt);
