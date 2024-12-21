@@ -14,4 +14,12 @@ public interface BookService {
     List<BookResponseDto> findByIds(Set<Long> ids);
 
     BookResponseDto findById(Long id);
+
+    byte[] getBooksPdfContent(Set<Long> ids);
+
+    byte[] getBooksLabelType1PdfContent(Set<Long> ids);
+
+    byte[] getBooksLabelType2PdfContent(Set<Long> ids);
+
+    byte[] generateBookListPdf();
 }

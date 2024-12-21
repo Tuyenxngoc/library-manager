@@ -1,10 +1,16 @@
 import { useEffect, useState } from 'react';
-import { Button, Input, Select, Space, Table } from 'antd';
+import { Button, Dropdown, Input, Select, Space, Table } from 'antd';
 import { FaPrint } from 'react-icons/fa';
+import { GrPrint } from 'react-icons/gr';
 import queryString from 'query-string';
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
-import { getBooks } from '~/services/bookService';
-
+import {
+    getBooks,
+    getBookLabelType1Pdf,
+    getBookLabelType2Pdf,
+    getBookListPdf,
+    getBookPdf,
+} from '~/services/bookService';
 const options = [
     { value: 'bookCode', label: 'Số ĐKCB' },
     { value: 'title', label: 'Nhan đề' },
@@ -20,6 +26,8 @@ function BookListByCode() {
     const [filters, setFilters] = useState(INITIAL_FILTERS);
 
     const [entityData, setEntityData] = useState(null);
+
+    const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
     const [searchInput, setSearchInput] = useState('');
     const [activeFilterOption, setActiveFilterOption] = useState(options[0].value);
@@ -57,6 +65,74 @@ function BookListByCode() {
         }));
     };
 
+    const openBookPdf = async (ids) => {
+        try {
+            const response = await getBookPdf(ids);
+            if (response.status === 200) {
+                const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+                const url = URL.createObjectURL(pdfBlob);
+
+                const newTab = window.open(url, '_blank');
+                newTab.focus();
+
+                URL.revokeObjectURL(url);
+            }
+        } catch (error) {
+            console.error('Error getting book PDF:', error);
+        }
+    };
+
+    const openBookLabelType1Pdf = async (ids) => {
+        try {
+            const response = await getBookLabelType1Pdf(ids);
+            if (response.status === 200) {
+                const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+                const url = URL.createObjectURL(pdfBlob);
+
+                const newTab = window.open(url, '_blank');
+                newTab.focus();
+
+                URL.revokeObjectURL(url);
+            }
+        } catch (error) {
+            console.error('Error getting book label type 1 PDF:', error);
+        }
+    };
+
+    const openBookLabelType2Pdf = async (ids) => {
+        try {
+            const response = await getBookLabelType2Pdf(ids);
+            if (response.status === 200) {
+                const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+                const url = URL.createObjectURL(pdfBlob);
+
+                const newTab = window.open(url, '_blank');
+                newTab.focus();
+
+                URL.revokeObjectURL(url);
+            }
+        } catch (error) {
+            console.error('Error getting book label type 2 PDF:', error);
+        }
+    };
+
+    const openBookListPdf = async () => {
+        try {
+            const response = await getBookListPdf();
+            if (response.status === 200) {
+                const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+                const url = URL.createObjectURL(pdfBlob);
+
+                const newTab = window.open(url, '_blank');
+                newTab.focus();
+
+                URL.revokeObjectURL(url);
+            }
+        } catch (error) {
+            console.error('Error getting book list PDF:', error);
+        }
+    };
+
     useEffect(() => {
         const fetchEntities = async () => {
             setIsLoading(true);
@@ -91,7 +167,7 @@ function BookListByCode() {
             key: 'bookDefinition',
             sorter: true,
             showSorterTooltip: false,
-            render: (text, record) => <span>{text.title}</span>,
+            render: (text) => <span>{text.title}</span>,
         },
         {
             title: 'KHPL',
@@ -99,7 +175,7 @@ function BookListByCode() {
             key: 'bookDefinition',
             sorter: true,
             showSorterTooltip: false,
-            render: (text, record) => <span>{text.classificationSymbol ? text.classificationSymbol.name : ''}</span>,
+            render: (text) => <span>{text.classificationSymbol ? text.classificationSymbol.name : ''}</span>,
         },
         {
             title: 'Tác giả',
@@ -107,7 +183,7 @@ function BookListByCode() {
             key: 'bookDefinition',
             sorter: true,
             showSorterTooltip: false,
-            render: (text, record) => (
+            render: (text) => (
                 <span>
                     {text.authors.map((author, index) => (
                         <span key={author.id}>
@@ -124,7 +200,7 @@ function BookListByCode() {
             key: 'bookDefinition',
             sorter: true,
             showSorterTooltip: false,
-            render: (text, record) => <span>{text.publisher ? text.publisher.name : 'Không có'}</span>,
+            render: (text) => <span>{text.publisher ? text.publisher.name : 'Không có'}</span>,
         },
         {
             title: 'Năm xuất bản',
@@ -132,7 +208,7 @@ function BookListByCode() {
             key: 'bookDefinition',
             sorter: true,
             showSorterTooltip: false,
-            render: (text, record) => text.publishingYear,
+            render: (text) => text.publishingYear,
         },
         {
             title: 'Tình trạng',
@@ -140,7 +216,47 @@ function BookListByCode() {
             key: 'bookCondition',
             sorter: true,
             showSorterTooltip: false,
-            render: (text, record) => bookConditionMapping[text] || '',
+            render: (text) => bookConditionMapping[text] || '',
+        },
+    ];
+
+    const rowSelection = {
+        onChange: (selectedRowKeys) => {
+            setSelectedRowKeys(selectedRowKeys);
+        },
+        getCheckboxProps: (record, index) => ({
+            name: record.id,
+        }),
+    };
+
+    const items = [
+        {
+            key: '1',
+            icon: <GrPrint />,
+            label: 'Phích chuẩn ISBD',
+            disabled: selectedRowKeys.length === 0,
+            onClick: () => openBookPdf(selectedRowKeys),
+        },
+        {
+            key: '2',
+            icon: <GrPrint />,
+            label: 'Dán bìa, gáy - dọc A4',
+            disabled: selectedRowKeys.length === 0,
+            onClick: () => openBookLabelType1Pdf(selectedRowKeys),
+        },
+        {
+            key: '3',
+            icon: <GrPrint />,
+            label: 'Nhãn dán từ gáy đến bìa A4',
+            disabled: selectedRowKeys.length === 0,
+            onClick: () => openBookLabelType2Pdf(selectedRowKeys),
+        },
+        {
+            key: '4',
+            icon: <GrPrint />,
+            label: 'Danh mục sách',
+            disabled: selectedRowKeys.length === 0,
+            onClick: openBookListPdf,
         },
     ];
 
@@ -175,9 +291,11 @@ function BookListByCode() {
                     </Button>
                 </Space.Compact>
 
-                <Button type="primary" icon={<FaPrint />}>
-                    In
-                </Button>
+                <Dropdown menu={{ items }}>
+                    <Button type="primary" icon={<FaPrint />}>
+                        In
+                    </Button>
+                </Dropdown>
             </Space>
 
             <Table
@@ -188,6 +306,7 @@ function BookListByCode() {
                 columns={columns}
                 loading={isLoading}
                 onChange={handleSortChange}
+                rowSelection={rowSelection}
                 pagination={{
                     current: filters.pageNum,
                     pageSize: filters.pageSize,

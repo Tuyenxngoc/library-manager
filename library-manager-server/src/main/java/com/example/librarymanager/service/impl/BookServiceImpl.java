@@ -12,6 +12,7 @@ import com.example.librarymanager.domain.specification.EntitySpecification;
 import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.BookRepository;
 import com.example.librarymanager.service.BookService;
+import com.example.librarymanager.service.PdfService;
 import com.example.librarymanager.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,8 @@ import java.util.Set;
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
+
+    private final PdfService pdfService;
 
     private Book getEntity(long id) {
         return bookRepository.findById(id)
@@ -61,5 +64,29 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookResponseDto findById(Long id) {
         return new BookResponseDto(getEntity(id));
+    }
+
+    @Override
+    public byte[] getBooksPdfContent(Set<Long> ids) {
+        List<Book> books = bookRepository.findAllById(ids);
+        return pdfService.createPdfFromBooks(books);
+    }
+
+    @Override
+    public byte[] getBooksLabelType1PdfContent(Set<Long> ids) {
+        List<Book> books = bookRepository.findAllById(ids);
+        return pdfService.createLabelType1Pdf(books);
+    }
+
+    @Override
+    public byte[] getBooksLabelType2PdfContent(Set<Long> ids) {
+        List<Book> books = bookRepository.findAllById(ids);
+        return pdfService.createLabelType2Pdf(books);
+    }
+
+    @Override
+    public byte[] generateBookListPdf() {
+        List<Book> books = bookRepository.findAll();
+        return pdfService.createBookListPdf(books);
     }
 }

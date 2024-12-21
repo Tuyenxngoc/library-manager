@@ -196,6 +196,11 @@ public class UrlConstant {
         public static final String GET_BY_ID = PRE_FIX + "/{id}";
         public static final String UPDATE = PRE_FIX + "/{id}";
         public static final String DELETE = PRE_FIX + "/{id}";
+
+        public static final String BOOK_PDF = PRE_FIX + "/pdf";
+        public static final String BOOK_LABEL_TYPE_1_PDF = PRE_FIX + "/pdf/label-type-1";
+        public static final String BOOK_LABEL_TYPE_2_PDF = PRE_FIX + "/pdf/label-type-2";
+        public static final String GET_BOOK_LIST_PDF = PRE_FIX + "/pdf/book-list";
     }
 
     public static class NewsArticle {
