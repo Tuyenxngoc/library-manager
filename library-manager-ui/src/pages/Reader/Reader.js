@@ -383,6 +383,7 @@ function Reader() {
                 isLoading={isLoading}
                 form={editForm}
                 messageApi={messageApi}
+                isEdit
             />
 
             <Flex className="py-2" wrap justify="space-between" align="center">
@@ -413,9 +414,7 @@ function Reader() {
                         Thêm mới
                     </Button>
                     <Dropdown menu={{ items }}>
-                        <Button type="primary" icon={<FaPrint />}>
-                            In
-                        </Button>
+                        <Button icon={<FaPrint />}>In</Button>
                     </Dropdown>
                 </Space>
             </Flex>

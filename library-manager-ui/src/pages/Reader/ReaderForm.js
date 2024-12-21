@@ -16,6 +16,7 @@ function ReaderForm({
     initialValues = {},
     submitText = 'Lưu thay đổi',
     messageApi,
+    isEdit = false,
 }) {
     const [fileList, setFileList] = useState([]);
 
@@ -39,6 +40,7 @@ function ReaderForm({
             onOk={form.submit}
             onCancel={onClose}
             width={800}
+            centered
             footer={[
                 <Button key="back" onClick={onClose}>
                     Hủy
@@ -52,6 +54,7 @@ function ReaderForm({
                 <Row gutter={16}>
                     <Col span={8} className="text-center">
                         <Image width={200} src={form.getFieldValue('previousImage')} fallback={images.placeimg} />
+
                         <Form.Item className="mt-2" name="image" help="Vui lòng chọn hình ảnh dung lượng không quá 2MB">
                             <Upload
                                 accept="image/*"
@@ -214,11 +217,24 @@ function ReaderForm({
                                     label="Mật khẩu"
                                     name="password"
                                     hasFeedback
-                                    rules={[
-                                        { required: true, message: 'Vui lòng nhập mật khẩu' },
-                                        { pattern: REGEXP_PASSWORD, message: 'Mật khẩu không đúng định dạng' },
-                                        { min: 6, max: 30, message: 'Mật khẩu từ 6 - 30 kí tự' },
-                                    ]}
+                                    rules={
+                                        isEdit
+                                            ? [
+                                                  {
+                                                      pattern: REGEXP_PASSWORD,
+                                                      message: 'Mật khẩu không đúng định dạng',
+                                                  },
+                                                  { min: 6, max: 30, message: 'Mật khẩu từ 6 - 30 kí tự' },
+                                              ]
+                                            : [
+                                                  { required: true, message: 'Vui lòng nhập mật khẩu' },
+                                                  {
+                                                      pattern: REGEXP_PASSWORD,
+                                                      message: 'Mật khẩu không đúng định dạng',
+                                                  },
+                                                  { min: 6, max: 30, message: 'Mật khẩu từ 6 - 30 kí tự' },
+                                              ]
+                                    }
                                 >
                                     <Input.Password placeholder="Nhập mật khẩu" />
                                 </Form.Item>

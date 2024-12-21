@@ -5,6 +5,7 @@ import { MdOutlineModeEdit } from 'react-icons/md';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import queryString from 'query-string';
 import dayjs from 'dayjs';
+import { cardPenaltyForm } from '~/common/cardConstants';
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
 import { getReaders } from '~/services/readerService';
 import { createReaderViolation, deleteReaderViolation } from '~/services/readerViolationsService';
@@ -303,13 +304,18 @@ function ReaderViolations() {
                 title="Thêm mới xử lý vi phạm"
                 isOpen={isAddModalOpen}
                 onClose={closeAddModal}
-                form={addForm}
-                isLoading={isLoading}
                 onSubmit={handleCreateEntity}
+                isLoading={isLoading}
+                form={addForm}
+                initialValues={{
+                    penaltyForm: cardPenaltyForm[0].value,
+                    penaltyDate: dayjs(),
+                    endDate: dayjs().add(1, 'month'),
+                }}
+                submitText="Thêm mới"
                 fetchReaders={fetchReaders}
                 isReadersLoading={isReadersLoading}
                 readers={readers}
-                submitText="Thêm mới"
             />
 
             {/* Modal chỉnh sửa */}
@@ -317,9 +323,9 @@ function ReaderViolations() {
                 title="Chỉnh sửa xử lý vi phạm"
                 isOpen={isEditModalOpen}
                 onClose={closeEditModal}
-                form={editForm}
-                isLoading={isLoading}
                 onSubmit={handleUpdateEntity}
+                isLoading={isLoading}
+                form={editForm}
                 fetchReaders={fetchReaders}
                 isReadersLoading={isReadersLoading}
                 readers={readers}
