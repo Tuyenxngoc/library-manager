@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Drawer, Flex, Input, message, Popconfirm, Select, Space, Table } from 'antd';
+import { Button, Drawer, Flex, Input, message, Popconfirm, Select, Space, Table, Tag } from 'antd';
 import { MdOutlineModeEdit } from 'react-icons/md';
 import { FaRegTrashAlt, FaPrint } from 'react-icons/fa';
 
@@ -19,6 +19,13 @@ const options = [
     { value: 'cardNumber', label: 'Số thẻ bạn đọc' },
     { value: 'fullName', label: 'Tên bạn đọc' },
 ];
+
+const borrowReceiptMapping = {
+    NOT_RETURNED: <Tag color="orange">Chưa trả</Tag>,
+    RETURNED: <Tag color="green">Đã trả</Tag>,
+    PARTIALLY_RETURNED: <Tag color="gold">Chưa trả đủ</Tag>,
+    OVERDUE: <Tag color="red">Quá hạn</Tag>,
+};
 
 function BorrowBook() {
     const navigate = useNavigate();
@@ -118,15 +125,12 @@ function BorrowBook() {
             });
 
             if (response.status === 200) {
-                // Chuyển đổi mảng byte thành Blob
                 const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
                 const url = URL.createObjectURL(pdfBlob);
 
-                // Mở hoặc tải xuống file PDF
                 const newTab = window.open(url, '_blank');
-                newTab.focus(); // Đưa tab mới lên trước
+                newTab.focus();
 
-                // Giải phóng URL sau khi sử dụng
                 URL.revokeObjectURL(url);
             }
         } catch (error) {
@@ -221,6 +225,7 @@ function BorrowBook() {
             key: 'status',
             sorter: true,
             showSorterTooltip: false,
+            render: (status) => borrowReceiptMapping[status],
         },
         {
             title: 'Ghi chú',

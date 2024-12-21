@@ -27,7 +27,7 @@ const defaultValue = {
 const validationSchema = yup.object({
     receiptNumber: yup.string().required('Vui lòng nhập số phiếu nhập'),
 
-    importDate: yup.date().nullable().required('Vui lòng chọn ngày nhập').typeError('Ngày nhập không hợp lệ'),
+    importDate: yup.mixed().required('Vui lòng chọn ngày nhập'),
 
     fundingSource: yup.string().required('Vui lòng chọn nguồn cấp phát'),
 
@@ -50,6 +50,7 @@ function InwardBookForm() {
         try {
             const formattedValues = {
                 ...values,
+                importDate: values.importDate ? values.importDate.format('YYYY-MM-DD') : null,
                 bookRequestDtos: values.bookRequestDtos.map((book) => ({
                     bookDefinitionId: book.bookDefinitionId,
                     quantity: book.quantity,
@@ -305,10 +306,9 @@ function InwardBookForm() {
                         <DatePicker
                             id="importDate"
                             name="importDate"
-                            value={formik.values.importDate ? dayjs(formik.values.importDate) : null}
-                            onChange={(date) => formik.setFieldValue('importDate', date ? date.toISOString() : null)}
+                            value={formik.values.importDate}
+                            onChange={(date) => formik.setFieldValue('importDate', date)}
                             onBlur={() => formik.setFieldTouched('importDate', true)}
-                            format="DD/MM/YYYY"
                             status={formik.touched.importDate && formik.errors.importDate ? 'error' : undefined}
                             className="w-100"
                         />

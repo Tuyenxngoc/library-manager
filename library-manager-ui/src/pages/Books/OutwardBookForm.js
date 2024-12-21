@@ -25,7 +25,7 @@ const defaultValue = {
 const validationSchema = yup.object({
     receiptNumber: yup.string().required('Vui lòng nhập số phiếu xuất'),
 
-    exportDate: yup.date().nullable().required('Vui lòng chọn ngày xuất').typeError('Ngày xuất không hợp lệ'),
+    exportDate: yup.mixed().required('Vui lòng chọn ngày xuất'),
 
     bookIds: yup.array().min(1, 'Bạn phải chọn ít nhất một cuốn sách'),
 });
@@ -45,6 +45,7 @@ function OutwardBookForm() {
         try {
             const formattedValues = {
                 ...values,
+                exportDate: values.exportDate ? values.exportDate.format('YYYY-MM-DD') : null,
                 bookIds: values.bookIds.map((book) => book.bookId),
             };
 
@@ -245,10 +246,9 @@ function OutwardBookForm() {
                         <DatePicker
                             id="exportDate"
                             name="exportDate"
-                            value={formik.values.exportDate ? dayjs(formik.values.exportDate) : null}
-                            onChange={(date) => formik.setFieldValue('exportDate', date ? date.toISOString() : null)}
+                            value={formik.values.exportDate}
+                            onChange={(date) => formik.setFieldValue('exportDate', date)}
                             onBlur={() => formik.setFieldTouched('exportDate', true)}
-                            format="DD/MM/YYYY"
                             status={formik.touched.exportDate && formik.errors.exportDate ? 'error' : undefined}
                             className="w-100"
                         />

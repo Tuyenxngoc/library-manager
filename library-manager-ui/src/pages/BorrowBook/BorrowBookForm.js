@@ -23,8 +23,8 @@ import { getReaders } from '~/services/readerService';
 
 const defaultValue = {
     receiptNumber: '',
-    borrowDate: dayjs().toISOString(),
-    dueDate: dayjs().add(30, 'day').toISOString(),
+    borrowDate: dayjs(),
+    dueDate: dayjs().add(30, 'day'),
     note: '',
     readerId: null,
     books: [],
@@ -34,15 +34,17 @@ const validationSchema = yup.object({
     receiptNumber: yup.string().required('Số phiếu mượn là bắt buộc'),
 
     borrowDate: yup.date().nullable().required('Ngày mượn là bắt buộc').typeError('Ngày mượn không hợp lệ'),
+
     dueDate: yup
         .date()
+        .nullable()
         .required('Ngày hẹn trả là bắt buộc')
         .typeError('Ngày hẹn trả không hợp lệ')
         .min(yup.ref('borrowDate'), 'Ngày hẹn trả phải sau ngày mượn'),
 
     note: yup.string(),
 
-    readerId: yup.number().min(1, 'ID bạn đọc phải là số hợp lệ').required('ID bạn đọc là bắt buộc'),
+    readerId: yup.number('ID bạn đọc phải là số hợp lệ').required('ID bạn đọc là bắt buộc'),
 
     books: yup.array().min(1, 'Bạn phải chọn ít nhất một cuốn sách'),
 });
@@ -59,8 +61,6 @@ function BorrowBookForm() {
     };
     const cartId = getQueryParams();
 
-    const [messageApi, contextHolder] = message.useMessage();
-
     const [books, setBooks] = useState([]);
     const [isBooksLoading, setIsBooksLoading] = useState(true);
 
@@ -69,20 +69,22 @@ function BorrowBookForm() {
 
     const [selectedBookCode, setSelectedBookCode] = useState(null);
 
+    const [messageApi, contextHolder] = message.useMessage();
+
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
-            let response;
-            const dataToSubmit = {
+            const formattedValues = {
                 ...values,
-                borrowDate: values.borrowDate ? dayjs(values.borrowDate).toISOString() : null,
-                dueDate: values.dueDate ? dayjs(values.dueDate).toISOString() : null,
+                borrowDate: values.borrowDate ? values.borrowDate.format('YYYY-MM-DD') : null,
+                dueDate: values.dueDate ? values.dueDate.format('YYYY-MM-DD') : null,
                 books: values.books.map((book) => book.bookCode),
             };
 
+            let response;
             if (id) {
-                response = await updateBorrowReceipt(id, dataToSubmit);
+                response = await updateBorrowReceipt(id, formattedValues);
             } else {
-                response = await createBorrowReceipt(dataToSubmit);
+                response = await createBorrowReceipt(formattedValues);
             }
 
             if (response.status === 200 || response.status === 201) {
@@ -267,10 +269,9 @@ function BorrowBookForm() {
                         <DatePicker
                             id="borrowDate"
                             name="borrowDate"
-                            value={formik.values.borrowDate ? dayjs(formik.values.borrowDate) : null}
-                            onChange={(date) => formik.setFieldValue('borrowDate', date ? date.toISOString() : null)}
+                            value={formik.values.borrowDate}
+                            onChange={(date) => formik.setFieldValue('borrowDate', date)}
                             onBlur={() => formik.setFieldTouched('borrowDate', true)}
-                            format="DD/MM/YYYY"
                             status={formik.touched.borrowDate && formik.errors.borrowDate ? 'error' : undefined}
                             className="w-100"
                         />
@@ -284,10 +285,9 @@ function BorrowBookForm() {
                         <DatePicker
                             id="dueDate"
                             name="dueDate"
-                            value={formik.values.dueDate ? dayjs(formik.values.dueDate) : null}
-                            onChange={(date) => formik.setFieldValue('dueDate', date ? date.toISOString() : null)}
+                            value={formik.values.dueDate}
+                            onChange={(date) => formik.setFieldValue('dueDate', date)}
                             onBlur={() => formik.setFieldTouched('dueDate', true)}
-                            format="DD/MM/YYYY"
                             status={formik.touched.dueDate && formik.errors.dueDate ? 'error' : undefined}
                             className="w-100"
                         />

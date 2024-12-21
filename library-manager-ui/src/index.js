@@ -13,6 +13,11 @@ import 'normalize.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '~/styles/Global.scss';
 
+import dayjs from 'dayjs';
+import 'dayjs/locale/vi';
+
+dayjs.locale('vi');
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>

@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Flex, Input, message, Popconfirm, Select, Space, Switch, Table } from 'antd';
+import { Button, Flex, Input, message, Popconfirm, Select, Space, Switch, Table, Tooltip } from 'antd';
 import { MdOutlineModeEdit } from 'react-icons/md';
 import { FaRegTrashAlt } from 'react-icons/fa';
-import dayjs from 'dayjs';
 import queryString from 'query-string';
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
 import { deleteNewsArticle, getNewsArticles, toggleActiveFlag } from '~/services/newsArticlesService';
@@ -113,6 +112,14 @@ function NewsArticles() {
             key: 'title',
             sorter: true,
             showSorterTooltip: false,
+            ellipsis: {
+                showTitle: false,
+            },
+            render: (text) => (
+                <Tooltip placement="topLeft" title={text}>
+                    {text}
+                </Tooltip>
+            ),
         },
         {
             title: 'Mô tả',
@@ -120,6 +127,14 @@ function NewsArticles() {
             key: 'description',
             sorter: true,
             showSorterTooltip: false,
+            ellipsis: {
+                showTitle: false,
+            },
+            render: (text) => (
+                <Tooltip placement="topLeft" title={text}>
+                    {text}
+                </Tooltip>
+            ),
         },
         {
             title: 'Loại tin',
@@ -207,7 +222,6 @@ function NewsArticles() {
             <Table
                 bordered
                 rowKey="id"
-                scroll={{ x: 'max-content' }}
                 dataSource={entityData}
                 columns={columns}
                 loading={isLoading}

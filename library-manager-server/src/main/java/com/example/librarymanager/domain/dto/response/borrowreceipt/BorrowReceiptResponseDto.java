@@ -1,5 +1,6 @@
 package com.example.librarymanager.domain.dto.response.borrowreceipt;
 
+import com.example.librarymanager.constant.BorrowStatus;
 import com.example.librarymanager.domain.entity.BorrowReceipt;
 import lombok.Getter;
 
@@ -11,21 +12,21 @@ public class BorrowReceiptResponseDto {
 
     private final String receiptNumber;
 
-    private final LocalDate borrowDate; //Ngày mượn
+    private final LocalDate borrowDate;
 
-    private final LocalDate dueDate; // Ngày hết hạn
+    private final LocalDate dueDate;
 
     private final LocalDate returnDate;
 
-    private final String status;
+    private final BorrowStatus status;
 
-    private final String note; // Ghi chú
+    private final String note;
 
-    private final String cardNumber; // Số thẻ
+    private final String cardNumber;
 
-    private final String fullName; // Họ tên
+    private final String fullName;
 
-    private final int books;//Số sách mượn
+    private final int books;
 
     public BorrowReceiptResponseDto(BorrowReceipt borrowReceipt) {
         this.id = borrowReceipt.getId();
@@ -33,7 +34,7 @@ public class BorrowReceiptResponseDto {
         this.borrowDate = borrowReceipt.getBorrowDate();
         this.dueDate = borrowReceipt.getDueDate();
         this.returnDate = borrowReceipt.getReturnDate();
-        this.status = borrowReceipt.getStatus().getName();
+        this.status = borrowReceipt.getStatus();
         this.note = borrowReceipt.getNote();
         this.cardNumber = borrowReceipt.getReader().getCardNumber();
         this.fullName = borrowReceipt.getReader().getFullName();
