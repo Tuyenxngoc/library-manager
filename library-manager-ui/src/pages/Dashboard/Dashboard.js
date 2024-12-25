@@ -142,7 +142,7 @@ function Dashboard() {
                         icon={<FaBan className="fs-1" />}
                         count={borrowStatistics.overdue}
                         label="Quá hạn trả"
-                        link="/admin/circulation/borrow?type=2"
+                        link="/admin/circulation/borrow?type=4"
                         color="#d9534f"
                     />
                 </div>

@@ -1,6 +1,7 @@
 package com.example.librarymanager.domain.specification;
 
 import com.example.librarymanager.constant.BookCondition;
+import com.example.librarymanager.constant.BorrowStatus;
 import com.example.librarymanager.constant.CardStatus;
 import com.example.librarymanager.constant.PenaltyForm;
 import com.example.librarymanager.domain.dto.filter.LibraryVisitFilter;
@@ -531,11 +532,24 @@ public class EntitySpecification {
         };
     }
 
-    public static Specification<BorrowReceipt> filterBorrowReceipts(String keyword, String searchBy) {
+    public static Specification<BorrowReceipt> filterBorrowReceipts(String keyword, String searchBy, BorrowStatus status) {
         return (root, query, builder) -> {
             query.distinct(true);
 
             Predicate predicate = builder.conjunction();
+
+            if (status != null) {
+                switch (status) {
+                    case NOT_RETURNED ->
+                            predicate = builder.and(predicate, builder.equal(root.get(BorrowReceipt_.status), BorrowStatus.NOT_RETURNED));
+                    case RETURNED ->
+                            predicate = builder.and(predicate, builder.equal(root.get(BorrowReceipt_.status), BorrowStatus.RETURNED));
+                    case PARTIALLY_RETURNED ->
+                            predicate = builder.and(predicate, builder.equal(root.get(BorrowReceipt_.status), BorrowStatus.PARTIALLY_RETURNED));
+                    case OVERDUE ->
+                            predicate = builder.and(predicate, builder.equal(root.get(BorrowReceipt_.status), BorrowStatus.OVERDUE));
+                }
+            }
 
             if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(searchBy)) {
                 switch (searchBy) {

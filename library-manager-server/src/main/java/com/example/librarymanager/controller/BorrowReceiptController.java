@@ -3,6 +3,7 @@ package com.example.librarymanager.controller;
 import com.example.librarymanager.annotation.CurrentUser;
 import com.example.librarymanager.annotation.RestApiV1;
 import com.example.librarymanager.base.VsResponseUtil;
+import com.example.librarymanager.constant.BorrowStatus;
 import com.example.librarymanager.constant.UrlConstant;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.request.BorrowReceiptRequestDto;
@@ -72,8 +73,11 @@ public class BorrowReceiptController {
     @Operation(summary = "API Get All Borrow Receipts")
     @PreAuthorize("hasRole('ROLE_MANAGE_BORROW_RECEIPT')")
     @GetMapping(UrlConstant.BorrowReceipt.GET_ALL)
-    public ResponseEntity<?> getAllBorrowReceipts(@ParameterObject PaginationFullRequestDto requestDto) {
-        return VsResponseUtil.success(borrowReceiptService.findAll(requestDto));
+    public ResponseEntity<?> getAllBorrowReceipts(
+            @ParameterObject PaginationFullRequestDto requestDto,
+            @RequestParam(value = "status", required = false) BorrowStatus status
+    ) {
+        return VsResponseUtil.success(borrowReceiptService.findAll(requestDto, status));
     }
 
     @Operation(summary = "API Get Borrow Receipt By Id")
@@ -95,9 +99,10 @@ public class BorrowReceiptController {
     @GetMapping(UrlConstant.BorrowReceipt.GET_BY_READER)
     public ResponseEntity<?> getBorrowReceiptsByReader(
             @CurrentUser CustomUserDetails userDetails,
-            @ParameterObject PaginationFullRequestDto requestDto
+            @ParameterObject PaginationFullRequestDto requestDto,
+            @RequestParam(value = "status", required = false) BorrowStatus status
     ) {
-        return VsResponseUtil.success(borrowReceiptService.findByCardNumber(userDetails.getCardNumber(), requestDto));
+        return VsResponseUtil.success(borrowReceiptService.findByCardNumber(userDetails.getCardNumber(), requestDto, status));
     }
 
     @Operation(summary = "API Get Borrow Receipt Details By Id")

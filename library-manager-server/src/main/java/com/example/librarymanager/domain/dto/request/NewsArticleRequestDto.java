@@ -21,10 +21,10 @@ public class NewsArticleRequestDto {
     @Size(max = 255, message = ErrorMessage.INVALID_TEXT_LENGTH)
     private String newsType;
 
-    @Size(max = 255, message = ErrorMessage.INVALID_TEXT_LENGTH)
+    @Size(max = 1000, message = ErrorMessage.INVALID_TEXT_LENGTH)
     private String description;
 
     @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)
-    @Size(max = 10000, message = ErrorMessage.INVALID_TEXT_LENGTH)
+    @Size(max = 20000, message = ErrorMessage.INVALID_TEXT_LENGTH)
     private String content;
 }

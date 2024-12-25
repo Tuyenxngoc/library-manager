@@ -239,11 +239,11 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
     }
 
     @Override
-    public PaginationResponseDto<BorrowReceiptResponseDto> findAll(PaginationFullRequestDto requestDto) {
+    public PaginationResponseDto<BorrowReceiptResponseDto> findAll(PaginationFullRequestDto requestDto, BorrowStatus status) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BORROW_RECEIPT);
 
         Page<BorrowReceipt> page = borrowReceiptRepository.findAll(
-                EntitySpecification.filterBorrowReceipts(requestDto.getKeyword(), requestDto.getSearchBy()),
+                EntitySpecification.filterBorrowReceipts(requestDto.getKeyword(), requestDto.getSearchBy(), status),
                 pageable);
 
         List<BorrowReceiptResponseDto> items = page.getContent().stream()
@@ -284,11 +284,11 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
     }
 
     @Override
-    public PaginationResponseDto<BorrowReceiptForReaderResponseDto> findByCardNumber(String cardNumber, PaginationFullRequestDto requestDto) {
+    public PaginationResponseDto<BorrowReceiptForReaderResponseDto> findByCardNumber(String cardNumber, PaginationFullRequestDto requestDto, BorrowStatus status) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BORROW_RECEIPT);
 
         Specification<BorrowReceipt> spec = EntitySpecification.filterBorrowReceiptsByReader(cardNumber)
-                .and(EntitySpecification.filterBorrowReceipts(requestDto.getKeyword(), requestDto.getSearchBy()));
+                .and(EntitySpecification.filterBorrowReceipts(requestDto.getKeyword(), requestDto.getSearchBy(), status));
         Page<BorrowReceipt> page = borrowReceiptRepository.findAll(spec, pageable);
 
         List<BorrowReceiptForReaderResponseDto> items = page.getContent().stream()

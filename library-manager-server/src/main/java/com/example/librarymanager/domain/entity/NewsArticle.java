@@ -25,10 +25,10 @@ public class NewsArticle {
     @Column(name = "title_slug", unique = true, nullable = false)
     private String titleSlug;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 1000)
     private String description;
 
-    @Column(name = "image_url")
+    @Column(name = "image_url", length = 500)
     private String imageUrl;
 
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)

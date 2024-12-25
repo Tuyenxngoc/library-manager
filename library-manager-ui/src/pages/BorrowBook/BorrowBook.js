@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Drawer, Flex, Input, message, Popconfirm, Select, Space, Table, Tag } from 'antd';
 import { MdOutlineModeEdit } from 'react-icons/md';
 import { FaRegTrashAlt, FaPrint } from 'react-icons/fa';
@@ -27,7 +27,15 @@ const borrowReceiptMapping = {
     OVERDUE: <Tag color="red">Quá hạn</Tag>,
 };
 
+const mapTypeToStatus = {
+    1: 'NOT_RETURNED',
+    2: 'RETURNED',
+    3: 'PARTIALLY_RETURNED',
+    4: 'OVERDUE',
+};
+
 function BorrowBook() {
+    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 
     const [meta, setMeta] = useState(INITIAL_META);
@@ -158,8 +166,19 @@ function BorrowBook() {
             }
         };
 
-        fetchEntities();
-    }, [filters]);
+        const type = searchParams.get('type');
+
+        const updatedFilters = {
+            ...filters,
+            status: mapTypeToStatus[type],
+        };
+
+        if (JSON.stringify(filters) !== JSON.stringify(updatedFilters)) {
+            setFilters(updatedFilters);
+        } else {
+            fetchEntities();
+        }
+    }, [filters, searchParams]);
 
     const rowSelection = {
         onChange: (selectedRowKeys) => {
