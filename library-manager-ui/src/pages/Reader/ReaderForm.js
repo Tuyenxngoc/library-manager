@@ -123,7 +123,11 @@ function ReaderForm({
 
                             {/* Giới tính */}
                             <Col span={12}>
-                                <Form.Item label="Giới tính" name="gender">
+                                <Form.Item
+                                    label="Giới tính"
+                                    name="gender"
+                                    rules={[{ required: true, message: 'Vui lòng chọn giới tính' }]}
+                                >
                                     <Select placeholder="Chọn giới tính">
                                         {cardGender.map((card) => (
                                             <Select.Option key={card.value} value={card.value}>

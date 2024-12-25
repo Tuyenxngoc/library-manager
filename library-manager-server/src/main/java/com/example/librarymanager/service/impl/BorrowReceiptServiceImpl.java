@@ -217,6 +217,7 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
         borrowReceipt.setBorrowDate(requestDto.getBorrowDate());
         borrowReceipt.setDueDate(requestDto.getDueDate());
         borrowReceipt.setNote(requestDto.getNote());
+        updateBorrowStatus(borrowReceipt);
 
         borrowReceiptRepository.save(borrowReceipt);
 
@@ -224,6 +225,31 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message);
+    }
+
+    @Override
+    public void updateBorrowStatus(BorrowReceipt borrowReceipt) {
+        boolean allReturned = borrowReceipt.getBookBorrows().stream()
+                .allMatch(BookBorrow::isReturned);
+        if (allReturned) {
+            borrowReceipt.setStatus(BorrowStatus.RETURNED);
+            return;
+        }
+
+        boolean overdue = borrowReceipt.getDueDate().isBefore(LocalDate.now());
+        if (overdue) {
+            borrowReceipt.setStatus(BorrowStatus.OVERDUE);
+            return;
+        }
+
+        boolean partiallyReturned = borrowReceipt.getBookBorrows().stream()
+                .anyMatch(BookBorrow::isReturned);
+        if (partiallyReturned) {
+            borrowReceipt.setStatus(BorrowStatus.PARTIALLY_RETURNED);
+            return;
+        }
+
+        borrowReceipt.setStatus(BorrowStatus.NOT_RETURNED);
     }
 
     @Override
@@ -246,6 +272,8 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
                 EntitySpecification.filterBorrowReceipts(requestDto.getKeyword(), requestDto.getSearchBy(), status),
                 pageable);
 
+        page.getContent().forEach(this::checkAndUpdateOverdueStatus);
+
         List<BorrowReceiptResponseDto> items = page.getContent().stream()
                 .map(BorrowReceiptResponseDto::new)
                 .toList();
@@ -259,9 +287,18 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
         return responseDto;
     }
 
+    private void checkAndUpdateOverdueStatus(BorrowReceipt borrowReceipt) {
+        if (!borrowReceipt.getStatus().equals(BorrowStatus.RETURNED)
+                && !borrowReceipt.getStatus().equals(BorrowStatus.OVERDUE)
+                && borrowReceipt.getDueDate().isBefore(LocalDate.now())) {
+            borrowReceipt.setStatus(BorrowStatus.OVERDUE);
+        }
+    }
+
     @Override
     public BorrowReceiptDetailResponseDto findById(Long id) {
         BorrowReceipt borrowReceipt = getEntity(id);
+        checkAndUpdateOverdueStatus(borrowReceipt);
         return new BorrowReceiptDetailResponseDto(borrowReceipt);
     }
 
@@ -291,6 +328,8 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
                 .and(EntitySpecification.filterBorrowReceipts(requestDto.getKeyword(), requestDto.getSearchBy(), status));
         Page<BorrowReceipt> page = borrowReceiptRepository.findAll(spec, pageable);
 
+        page.getContent().forEach(this::checkAndUpdateOverdueStatus);
+
         List<BorrowReceiptForReaderResponseDto> items = page.getContent().stream()
                 .map(BorrowReceiptForReaderResponseDto::new)
                 .toList();
@@ -307,7 +346,7 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
     @Override
     public BorrowReceiptDetailsDto findDetailsById(Long id) {
         BorrowReceipt borrowReceipt = getEntity(id);
-
+        checkAndUpdateOverdueStatus(borrowReceipt);
         return new BorrowReceiptDetailsDto(borrowReceipt);
     }
 

@@ -10,6 +10,7 @@ import com.example.librarymanager.domain.dto.response.borrowreceipt.BorrowReceip
 import com.example.librarymanager.domain.dto.response.borrowreceipt.BorrowReceiptDetailsDto;
 import com.example.librarymanager.domain.dto.response.borrowreceipt.BorrowReceiptForReaderResponseDto;
 import com.example.librarymanager.domain.dto.response.borrowreceipt.BorrowReceiptResponseDto;
+import com.example.librarymanager.domain.entity.BorrowReceipt;
 
 public interface BorrowReceiptService {
     String generateReceiptNumber();
@@ -17,6 +18,8 @@ public interface BorrowReceiptService {
     CommonResponseDto save(BorrowReceiptRequestDto requestDto, String userId);
 
     CommonResponseDto update(Long id, BorrowReceiptRequestDto requestDto, String userId);
+
+    void updateBorrowStatus(BorrowReceipt borrowReceipt);
 
     CommonResponseDto delete(Long id, String userId);
 
