@@ -50,6 +50,11 @@ public class BookBorrowServiceImpl implements BookBorrowService {
 
     private final BorrowReceiptService borrowReceiptService;
 
+    private BookBorrow getEntity(Long id) {
+        return bookBorrowRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.BookBorrow.ERR_NOT_FOUND_ID, id));
+    }
+
     @Override
     public PaginationResponseDto<BookBorrowResponseDto> findAll(PaginationFullRequestDto requestDto, TimeFilter timeFilter, Boolean isReturn) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BOOK_BORROW);
@@ -72,16 +77,22 @@ public class BookBorrowServiceImpl implements BookBorrowService {
 
     @Override
     public CommonResponseDto returnBooksByIds(Set<Long> ids, String userId) {
-        Set<BookBorrow> bookBorrows = ids.stream().map(this::getBookBorrow).collect(Collectors.toSet());
+        Set<BookBorrow> bookBorrows = ids.stream()
+                .map(id -> {
+                    BookBorrow bookBorrow = getEntity(id);
+                    if (bookBorrow.isReturned()) {
+                        throw new ConflictException(ErrorMessage.BookBorrow.ERR_RETURNED_BOOK_CANNOT_BE_RETURNED, id);
+                    }
+                    return bookBorrow;
+                })
+                .collect(Collectors.toSet());
+
         bookBorrows.forEach(bookBorrow -> {
-            //Cập nhật trạng thái của sách
             Book book = bookBorrow.getBook();
             book.setBookCondition(BookCondition.AVAILABLE);
 
-            //Cập nhật trạng thái của bookBorrow
             bookBorrow.setReturned(true);
 
-            //Cập nhật trạng thái của phiếu mượn
             BorrowReceipt borrowReceipt = bookBorrow.getBorrowReceipt();
             borrowReceiptService.updateBorrowStatus(borrowReceipt);
 
@@ -96,12 +107,35 @@ public class BookBorrowServiceImpl implements BookBorrowService {
         return new CommonResponseDto(message);
     }
 
-    private BookBorrow getBookBorrow(Long id) {
-        BookBorrow bookBorrow = bookBorrowRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.BookBorrow.ERR_NOT_FOUND_ID, id));
-        if (bookBorrow.isReturned()) {
-            throw new ConflictException(ErrorMessage.BookBorrow.ERR_RETURNED_BOOK_CANNOT_BE_RETURNED, id);
-        }
-        return bookBorrow;
+    @Override
+    public CommonResponseDto reportLostBooksByIds(Set<Long> ids, String userId) {
+        Set<BookBorrow> bookBorrows = ids.stream()
+                .map(id -> {
+                    BookBorrow bookBorrow = getEntity(id);
+                    if (bookBorrow.isReturned()) {
+                        throw new ConflictException(ErrorMessage.BookBorrow.ERR_RETURNED_BOOK_CANNOT_BE_RETURNED, id);
+                    }
+                    return bookBorrow;
+                })
+                .collect(Collectors.toSet());
+
+        bookBorrows.forEach(bookBorrow -> {
+            Book book = bookBorrow.getBook();
+            book.setBookCondition(BookCondition.LOST);
+
+            bookBorrow.setReturned(false);
+
+            BorrowReceipt borrowReceipt = bookBorrow.getBorrowReceipt();
+            borrowReceiptService.updateBorrowStatus(borrowReceipt);
+
+            bookRepository.save(book);
+            borrowReceiptRepository.save(borrowReceipt);
+            bookBorrowRepository.save(bookBorrow);
+
+            logService.createLog(TAG, EventConstants.EDIT, "Báo mất sách mã: " + bookBorrow.getBook().getBookCode(), userId);
+        });
+
+        String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
+        return new CommonResponseDto(message);
     }
 }

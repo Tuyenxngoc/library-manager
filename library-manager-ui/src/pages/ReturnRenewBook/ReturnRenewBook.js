@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Button, Flex, Input, message, Modal, Select, Space, Table, Tag } from 'antd';
-import dayjs from 'dayjs';
+import { Button, Flex, Input, message, Modal, Select, Space, Table } from 'antd';
 import queryString from 'query-string';
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
-import { getBookBorrows, returnBooks } from '~/services/bookBorrowService';
+import { getBookBorrows, reportLostBooks, returnBooks } from '~/services/bookBorrowService';
 
 const options = [
     { value: 'receiptNumber', label: 'Số phiếu mượn' },
@@ -13,7 +11,6 @@ const options = [
 ];
 
 function ReturnRenewBook() {
-    const navigate = useNavigate();
     const [meta, setMeta] = useState(INITIAL_META);
     const [filters, setFilters] = useState(INITIAL_FILTERS);
 
@@ -27,7 +24,8 @@ function ReturnRenewBook() {
 
     const [messageApi, contextHolder] = message.useMessage();
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+    const [isLostModalOpen, setIsLostModalOpen] = useState(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
     const handleChangePage = (newPage) => {
@@ -62,40 +60,77 @@ function ReturnRenewBook() {
 
     const handleReturnBook = async (bookId) => {
         try {
+            setIsLoading(true);
             const response = await returnBooks([bookId]);
             if (response.status === 200) {
                 messageApi.success('Trả sách thành công!');
-
                 handleChangePage(1);
             }
         } catch (error) {
             messageApi.error(`Lỗi khi trả sách: ${error.response?.data?.message || error.message}`);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleReportLostBook = async (bookId) => {
+        try {
+            setIsLoading(true);
+            const response = await reportLostBooks([bookId]);
+            if (response.status === 200) {
+                messageApi.success('Báo mất sách thành công!');
+                handleChangePage(1);
+            }
+        } catch (error) {
+            messageApi.error(`Lỗi khi báo mất sách: ${error.response?.data?.message || error.message}`);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     const handleBulkReturnBooks = async () => {
         try {
+            setIsLoading(true);
             if (selectedRowKeys.length === 0) {
-                return messageApi.warning('Vui lòng chọn ít nhất một sách để trả.');
+                messageApi.warning('Vui lòng chọn ít nhất một sách để trả.');
+                return;
             }
 
             const response = await returnBooks(selectedRowKeys);
             if (response.status === 200) {
                 messageApi.success('Trả sách hàng loạt thành công!');
                 setSelectedRowKeys([]);
-                setIsModalOpen(false);
+                setIsReturnModalOpen(false);
                 handleChangePage(1);
             }
         } catch (error) {
             messageApi.error(`Lỗi khi trả sách hàng loạt: ${error.response?.data?.message || error.message}`);
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const handleRenewBook = (receiptId) => {
-        navigate(`/admin/circulation/borrow/edit/${receiptId}`);
-    };
+    const handleBulkReportLostBooks = async () => {
+        try {
+            setIsLoading(true);
+            if (selectedRowKeys.length === 0) {
+                messageApi.warning('Vui lòng chọn ít nhất một sách để báo mất.');
+                return;
+            }
 
-    const handleViolationProcessing = (receiptId) => {};
+            const response = await reportLostBooks(selectedRowKeys);
+            if (response.status === 200) {
+                messageApi.success('Báo mất sách hàng loạt thành công!');
+                setSelectedRowKeys([]);
+                setIsLostModalOpen(false);
+                handleChangePage(1);
+            }
+        } catch (error) {
+            messageApi.error(`Lỗi khi báo mất sách hàng loạt: ${error.response?.data?.message || error.message}`);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
         const fetchEntities = async () => {
@@ -122,8 +157,6 @@ function ReturnRenewBook() {
             title: 'Mã cá biệt',
             dataIndex: 'bookCode',
             key: 'bookCode',
-            sorter: true,
-            showSorterTooltip: false,
         },
         {
             title: 'Nhan đề',
@@ -144,38 +177,16 @@ function ReturnRenewBook() {
             title: 'Tên bạn đọc',
             dataIndex: 'fullName',
             key: 'fullName',
-            sorter: true,
-            showSorterTooltip: false,
         },
         {
             title: 'Ngày mượn',
             dataIndex: 'borrowDate',
             key: 'borrowDate',
-            sorter: true,
-            showSorterTooltip: false,
         },
         {
             title: 'Ngày hẹn trả',
             dataIndex: 'dueDate',
             key: 'dueDate',
-            sorter: true,
-            showSorterTooltip: false,
-        },
-        {
-            title: 'Trạng thái',
-            key: 'status',
-            render: (_, record) => {
-                const today = dayjs();
-                const dueDate = dayjs(record.dueDate);
-
-                if (dueDate.isBefore(today, 'day')) {
-                    return <Tag color="red">Quá hạn</Tag>;
-                }
-                if (dueDate.isSame(today, 'day')) {
-                    return <Tag color="orange">Đến hạn trả</Tag>;
-                }
-                return <Tag color="green">Đang mượn</Tag>;
-            },
         },
         {
             title: 'Thao tác',
@@ -185,11 +196,8 @@ function ReturnRenewBook() {
                     <Button type="link" onClick={() => handleReturnBook(record.id)}>
                         Trả sách
                     </Button>
-                    <Button type="link" onClick={() => handleRenewBook(record.receiptId)}>
-                        Gia hạn
-                    </Button>
-                    <Button danger type="link" onClick={() => handleViolationProcessing(record.receiptId)}>
-                        Xử lý vi phạm
+                    <Button type="link" onClick={() => handleReportLostBook(record.id)} danger>
+                        Báo mất
                     </Button>
                 </Space>
             ),
@@ -197,10 +205,12 @@ function ReturnRenewBook() {
     ];
 
     const rowSelection = {
-        selectedRowKeys,
-        onChange: (selectedKeys) => {
-            setSelectedRowKeys(selectedKeys);
+        onChange: (selectedRowKeys) => {
+            setSelectedRowKeys(selectedRowKeys);
         },
+        getCheckboxProps: (record, index) => ({
+            name: record.id,
+        }),
     };
 
     if (errorMessage) {
@@ -220,18 +230,33 @@ function ReturnRenewBook() {
                 style={{
                     top: 20,
                 }}
-                open={isModalOpen}
+                open={isReturnModalOpen}
                 onOk={() => handleBulkReturnBooks()}
-                onCancel={() => setIsModalOpen(false)}
+                onCancel={() => setIsReturnModalOpen(false)}
             >
                 <span> {selectedRowKeys.length} sách sẽ được trả về thư viện?</span>
+            </Modal>
+
+            <Modal
+                title="Thông báo"
+                style={{
+                    top: 20,
+                }}
+                open={isLostModalOpen}
+                onOk={() => handleBulkReportLostBooks()}
+                onCancel={() => setIsLostModalOpen(false)}
+            >
+                <span> {selectedRowKeys.length} sách sẽ được báo mất?</span>
             </Modal>
 
             <h2>Trả - Gia hạn sách</h2>
 
             <Flex wrap justify="space-between" align="center">
                 <Space>
-                    <Button onClick={() => setIsModalOpen(true)}>Trả sách</Button>
+                    <Button onClick={() => setIsReturnModalOpen(true)}>Trả sách</Button>
+                    <Button onClick={() => setIsLostModalOpen(true)} danger>
+                        Báo mất sách
+                    </Button>
                 </Space>
                 <Space.Compact className="my-2">
                     <Select

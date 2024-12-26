@@ -14,4 +14,6 @@ public interface BookBorrowService {
 
     CommonResponseDto returnBooksByIds(Set<Long> ids, String userId);
 
+    CommonResponseDto reportLostBooksByIds(Set<Long> ids, String userId);
+
 }

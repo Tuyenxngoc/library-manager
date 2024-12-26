@@ -7,3 +7,7 @@ export const getBookBorrows = (params) => {
 export const returnBooks = async (bookIds) => {
     return axiosPrivate.put('admin/book-borrows/return-books', bookIds);
 };
+
+export const reportLostBooks = async (bookIds) => {
+    return axiosPrivate.put('admin/book-borrows/report-lost', bookIds);
+};

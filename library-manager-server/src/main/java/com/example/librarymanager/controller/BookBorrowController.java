@@ -45,6 +45,18 @@ public class BookBorrowController {
         return VsResponseUtil.success(bookBorrowService.returnBooksByIds(ids, userDetails.getUserId()));
     }
 
+    @Operation(summary = "API Report Lost Books by List of IDs")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BORROW_RECEIPT')")
+    @PutMapping(UrlConstant.BookBorrow.REPORT_LOST)
+    public ResponseEntity<?> reportLostBooks(
+            @RequestBody
+            @NotNull(message = ErrorMessage.INVALID_ARRAY_IS_REQUIRED)
+            Set<@NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED) Long> ids,
+            @CurrentUser CustomUserDetails userDetails
+    ) {
+        return VsResponseUtil.success(bookBorrowService.reportLostBooksByIds(ids, userDetails.getUserId()));
+    }
+
     @Operation(summary = "API Get All Book Borrows")
     @PreAuthorize("hasRole('ROLE_MANAGE_BORROW_RECEIPT')")
     @GetMapping(UrlConstant.BookBorrow.GET_ALL)

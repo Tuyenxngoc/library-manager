@@ -112,6 +112,7 @@ public class UrlConstant {
         public static final String DELETE = ADMIN_URL + PRE_FIX + "/{id}";
 
         public static final String RETURN_BOOKS = ADMIN_URL + PRE_FIX + "/return-books";
+        public static final String REPORT_LOST = ADMIN_URL + PRE_FIX + "/report-lost";
     }
 
     public static class Publisher {

@@ -1,5 +1,6 @@
 package com.example.librarymanager.domain.dto.response.bookborrow;
 
+import com.example.librarymanager.constant.BorrowStatus;
 import com.example.librarymanager.domain.entity.BookBorrow;
 import com.example.librarymanager.domain.entity.BorrowReceipt;
 import lombok.Getter;
@@ -27,6 +28,10 @@ public class BookBorrowResponseDto {
 
     private final LocalDate dueDate;
 
+    private final BorrowStatus status;
+
+    private final boolean isReturned;
+
     public BookBorrowResponseDto(BookBorrow bookBorrow) {
         BorrowReceipt borrowReceipt = bookBorrow.getBorrowReceipt();
         this.id = bookBorrow.getId();
@@ -38,5 +43,7 @@ public class BookBorrowResponseDto {
         this.fullName = borrowReceipt.getReader().getFullName();
         this.borrowDate = borrowReceipt.getBorrowDate();
         this.dueDate = borrowReceipt.getDueDate();
+        this.status = borrowReceipt.getStatus();
+        this.isReturned = bookBorrow.isReturned();
     }
 }

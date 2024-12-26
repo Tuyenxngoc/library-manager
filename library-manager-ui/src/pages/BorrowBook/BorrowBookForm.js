@@ -122,7 +122,7 @@ function BorrowBookForm() {
     const fetchBooks = async (keyword = '') => {
         setIsBooksLoading(true);
         try {
-            const params = queryString.stringify({ keyword, searchBy: 'title' });
+            const params = queryString.stringify({ keyword, searchBy: 'title', bookCondition: 'AVAILABLE' });
             const response = await getBooks(params);
             const { items } = response.data.data;
             setBooks(items);
