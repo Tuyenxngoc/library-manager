@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Drawer, Flex, Input, message, Popconfirm, Select, Space, Table, Tag } from 'antd';
+import { Button, Drawer, Dropdown, Flex, Input, message, Popconfirm, Select, Space, Table, Tag } from 'antd';
 import { MdOutlineModeEdit } from 'react-icons/md';
 import { FaRegTrashAlt, FaPrint } from 'react-icons/fa';
-
+import { GrPrint } from 'react-icons/gr';
 import queryString from 'query-string';
-
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
 import {
     deleteBorrowReceipt,
@@ -121,15 +120,61 @@ function BorrowBook() {
     };
 
     const handlePrintBorrow = async () => {
-        if (selectedRowKeys.length === 0) {
-            messageApi.info('Vui lòng chọn ít nhất một phiếu.');
-            return;
-        }
         setIsLoading(true);
         try {
             const response = await printBorrowReceipts({
                 schoolName: 'Trường Đại học Công nghiệp Hà Nội',
                 borrowIds: selectedRowKeys,
+            });
+
+            if (response.status === 200) {
+                const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+                const url = URL.createObjectURL(pdfBlob);
+
+                const newTab = window.open(url, '_blank');
+                newTab.focus();
+
+                URL.revokeObjectURL(url);
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi xuất dữ liệu.';
+            messageApi.error(errorMessage);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handlePrintBlankTemplate = async () => {
+        setIsLoading(true);
+        try {
+            const response = await printBorrowReceipts({
+                schoolName: 'Trường Đại học Công nghiệp Hà Nội',
+                template: true,
+            });
+
+            if (response.status === 200) {
+                const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
+                const url = URL.createObjectURL(pdfBlob);
+
+                const newTab = window.open(url, '_blank');
+                newTab.focus();
+
+                URL.revokeObjectURL(url);
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi xuất dữ liệu.';
+            messageApi.error(errorMessage);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handlePrintOverdueList = async () => {
+        setIsLoading(true);
+        try {
+            const response = await printBorrowReceipts({
+                schoolName: 'Trường Đại học Công nghiệp Hà Nội',
+                overdueOnly: true,
             });
 
             if (response.status === 200) {
@@ -273,6 +318,28 @@ function BorrowBook() {
         },
     ];
 
+    const items = [
+        {
+            key: '1',
+            icon: <GrPrint />,
+            label: 'Phiếu mượn',
+            disabled: selectedRowKeys.length === 0,
+            onClick: handlePrintBorrow,
+        },
+        {
+            key: '2',
+            icon: <GrPrint />,
+            label: 'Phiếu mượn tài liệu mẫu trắng',
+            onClick: handlePrintBlankTemplate,
+        },
+        {
+            key: '3',
+            icon: <GrPrint />,
+            label: 'Danh sách mượn quá hạn chưa trả',
+            onClick: handlePrintOverdueList,
+        },
+    ];
+
     if (errorMessage) {
         return (
             <div className="alert alert-danger p-2" role="alert">
@@ -369,7 +436,9 @@ function BorrowBook() {
                         Lập phiếu mượn
                     </Button>
 
-                    <Button icon={<FaPrint />} onClick={handlePrintBorrow}></Button>
+                    <Dropdown menu={{ items }}>
+                        <Button icon={<FaPrint />}>In</Button>
+                    </Dropdown>
                 </Space>
             </Flex>
 

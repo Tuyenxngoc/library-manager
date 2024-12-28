@@ -95,8 +95,8 @@ const menuConfig = [
         roles: [ROLES.ManageBorrowReceipt],
         children: [
             { label: 'Mượn sách', key: '/admin/circulation/borrow' },
-            { label: 'Trả-Gia hạn sách', key: '/admin/circulation/return-renew' },
-            // { label: 'Lịch sử trả sách', key: '/admin/circulation/return-history' },
+            { label: 'Trả sách', key: '/admin/circulation/return-renew' },
+            { label: 'Lịch sử trả sách', key: '/admin/circulation/return-history' },
         ],
     },
     // {

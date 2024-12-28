@@ -115,9 +115,9 @@ function BookListByCategory() {
         }));
     };
 
-    const openBookPdf = async (ids) => {
+    const openBookPdf = async () => {
         try {
-            const response = await getBookPdf(ids);
+            const response = await getBookPdf(selectedRowKeys);
             if (response.status === 200) {
                 const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
                 const url = URL.createObjectURL(pdfBlob);
@@ -132,9 +132,9 @@ function BookListByCategory() {
         }
     };
 
-    const openBookLabelType1Pdf = async (ids) => {
+    const openBookLabelType1Pdf = async () => {
         try {
-            const response = await getBookLabelType1Pdf(ids);
+            const response = await getBookLabelType1Pdf(selectedRowKeys);
             if (response.status === 200) {
                 const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
                 const url = URL.createObjectURL(pdfBlob);
@@ -149,9 +149,9 @@ function BookListByCategory() {
         }
     };
 
-    const openBookLabelType2Pdf = async (ids) => {
+    const openBookLabelType2Pdf = async () => {
         try {
-            const response = await getBookLabelType2Pdf(ids);
+            const response = await getBookLabelType2Pdf(selectedRowKeys);
             if (response.status === 200) {
                 const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
                 const url = URL.createObjectURL(pdfBlob);
@@ -322,21 +322,21 @@ function BookListByCategory() {
             icon: <GrPrint />,
             label: 'Phích chuẩn ISBD',
             disabled: selectedRowKeys.length === 0,
-            onClick: () => openBookPdf(selectedRowKeys),
+            onClick: openBookPdf,
         },
         {
             key: '2',
             icon: <GrPrint />,
             label: 'Dán bìa, gáy - dọc A4',
             disabled: selectedRowKeys.length === 0,
-            onClick: () => openBookLabelType1Pdf(selectedRowKeys),
+            onClick: openBookLabelType1Pdf,
         },
         {
             key: '3',
             icon: <GrPrint />,
             label: 'Nhãn dán từ gáy đến bìa A4',
             disabled: selectedRowKeys.length === 0,
-            onClick: () => openBookLabelType2Pdf(selectedRowKeys),
+            onClick: openBookLabelType2Pdf,
         },
         {
             key: '4',

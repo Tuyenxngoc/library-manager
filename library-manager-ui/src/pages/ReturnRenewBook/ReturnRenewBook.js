@@ -249,7 +249,7 @@ function ReturnRenewBook() {
                 <span> {selectedRowKeys.length} sách sẽ được báo mất?</span>
             </Modal>
 
-            <h2>Trả - Gia hạn sách</h2>
+            <h2>Trả sách</h2>
 
             <Flex wrap justify="space-between" align="center">
                 <Space>
