@@ -14,6 +14,8 @@ public interface PdfService {
 
     byte[] createReceipt(User user, CreateBorrowReceiptRequestDto requestDto, List<BorrowReceipt> borrowReceipts);
 
+    byte[] createReceiptWithFourPerPage(CreateBorrowReceiptRequestDto requestDto);
+
     byte[] createPdfFromBooks(List<Book> books);
 
     byte[] createLabelType1Pdf(List<Book> books);
