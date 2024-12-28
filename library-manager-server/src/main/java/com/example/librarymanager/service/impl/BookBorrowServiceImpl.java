@@ -77,28 +77,33 @@ public class BookBorrowServiceImpl implements BookBorrowService {
 
     @Override
     public CommonResponseDto returnBooksByIds(Set<Long> ids, String userId) {
+        //Lấy ra danh sách sách dựa vào id
         Set<BookBorrow> bookBorrows = ids.stream()
                 .map(id -> {
                     BookBorrow bookBorrow = getEntity(id);
-                    if (bookBorrow.isReturned()) {
+                    if (BookBorrowStatus.RETURNED.equals(bookBorrow.getStatus())) {
                         throw new ConflictException(ErrorMessage.BookBorrow.ERR_RETURNED_BOOK_CANNOT_BE_RETURNED, id);
                     }
                     return bookBorrow;
                 })
                 .collect(Collectors.toSet());
 
+        //Cập nhật trạng thái sách
         bookBorrows.forEach(bookBorrow -> {
+            //Đánh dấu sách đang rảnh
             Book book = bookBorrow.getBook();
             book.setBookCondition(BookCondition.AVAILABLE);
 
-            bookBorrow.setReturned(true);
+            //Đánh dấu sách đã trả
+            bookBorrow.setStatus(BookBorrowStatus.RETURNED);
 
+            //Cập nhật trạng thái phiếu mượn
             BorrowReceipt borrowReceipt = bookBorrow.getBorrowReceipt();
             borrowReceiptService.updateBorrowStatus(borrowReceipt);
 
             bookRepository.save(book);
-            borrowReceiptRepository.save(borrowReceipt);
             bookBorrowRepository.save(bookBorrow);
+            borrowReceiptRepository.save(borrowReceipt);
 
             logService.createLog(TAG, EventConstants.EDIT, "Trả sách về thư viện mã: " + bookBorrow.getBook().getBookCode(), userId);
         });
@@ -109,28 +114,33 @@ public class BookBorrowServiceImpl implements BookBorrowService {
 
     @Override
     public CommonResponseDto reportLostBooksByIds(Set<Long> ids, String userId) {
+        //Lấy ra danh sách sách dựa vào id
         Set<BookBorrow> bookBorrows = ids.stream()
                 .map(id -> {
                     BookBorrow bookBorrow = getEntity(id);
-                    if (bookBorrow.isReturned()) {
+                    if (BookBorrowStatus.LOST.equals(bookBorrow.getStatus())) {
                         throw new ConflictException(ErrorMessage.BookBorrow.ERR_RETURNED_BOOK_CANNOT_BE_RETURNED, id);
                     }
                     return bookBorrow;
                 })
                 .collect(Collectors.toSet());
 
+        //Cập nhật trạng thái sách
         bookBorrows.forEach(bookBorrow -> {
+            //Đánh dấu sách bị mất
             Book book = bookBorrow.getBook();
             book.setBookCondition(BookCondition.LOST);
 
-            bookBorrow.setReturned(false);
+            //Đánh dấu sách mất
+            bookBorrow.setStatus(BookBorrowStatus.LOST);
 
+            //Cập nhật trạng thái phiếu mượn
             BorrowReceipt borrowReceipt = bookBorrow.getBorrowReceipt();
             borrowReceiptService.updateBorrowStatus(borrowReceipt);
 
             bookRepository.save(book);
-            borrowReceiptRepository.save(borrowReceipt);
             bookBorrowRepository.save(bookBorrow);
+            borrowReceiptRepository.save(borrowReceipt);
 
             logService.createLog(TAG, EventConstants.EDIT, "Báo mất sách mã: " + bookBorrow.getBook().getBookCode(), userId);
         });

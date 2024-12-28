@@ -149,7 +149,7 @@ function BorrowBook() {
         try {
             const response = await printBorrowReceipts({
                 schoolName: 'Trường Đại học Công nghiệp Hà Nội',
-                template: true,
+                borrowIds: [],
             });
 
             if (response.status === 200) {

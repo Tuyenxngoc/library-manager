@@ -1,8 +1,11 @@
 package com.example.librarymanager.domain.entity;
 
+import com.example.librarymanager.constant.BookBorrowStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -18,8 +21,12 @@ public class BookBorrow {//Sách mượn chi tiết
     @Column(name = "book_borrow_id")
     private Long id;
 
-    @Column(name = "returned", nullable = false)
-    private boolean returned = false; // Trạng thái đã trả
+    @Column(name = "return_date")
+    private LocalDate returnDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private BookBorrowStatus status = BookBorrowStatus.NOT_RETURNED;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", foreignKey = @ForeignKey(name = "FK_BOOK_BORROWS_BOOK_ID"), referencedColumnName = "book_id", nullable = false)

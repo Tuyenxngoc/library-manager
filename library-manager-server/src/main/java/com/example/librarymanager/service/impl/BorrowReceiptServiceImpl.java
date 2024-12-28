@@ -230,8 +230,9 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
     @Override
     public void updateBorrowStatus(BorrowReceipt borrowReceipt) {
         boolean allReturned = borrowReceipt.getBookBorrows().stream()
-                .allMatch(BookBorrow::isReturned);
+                .allMatch(bookBorrow -> BookBorrowStatus.RETURNED.equals(bookBorrow.getStatus()));
         if (allReturned) {
+            borrowReceipt.setReturnDate(LocalDate.now());
             borrowReceipt.setStatus(BorrowStatus.RETURNED);
             return;
         }
@@ -243,7 +244,7 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
         }
 
         boolean partiallyReturned = borrowReceipt.getBookBorrows().stream()
-                .anyMatch(BookBorrow::isReturned);
+                .anyMatch(bookBorrow -> BookBorrowStatus.RETURNED.equals(bookBorrow.getStatus()));
         if (partiallyReturned) {
             borrowReceipt.setStatus(BorrowStatus.PARTIALLY_RETURNED);
             return;
@@ -352,6 +353,10 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
 
     @Override
     public byte[] createPdfForReceipts(CreateBorrowReceiptRequestDto requestDto, String userId) {
+        if (requestDto.getBorrowIds().isEmpty()) {
+            return pdfService.createReceiptWithFourPerPage(requestDto);
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.User.ERR_NOT_FOUND_ID, userId));
 

@@ -391,19 +391,19 @@ public class PdfServiceImpl implements PdfService {
                     receiptContainer.addElement(receiptNumber);
 
                     // Thông tin người mượn
-                    Paragraph readerName = new Paragraph(adjustLength("Họ và tên:", 50), normalFontMedium);
+                    Paragraph readerName = new Paragraph(adjustLength("Họ và tên:", 60), normalFontMedium);
                     readerName.setAlignment(Element.ALIGN_LEFT);
                     receiptContainer.addElement(readerName);
 
-                    Paragraph readerCard = new Paragraph(adjustLength("Mã số thẻ:", 50), normalFontMedium);
+                    Paragraph readerCard = new Paragraph(adjustLength("Mã số thẻ:", 60), normalFontMedium);
                     readerCard.setAlignment(Element.ALIGN_LEFT);
                     receiptContainer.addElement(readerCard);
 
-                    Paragraph borrowDate = new Paragraph(adjustLength("Ngày mượn:", 50), normalFontMedium);
+                    Paragraph borrowDate = new Paragraph(adjustLength("Ngày mượn:", 60), normalFontMedium);
                     borrowDate.setAlignment(Element.ALIGN_LEFT);
                     receiptContainer.addElement(borrowDate);
 
-                    Paragraph dueDate = new Paragraph(adjustLength("Ngày hẹn trả:", 50), normalFontMedium);
+                    Paragraph dueDate = new Paragraph(adjustLength("Ngày hẹn trả:", 60), normalFontMedium);
                     dueDate.setAlignment(Element.ALIGN_LEFT);
                     receiptContainer.addElement(dueDate);
 

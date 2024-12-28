@@ -22,6 +22,6 @@ public class CreateBorrowReceiptRequestDto {
     private String schoolName;
 
     @NotNull(message = ErrorMessage.INVALID_ARRAY_IS_REQUIRED)
-    @Size(min = 1, max = 100, message = ErrorMessage.INVALID_ARRAY_LENGTH)
+    @Size(max = 100, message = ErrorMessage.INVALID_ARRAY_LENGTH)
     private Set<@NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED) Long> borrowIds = new HashSet<>();
 }

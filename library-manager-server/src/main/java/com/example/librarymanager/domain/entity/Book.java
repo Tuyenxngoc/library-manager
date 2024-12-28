@@ -1,6 +1,7 @@
 package com.example.librarymanager.domain.entity;
 
 import com.example.librarymanager.constant.BookCondition;
+import com.example.librarymanager.constant.BookStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -30,7 +31,11 @@ public class Book {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "book_condition")
-    private BookCondition bookCondition = BookCondition.AVAILABLE; // Tình trạng sách
+    private BookCondition bookCondition = BookCondition.AVAILABLE; // Tình trạng mượn trả sách
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "book_status")
+    private BookStatus bookStatus = BookStatus.USABLE; // Trạng thái hiện tại của sách
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
