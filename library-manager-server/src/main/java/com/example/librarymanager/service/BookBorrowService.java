@@ -7,11 +7,12 @@ import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.response.bookborrow.BookBorrowResponseDto;
 
+import java.util.List;
 import java.util.Set;
 
 public interface BookBorrowService {
 
-    PaginationResponseDto<BookBorrowResponseDto> findAll(PaginationFullRequestDto requestDto, TimeFilter timeFilter, BookBorrowStatus status);
+    PaginationResponseDto<BookBorrowResponseDto> findAll(PaginationFullRequestDto requestDto, TimeFilter timeFilter, List<BookBorrowStatus> status);
 
     CommonResponseDto returnBooksByIds(Set<Long> ids, String userId);
 

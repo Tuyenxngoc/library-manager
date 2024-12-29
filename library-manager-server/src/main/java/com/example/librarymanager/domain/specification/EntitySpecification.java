@@ -15,6 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 public class EntitySpecification {
 
@@ -555,11 +556,15 @@ public class EntitySpecification {
         };
     }
 
-    public static Specification<BookBorrow> filterBookBorrows(BookBorrowStatus status) {
+    public static Specification<BookBorrow> filterBookBorrows(List<BookBorrowStatus> status) {
         return (root, query, builder) -> {
             query.distinct(true);
             Predicate predicate = builder.conjunction();
-            predicate = builder.and(predicate, builder.equal(root.get(BookBorrow_.status), status));
+
+            if (status != null && !status.isEmpty()) {
+                predicate = builder.and(predicate, root.get(BookBorrow_.status).in(status));
+            }
+
             return predicate;
         };
     }

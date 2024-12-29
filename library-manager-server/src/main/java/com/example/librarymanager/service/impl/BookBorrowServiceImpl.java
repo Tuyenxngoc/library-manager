@@ -28,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -56,7 +57,7 @@ public class BookBorrowServiceImpl implements BookBorrowService {
     }
 
     @Override
-    public PaginationResponseDto<BookBorrowResponseDto> findAll(PaginationFullRequestDto requestDto, TimeFilter timeFilter, BookBorrowStatus status) {
+    public PaginationResponseDto<BookBorrowResponseDto> findAll(PaginationFullRequestDto requestDto, TimeFilter timeFilter, List<BookBorrowStatus> status) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BOOK_BORROW);
 
         Specification<BookBorrow> spec = EntitySpecification.filterBookBorrows(status).and(EntitySpecification.filterBookBorrows(requestDto.getKeyword(), requestDto.getSearchBy()));
@@ -82,7 +83,7 @@ public class BookBorrowServiceImpl implements BookBorrowService {
                 .map(id -> {
                     BookBorrow bookBorrow = getEntity(id);
                     if (BookBorrowStatus.RETURNED.equals(bookBorrow.getStatus())) {
-                        throw new ConflictException(ErrorMessage.BookBorrow.ERR_RETURNED_BOOK_CANNOT_BE_RETURNED, id);
+                        throw new ConflictException(ErrorMessage.BookBorrow.ERR_ALREADY_MARKED_AS_RETURNED, id);
                     }
                     return bookBorrow;
                 })
@@ -95,6 +96,7 @@ public class BookBorrowServiceImpl implements BookBorrowService {
             book.setBookCondition(BookCondition.AVAILABLE);
 
             //Đánh dấu sách đã trả
+            bookBorrow.setReturnDate(LocalDate.now());
             bookBorrow.setStatus(BookBorrowStatus.RETURNED);
 
             //Cập nhật trạng thái phiếu mượn
@@ -119,7 +121,7 @@ public class BookBorrowServiceImpl implements BookBorrowService {
                 .map(id -> {
                     BookBorrow bookBorrow = getEntity(id);
                     if (BookBorrowStatus.LOST.equals(bookBorrow.getStatus())) {
-                        throw new ConflictException(ErrorMessage.BookBorrow.ERR_RETURNED_BOOK_CANNOT_BE_RETURNED, id);
+                        throw new ConflictException(ErrorMessage.BookBorrow.ERR_ALREADY_MARKED_AS_LOST, id);
                     }
                     return bookBorrow;
                 })

@@ -12,6 +12,7 @@ import {
     getBorrowReceipts,
     printBorrowReceipts,
 } from '~/services/borrowReceiptService';
+import { bookBorrowReceiptMapping } from '~/common/borrowConstants';
 
 const options = [
     { value: 'receiptNumber', label: 'Số phiếu mượn' },
@@ -358,8 +359,11 @@ function BorrowBook() {
                 ) : receiptDetails ? (
                     <div className="container">
                         <div className="row mb-4">
+                            <h4> Phiếu mượn sách {receiptDetails.receiptNumber}</h4>
+                        </div>
+                        <div className="row mb-4">
                             <div className="col-md-6">
-                                <div className="fw-bold">Tên người mượn:</div>
+                                <div className="fw-bold">Bạn đọc:</div>
                                 <p>{receiptDetails.fullName}</p>
                             </div>
                             <div className="col-md-6">
@@ -372,37 +376,39 @@ function BorrowBook() {
                             </div>
                             <div className="col-md-6">
                                 <div className="fw-bold">Tình trạng:</div>
-                                <p className={`text-${receiptDetails.status === 'Đã trả' ? 'success' : 'danger'}`}>
-                                    {receiptDetails.status}
-                                </p>
+                                {borrowReceiptMapping[receiptDetails.status]}
                             </div>
                         </div>
 
-                        <table className="table table-striped table-hover">
-                            <thead className="table-dark">
-                                <tr>
-                                    <th>Nhan đề</th>
-                                    <th>Số đăng ký cá biệt</th>
-                                    <th>Tình trạng</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {receiptDetails.books.map((book, index) => (
-                                    <tr key={index}>
-                                        <td>{book.title}</td>
-                                        <td>{book.bookCode}</td>
-                                        <td>{book.returned ? 'Đã trả' : 'Chưa trả'}</td>
+                        <div className="row">
+                            <table className="table table-striped table-hover">
+                                <thead className="table-dark">
+                                    <tr>
+                                        <th>Nhan đề</th>
+                                        <th>Số đăng ký cá biệt</th>
+                                        <th>Ngày trả</th>
+                                        <th>Tình trạng</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colSpan="3" className="text-end fw-bold">
-                                        Tổng: {receiptDetails.books.length} đầu sách
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {receiptDetails.books.map((book, index) => (
+                                        <tr key={index}>
+                                            <td>{book.title}</td>
+                                            <td>{book.bookCode}</td>
+                                            <td>{book.returnDate}</td>
+                                            <td>{bookBorrowReceiptMapping[book.status]}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colSpan="4" className="text-end fw-bold">
+                                            Tổng: {receiptDetails.books.length} đầu sách
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
                     </div>
                 ) : (
                     <div>Không có dữ liệu.</div>

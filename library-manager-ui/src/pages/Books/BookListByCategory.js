@@ -300,11 +300,11 @@ function BookListByCategory() {
                 },
             ],
         },
-        // {
-        //     title: 'Đã mất',
-        //     dataIndex: 'lostBooks',
-        //     key: 'lostBooks',
-        // },
+        {
+            title: 'Đã mất',
+            dataIndex: 'lostBooks',
+            key: 'lostBooks',
+        },
     ];
 
     const rowSelection = {

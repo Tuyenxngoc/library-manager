@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
 import java.util.Set;
 
 @RestApiV1
@@ -64,7 +65,7 @@ public class BookBorrowController {
     public ResponseEntity<?> getAllBookBorrows(
             @ParameterObject PaginationFullRequestDto requestDto,
             @ParameterObject TimeFilter timeFilter,
-            @RequestParam(value = "status", required = false, defaultValue = "false") BookBorrowStatus status
+            @RequestParam(value = "status", required = false) List<BookBorrowStatus> status
     ) {
         return VsResponseUtil.success(bookBorrowService.findAll(requestDto, timeFilter, status));
     }

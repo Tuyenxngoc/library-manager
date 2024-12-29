@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Button, DatePicker, Flex, Input, Select, Space, Table } from 'antd';
+import { Button, DatePicker, Flex, Input, message, Select, Space, Table } from 'antd';
 import queryString from 'query-string';
+import dayjs from 'dayjs';
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
 import { getBookBorrows } from '~/services/bookBorrowService';
+import { bookBorrowReceiptMapping } from '~/common/borrowConstants';
 
 const options = [
     { value: 'receiptNumber', label: 'Số phiếu mượn' },
@@ -12,7 +14,7 @@ const options = [
 
 function ReturnHistory() {
     const [meta, setMeta] = useState(INITIAL_META);
-    const [filters, setFilters] = useState(INITIAL_FILTERS);
+    const [filters, setFilters] = useState({ ...INITIAL_FILTERS, status: ['RETURNED', 'LOST'] });
 
     const [entityData, setEntityData] = useState(null);
 
@@ -25,6 +27,7 @@ function ReturnHistory() {
     const [errorMessage, setErrorMessage] = useState(null);
 
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+    const [messageApi, contextHolder] = message.useMessage();
 
     const handleChangePage = (newPage) => {
         setFilters((prev) => ({ ...prev, pageNum: newPage }));
@@ -56,6 +59,36 @@ function ReturnHistory() {
             startDate: startDate ? startDate.format('YYYY-MM-DD') : null,
             endDate: endDate ? endDate.format('YYYY-MM-DD') : null,
         }));
+    };
+
+    const handleCancelReturn = async (bookId) => {
+        // try {
+        //     setIsLoading(true);
+        //     const response = await returnBooks([bookId]);
+        //     if (response.status === 200) {
+        //         messageApi.success('Trả sách thành công!');
+        //         handleChangePage(1);
+        //     }
+        // } catch (error) {
+        //     messageApi.error(`Lỗi khi trả sách: ${error.response?.data?.message || error.message}`);
+        // } finally {
+        //     setIsLoading(false);
+        // }
+    };
+
+    const handleDelete = async (bookId) => {
+        // try {
+        //     setIsLoading(true);
+        //     const response = await reportLostBooks([bookId]);
+        //     if (response.status === 200) {
+        //         messageApi.success('Báo mất sách thành công!');
+        //         handleChangePage(1);
+        //     }
+        // } catch (error) {
+        //     messageApi.error(`Lỗi khi báo mất sách: ${error.response?.data?.message || error.message}`);
+        // } finally {
+        //     setIsLoading(false);
+        // }
     };
 
     useEffect(() => {
@@ -122,6 +155,51 @@ function ReturnHistory() {
             sorter: true,
             showSorterTooltip: false,
         },
+        {
+            title: 'Ngày trả',
+            dataIndex: 'returnDate',
+            key: 'returnDate',
+            sorter: true,
+            showSorterTooltip: false,
+        },
+        {
+            title: 'Quá hạn',
+            dataIndex: 'overdueDays',
+            key: 'overdueDays',
+            render: (_, record) => {
+                if (!record.returnDate) {
+                    return '';
+                }
+
+                const dueDate = dayjs(record.dueDate);
+                const returnDate = dayjs(record.returnDate);
+
+                const overdueDays = Math.max(0, returnDate.diff(dueDate, 'day'));
+                return `${overdueDays} ngày`;
+            },
+        },
+        {
+            title: 'Trạng thái',
+            dataIndex: 'status',
+            key: 'status',
+            sorter: true,
+            showSorterTooltip: false,
+            render: (status) => bookBorrowReceiptMapping[status],
+        },
+        {
+            title: '',
+            key: 'action',
+            render: (_, record) => (
+                <Space>
+                    <Button type="link" onClick={() => handleCancelReturn(record.id)}>
+                        Hủy trả
+                    </Button>
+                    <Button type="link" onClick={() => handleDelete(record.id)} danger>
+                        Xóa
+                    </Button>
+                </Space>
+            ),
+        },
     ];
 
     const rowSelection = {
@@ -141,6 +219,8 @@ function ReturnHistory() {
 
     return (
         <div>
+            {contextHolder}
+
             <Flex wrap justify="space-between" align="center">
                 <h2>Lịch sử trả sách</h2>
 

@@ -1,13 +1,13 @@
 package com.example.librarymanager.domain.dto.response.borrowreceipt;
 
 import com.example.librarymanager.constant.BookBorrowStatus;
+import com.example.librarymanager.constant.BorrowStatus;
 import com.example.librarymanager.domain.entity.BookBorrow;
 import com.example.librarymanager.domain.entity.BorrowReceipt;
 import lombok.Getter;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 public class BorrowReceiptDetailsDto {
@@ -27,14 +27,14 @@ public class BorrowReceiptDetailsDto {
         }
     }
 
-    private Long id;
-    private String receiptNumber;
-    private String fullName;
-    private LocalDate borrowDate;
-    private LocalDate dueDate;
-    private LocalDate returnDate;
-    private String status;
-    private List<BookDto> books;
+    private final Long id;
+    private final String receiptNumber;
+    private final String fullName;
+    private final LocalDate borrowDate;
+    private final LocalDate dueDate;
+    private final LocalDate returnDate;
+    private final BorrowStatus status;
+    private final List<BookDto> books;
 
     public BorrowReceiptDetailsDto(BorrowReceipt borrowReceipt) {
         this.id = borrowReceipt.getId();
@@ -43,9 +43,9 @@ public class BorrowReceiptDetailsDto {
         this.borrowDate = borrowReceipt.getBorrowDate();
         this.dueDate = borrowReceipt.getDueDate();
         this.returnDate = borrowReceipt.getReturnDate();
-        this.status = borrowReceipt.getStatus().getName();
+        this.status = borrowReceipt.getStatus();
         this.books = borrowReceipt.getBookBorrows().stream()
                 .map(BookDto::new)
-                .collect(Collectors.toList());
+                .toList();
     }
 }
