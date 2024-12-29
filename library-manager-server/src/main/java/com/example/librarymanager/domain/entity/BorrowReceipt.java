@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "borrow_receipts",
-        uniqueConstraints = @UniqueConstraint(name = "UN_BOOK_RECEIPTS_RECEIPT_NUMBER", columnNames = "receipt_number"))
+        uniqueConstraints = @UniqueConstraint(name = "UN_BORROW_RECEIPTS_RECEIPT_NUMBER", columnNames = "receipt_number"))
 public class BorrowReceipt {//Phiếu mượn sách
 
     @Id
@@ -38,13 +38,13 @@ public class BorrowReceipt {//Phiếu mượn sách
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private BorrowStatus status;
+    private BorrowStatus status; // Trạng thái phiếu mượn
 
     @Column(name = "note", length = 500)
     private String note; // Ghi chú
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reader_id", foreignKey = @ForeignKey(name = "FK_BOOK_LOAN_RECEIPTS_READER_ID"), referencedColumnName = "reader_id", nullable = false)
+    @JoinColumn(name = "reader_id", foreignKey = @ForeignKey(name = "FK_BORROW_RECEIPTS_READER_ID"), referencedColumnName = "reader_id", nullable = false)
     @JsonIgnore
     private Reader reader;
 

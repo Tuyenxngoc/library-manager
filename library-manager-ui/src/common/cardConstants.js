@@ -13,6 +13,7 @@ export const cardStatus = [
 export const cardGender = [
     { value: 'MALE', label: 'Nam' },
     { value: 'FEMALE', label: 'Nữ' },
+    { value: 'OTHER', label: 'Khác' },
 ];
 
 export const cardPenaltyForm = [

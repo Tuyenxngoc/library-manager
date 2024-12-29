@@ -3,6 +3,7 @@ package com.example.librarymanager.controller;
 import com.example.librarymanager.annotation.CurrentUser;
 import com.example.librarymanager.annotation.RestApiV1;
 import com.example.librarymanager.base.VsResponseUtil;
+import com.example.librarymanager.constant.BookBorrowStatus;
 import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.UrlConstant;
 import com.example.librarymanager.domain.dto.filter.TimeFilter;
@@ -63,9 +64,9 @@ public class BookBorrowController {
     public ResponseEntity<?> getAllBookBorrows(
             @ParameterObject PaginationFullRequestDto requestDto,
             @ParameterObject TimeFilter timeFilter,
-            @RequestParam(value = "isReturn", required = false, defaultValue = "false") Boolean isReturn
+            @RequestParam(value = "status", required = false, defaultValue = "false") BookBorrowStatus status
     ) {
-        return VsResponseUtil.success(bookBorrowService.findAll(requestDto, timeFilter, isReturn));
+        return VsResponseUtil.success(bookBorrowService.findAll(requestDto, timeFilter, status));
     }
 
 }

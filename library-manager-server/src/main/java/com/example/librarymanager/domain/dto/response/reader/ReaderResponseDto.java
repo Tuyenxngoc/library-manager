@@ -54,10 +54,7 @@ public class ReaderResponseDto {
         this.status = reader.getStatus();
 
         // Tính số sách đang mượn (số lượng BorrowReceipts chưa được trả)
-        this.currentBorrowedBooks = reader.getBorrowReceipts().stream()
-                .flatMap(receipt -> receipt.getBookBorrows().stream()) // Lấy tất cả các sách từ các phiếu mượn
-                .filter(bookBorrow -> !bookBorrow.isReturned()) // Chỉ lấy những sách chưa trả
-                .count(); // Đếm số lượng sách chưa trả
+        this.currentBorrowedBooks = 0;
 
         // Tính số lượt vào thư viện
         this.libraryVisitCount = reader.getLibraryVisits().size();

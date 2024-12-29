@@ -44,6 +44,7 @@ public class ReaderRequestDto {
     @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
     private String cardNumber;
 
+    @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
     private String password;
 
     @NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED)

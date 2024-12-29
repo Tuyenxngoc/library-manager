@@ -1,7 +1,10 @@
 package com.example.librarymanager.domain.dto.response.bookdefinition;
 
 import com.example.librarymanager.domain.dto.common.BaseEntityDto;
-import com.example.librarymanager.domain.entity.*;
+import com.example.librarymanager.domain.entity.BookAuthor;
+import com.example.librarymanager.domain.entity.BookDefinition;
+import com.example.librarymanager.domain.entity.ClassificationSymbol;
+import com.example.librarymanager.domain.entity.Publisher;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -36,16 +39,9 @@ public class BookByBookDefinitionResponseDto {
         this.title = bookDefinition.getTitle();
         this.bookCode = bookDefinition.getBookCode();
         this.publishingYear = bookDefinition.getPublishingYear();
-
-        List<Book> books = bookDefinition.getBooks().stream()
-                .filter(book -> book.getExportReceipt() == null)
-                .toList();
-        this.totalBooks = books.size();
-        this.availableBooks = books.stream().filter(book -> {
-            List<BookBorrow> bookBorrows = book.getBookBorrows();
-            return bookBorrows.stream().allMatch(BookBorrow::isReturned);
-        }).count();
-        this.borrowedBooks = totalBooks - availableBooks;
+        this.totalBooks = 0;
+        this.availableBooks = 0;
+        this.borrowedBooks = 0;
         this.lostBooks = 0;
 
         // Set authors

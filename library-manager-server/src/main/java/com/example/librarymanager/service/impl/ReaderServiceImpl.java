@@ -70,9 +70,7 @@ public class ReaderServiceImpl implements ReaderService {
     }
 
     public void validatePassword(String password) {
-        if (password.length() > 30) {
-            throw new BadRequestException(ErrorMessage.INVALID_TEXT_LENGTH);
-        } else if (!password.matches(CommonConstant.REGEXP_PASSWORD)) {
+        if (!password.matches(CommonConstant.REGEXP_PASSWORD)) {
             throw new BadRequestException(ErrorMessage.INVALID_FORMAT_PASSWORD);
         }
     }
@@ -97,6 +95,7 @@ public class ReaderServiceImpl implements ReaderService {
                 reader.setPassword(passwordEncoder.encode(values[3]));
                 reader.setCreatedDate(LocalDate.now());
                 reader.setExpiryDate(LocalDate.now().plusMonths(1));
+                reader.setGender(Gender.OTHER);
                 reader.setStatus(CardStatus.ACTIVE);
 
                 if (!readerRepository.existsByCardNumber(reader.getCardNumber())

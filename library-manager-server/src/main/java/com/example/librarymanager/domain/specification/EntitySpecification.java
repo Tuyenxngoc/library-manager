@@ -1,9 +1,6 @@
 package com.example.librarymanager.domain.specification;
 
-import com.example.librarymanager.constant.BookCondition;
-import com.example.librarymanager.constant.BorrowStatus;
-import com.example.librarymanager.constant.CardStatus;
-import com.example.librarymanager.constant.PenaltyForm;
+import com.example.librarymanager.constant.*;
 import com.example.librarymanager.domain.dto.filter.LibraryVisitFilter;
 import com.example.librarymanager.domain.dto.filter.LogFilter;
 import com.example.librarymanager.domain.entity.*;
@@ -310,12 +307,7 @@ public class EntitySpecification {
             predicate = builder.and(predicate, builder.isNull(root.get(Book_.exportReceipt)));
 
             if (bookCondition != null) {
-                switch (bookCondition) {
-                    case AVAILABLE ->
-                            predicate = builder.and(predicate, builder.equal(root.get(Book_.BOOK_CONDITION), BookCondition.AVAILABLE.name()));
-                    case ON_LOAN ->
-                            predicate = builder.and(predicate, builder.equal(root.get(Book_.BOOK_CONDITION), BookCondition.ON_LOAN.name()));
-                }
+                predicate = builder.and(predicate, builder.equal(root.get(Book_.bookCondition), bookCondition));
             }
 
             if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(searchBy)) {
@@ -539,16 +531,7 @@ public class EntitySpecification {
             Predicate predicate = builder.conjunction();
 
             if (status != null) {
-                switch (status) {
-                    case NOT_RETURNED ->
-                            predicate = builder.and(predicate, builder.equal(root.get(BorrowReceipt_.status), BorrowStatus.NOT_RETURNED));
-                    case RETURNED ->
-                            predicate = builder.and(predicate, builder.equal(root.get(BorrowReceipt_.status), BorrowStatus.RETURNED));
-                    case PARTIALLY_RETURNED ->
-                            predicate = builder.and(predicate, builder.equal(root.get(BorrowReceipt_.status), BorrowStatus.PARTIALLY_RETURNED));
-                    case OVERDUE ->
-                            predicate = builder.and(predicate, builder.equal(root.get(BorrowReceipt_.status), BorrowStatus.OVERDUE));
-                }
+                predicate = builder.and(predicate, builder.equal(root.get(BorrowReceipt_.status), status));
             }
 
             if (StringUtils.isNotBlank(keyword) && StringUtils.isNotBlank(searchBy)) {
@@ -572,11 +555,11 @@ public class EntitySpecification {
         };
     }
 
-    public static Specification<BookBorrow> filterBookBorrows(Boolean isReturn) {
+    public static Specification<BookBorrow> filterBookBorrows(BookBorrowStatus status) {
         return (root, query, builder) -> {
             query.distinct(true);
             Predicate predicate = builder.conjunction();
-            predicate = builder.and(predicate, builder.equal(root.get(BookBorrow_.returned), isReturn));
+            predicate = builder.and(predicate, builder.equal(root.get(BookBorrow_.status), status));
             return predicate;
         };
     }

@@ -44,9 +44,9 @@ import LibraryRules from './pages/settings/LibraryRules';
 import Holidays from './pages/settings/Holidays';
 import GeneralConfig from './pages/settings/GeneralConfig';
 import SlideConfig from './pages/settings/SlideConfig';
-import UserManagement from './pages/UserManagement/UserManagement';
-import UserManagementForm from './pages/UserManagement/UserManagementForm';
-import UserGroupManagement from './pages/UserGroupManagement/UserGroupManagement';
+import User from './pages/User/User';
+import UserForm from './pages/User/UserForm';
+import UserGroup from './pages/UserGroup/UserGroup';
 import Reader from './pages/Reader/Reader';
 import LibraryVisit from './pages/LibraryVisit/LibraryVisit';
 import VisitorStatistics from './pages/LibraryVisit/VisitorStatistics';
@@ -137,9 +137,9 @@ function App() {
 
                         {/* Quản lý người dùng */}
                         <Route path="users">
-                            <Route index element={<UserManagement />} />
-                            <Route path="new" element={<UserManagementForm />} />
-                            <Route path="edit/:id" element={<UserManagementForm />} />
+                            <Route index element={<User />} />
+                            <Route path="new" element={<UserForm />} />
+                            <Route path="edit/:id" element={<UserForm />} />
                         </Route>
 
                         {/* Quản lý bạn đọc */}
@@ -154,7 +154,7 @@ function App() {
 
                         {/* Quản lý nhóm người dùng */}
                         <Route path="user-groups">
-                            <Route index element={<UserGroupManagement />} />
+                            <Route index element={<UserGroup />} />
                         </Route>
 
                         {/* Sách */}

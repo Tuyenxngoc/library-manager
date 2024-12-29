@@ -56,10 +56,10 @@ public class BookBorrowServiceImpl implements BookBorrowService {
     }
 
     @Override
-    public PaginationResponseDto<BookBorrowResponseDto> findAll(PaginationFullRequestDto requestDto, TimeFilter timeFilter, Boolean isReturn) {
+    public PaginationResponseDto<BookBorrowResponseDto> findAll(PaginationFullRequestDto requestDto, TimeFilter timeFilter, BookBorrowStatus status) {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.BOOK_BORROW);
 
-        Specification<BookBorrow> spec = EntitySpecification.filterBookBorrows(isReturn).and(EntitySpecification.filterBookBorrows(requestDto.getKeyword(), requestDto.getSearchBy()));
+        Specification<BookBorrow> spec = EntitySpecification.filterBookBorrows(status).and(EntitySpecification.filterBookBorrows(requestDto.getKeyword(), requestDto.getSearchBy()));
         Page<BookBorrow> page = bookBorrowRepository.findAll(spec, pageable);
 
         List<BookBorrowResponseDto> items = page.getContent().stream()

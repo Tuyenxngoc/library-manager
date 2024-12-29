@@ -69,6 +69,12 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.User.ERR_NOT_FOUND_ID, id));
     }
 
+    public void validatePassword(String password) {
+        if (!password.matches(CommonConstant.REGEXP_PASSWORD)) {
+            throw new BadRequestException(ErrorMessage.INVALID_FORMAT_PASSWORD);
+        }
+    }
+
     @Override
     public void initAdmin(AdminInfo adminInfo, UserGroup userGroup) {
         if (userRepository.count() == 0) {
@@ -108,6 +114,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public CommonResponseDto save(UserRequestDto requestDto, String userId) {
+        //Kiểm tra mật khẩu
+        String password = requestDto.getPassword();
+        if (password == null || password.isEmpty()) {
+            throw new BadRequestException(ErrorMessage.INVALID_NOT_BLANK_FIELD);
+        } else {
+            validatePassword(password);
+        }
+
         // Kiểm tra trùng lặp username hoặc email
         if (userRepository.existsByUsername(requestDto.getUsername())) {
             throw new ConflictException(ErrorMessage.Auth.ERR_DUPLICATE_USERNAME, requestDto.getUsername());
@@ -143,6 +157,13 @@ public class UserServiceImpl implements UserService {
         }
         if (!Objects.equals(user.getEmail(), requestDto.getEmail()) && userRepository.existsByEmail(requestDto.getEmail())) {
             throw new ConflictException(ErrorMessage.Auth.ERR_DUPLICATE_EMAIL, requestDto.getEmail());
+        }
+
+        //Nếu mật khẩu khác null thì cập nhật lại mật khẩu
+        String password = requestDto.getPassword();
+        if (password != null && !password.isEmpty()) {
+            validatePassword(password);
+            user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         }
 
         // Cập nhật nhóm người dùng nếu có

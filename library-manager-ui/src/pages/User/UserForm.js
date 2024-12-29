@@ -11,6 +11,7 @@ import FormTextArea from '~/components/FormTextArea';
 import FormSelect from '~/components/FormSelect';
 import { getUserGroups } from '~/services/userGroupService';
 import { createUser, getUserById, updateUser } from '~/services/userService';
+import { REGEXP_FULL_NAME, REGEXP_PASSWORD, REGEXP_PHONE_NUMBER, REGEXP_USERNAME } from '~/common/commonConstants';
 
 const statusOptions = [
     { value: 'ACTIVATED', label: 'Đã kích hoạt' },
@@ -22,8 +23,8 @@ const defaultValue = {
     username: '',
     password: '',
     userGroupId: null,
-    expiryDate: null,
-    status: 'ACTIVATED',
+    expiryDate: dayjs(),
+    status: statusOptions[0].value,
     fullName: '',
     position: '',
     email: '',
@@ -35,29 +36,35 @@ const defaultValue = {
 const validationSchema = yup.object({
     username: yup
         .string()
-        .matches(/^[a-z][a-z0-9]{3,15}$/, 'Tên đăng nhập không đúng định dạng')
+        .matches(
+            REGEXP_USERNAME,
+            'Tên đăng nhập phải bắt đầu bằng chữ cái, từ 4-16 ký tự và chỉ chứa chữ cái thường hoặc số.',
+        )
         .required('Tên đăng nhập là bắt buộc'),
 
     password: yup
         .string()
-        .matches(/^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{6,}$/, 'Mật khẩu không đúng định dạng')
-        .required('Mật khẩu là bắt buộc'),
+        .matches(REGEXP_PASSWORD, 'Mật khẩu phải có tối thiểu 6 ký tự, bao gồm ít nhất một chữ cái và một chữ số.')
+        .nullable(),
 
     phoneNumber: yup
         .string()
-        .matches(/^(?:\+84|0)(?:1[2689]|9[0-9]|3[2-9]|5[6-9]|7[0-9])(?:\d{7}|\d{8})$/, 'Số điện thoại không hợp lệ')
+        .matches(
+            REGEXP_PHONE_NUMBER,
+            'Số điện thoại phải bắt đầu bằng +84 hoặc 0, tiếp theo là mã nhà mạng hợp lệ và có 7-8 chữ số.',
+        )
         .required('Số điện thoại là bắt buộc'),
 
     fullName: yup
         .string()
-        .matches(/^\S+(\s+\S+)+/, 'Họ tên không đúng định dạng')
+        .matches(REGEXP_FULL_NAME, 'Họ tên phải có ít nhất hai từ và không chứa ký tự đặc biệt.')
         .required('Họ tên là bắt buộc'),
 
     email: yup.string().email('Email không hợp lệ').required('Email là bắt buộc'),
 
     userGroupId: yup.number().required('Nhóm người dùng là bắt buộc'),
 
-    expiryDate: yup.date().nullable(),
+    expiryDate: yup.mixed().nullable(),
 
     status: yup.string().nullable(),
 
@@ -68,26 +75,36 @@ const validationSchema = yup.object({
     note: yup.string().nullable(),
 });
 
-const UserManagementForm = () => {
+const UserForm = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [messageApi, contextHolder] = message.useMessage();
 
     const [userGroups, setUserGroups] = useState([]);
     const [isUserGroupsLoading, setIsUserGroupsLoading] = useState(true);
 
-    const handleSubmit = async (values, { setSubmitting }) => {
+    const [messageApi, contextHolder] = message.useMessage();
+
+    const handleSubmit = async (values, { setSubmitting, setErrors }) => {
         try {
-            let response;
-            if (id) {
-                response = await updateUser(id, values);
-            } else {
-                response = await createUser(values);
+            if (!id && !values.password) {
+                setErrors({ password: 'Mật khẩu là bắt buộc' });
+                setSubmitting(false);
+                return;
             }
 
-            if (response.status === 200) {
-                messageApi.success(response.data.data.message);
-            } else if (response.status === 201) {
+            const formattedValues = {
+                ...values,
+                expiryDate: values.expiryDate ? values.expiryDate.format('YYYY-MM-DD') : null,
+            };
+
+            let response;
+            if (id) {
+                response = await updateUser(id, formattedValues);
+            } else {
+                response = await createUser(formattedValues);
+            }
+
+            if (response.status === 200 || response.status === 201) {
                 messageApi.success(response.data.data.message);
             }
         } catch (error) {
@@ -124,40 +141,43 @@ const UserManagementForm = () => {
     }, []);
 
     useEffect(() => {
-        // Nếu có id, lấy thông tin người dùng để sửa
-        if (id) {
-            getUserById(id)
-                .then((response) => {
-                    const {
-                        username,
-                        password,
-                        userGroup,
-                        expiryDate,
-                        status,
-                        fullName,
-                        position,
-                        email,
-                        phoneNumber,
-                        address,
-                        note,
-                    } = response.data.data;
-                    formik.setValues({
-                        username,
-                        password,
-                        userGroupId: userGroup ? userGroup.id : null,
-                        expiryDate: expiryDate ? dayjs(expiryDate) : null,
-                        status,
-                        fullName,
-                        position,
-                        email,
-                        phoneNumber,
-                        address,
-                        note,
-                    });
-                })
-                .catch((error) => {
-                    console.log(error);
+        const fetchData = async () => {
+            try {
+                const response = await getUserById(id);
+                const {
+                    username,
+                    password,
+                    userGroup,
+                    expiryDate,
+                    status,
+                    fullName,
+                    position,
+                    email,
+                    phoneNumber,
+                    address,
+                    note,
+                } = response.data.data;
+
+                formik.setValues({
+                    username,
+                    password,
+                    userGroupId: userGroup ? userGroup.id : null,
+                    expiryDate: expiryDate ? dayjs(expiryDate) : null,
+                    status,
+                    fullName,
+                    position,
+                    email,
+                    phoneNumber,
+                    address,
+                    note,
                 });
+            } catch (error) {
+                messageApi.error(error.message || 'Có lỗi xảy ra khi tải thông tin người dùng.');
+            }
+        };
+
+        if (id) {
+            fetchData();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id]);
@@ -179,7 +199,7 @@ const UserManagementForm = () => {
                         autoComplete="on"
                     />
 
-                    <FormInput id="password" label="Mật khẩu" className={'col-md-6'} formik={formik} required />
+                    <FormInput id="password" label="Mật khẩu" className={'col-md-6'} formik={formik} required={!id} />
 
                     <FormSelect
                         required
@@ -197,12 +217,13 @@ const UserManagementForm = () => {
                         <label htmlFor="expiryDate">Hiệu lực đến ngày:</label>
                         <div>
                             <DatePicker
-                                className="w-100"
                                 id="expiryDate"
                                 name="expiryDate"
                                 value={formik.values.expiryDate}
                                 onChange={(date) => formik.setFieldValue('expiryDate', date)}
+                                onBlur={() => formik.setFieldTouched('expiryDate', true)}
                                 status={formik.touched.expiryDate && formik.errors.expiryDate ? 'error' : undefined}
+                                className="w-100"
                             />
                         </div>
                         <div className="text-danger">{formik.touched.expiryDate && formik.errors.expiryDate}</div>
@@ -250,4 +271,4 @@ const UserManagementForm = () => {
     );
 };
 
-export default UserManagementForm;
+export default UserForm;

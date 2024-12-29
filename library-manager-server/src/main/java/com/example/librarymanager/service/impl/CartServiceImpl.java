@@ -1,5 +1,6 @@
 package com.example.librarymanager.service.impl;
 
+import com.example.librarymanager.constant.BookCondition;
 import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.SortByDataConstant;
 import com.example.librarymanager.constant.SuccessMessage;
@@ -106,19 +107,17 @@ public class CartServiceImpl implements CartService {
         Book book = null;
 
         for (Book bookCandidate : bookDefinition.getBooks()) {
-            // Kiểm tra nếu sách có phiếu xuất (ExportReceipt), nếu có thì bỏ qua sách này
+            // Kiểm tra nếu sách có trong phiếu xuất
             if (bookCandidate.getExportReceipt() != null) {
                 continue;
             }
 
-            // Kiểm tra nếu sách có phiếu mượn chưa trả
-            List<BookBorrow> bookBorrows = bookCandidate.getBookBorrows();
-            boolean hasUnreturnedBorrow = bookBorrows.stream().anyMatch(bookBorrow -> !bookBorrow.isReturned());
-            if (hasUnreturnedBorrow) {
+            // Kiểm tra sách có rảnh không
+            if (!bookCandidate.getBookCondition().equals(BookCondition.AVAILABLE)) {
                 continue;
             }
 
-            // Kiểm tra xem sách đã được giữ chỗ (CartDetail) trong khoảng thời gian hiện tại
+            // Kiểm tra xem sách đã được giữ chỗ chưa
             List<CartDetail> cartDetails = bookCandidate.getCartDetails();
             boolean isBookReserved = cartDetails.stream().anyMatch(cartDetail -> cartDetail.getBorrowTo().isAfter(now));
             if (isBookReserved) {

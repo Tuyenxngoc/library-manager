@@ -20,8 +20,6 @@ public class UserRequestDto {
     @Pattern(regexp = CommonConstant.REGEXP_USERNAME, message = ErrorMessage.INVALID_FORMAT_USERNAME)
     private String username;
 
-    @NotBlank(message = ErrorMessage.INVALID_NOT_BLANK_FIELD)
-    @Pattern(regexp = CommonConstant.REGEXP_PASSWORD, message = ErrorMessage.INVALID_FORMAT_PASSWORD)
     @Size(max = 100, message = ErrorMessage.INVALID_TEXT_LENGTH)
     private String password;
 

@@ -15,7 +15,7 @@ import { getRoles } from '~/services/roleService';
 
 const { TextArea } = Input;
 
-function UserGroupManagement() {
+function UserGroup() {
     const [meta, setMeta] = useState(INITIAL_META);
     const [filters, setFilters] = useState(INITIAL_FILTERS);
 
@@ -369,4 +369,4 @@ function UserGroupManagement() {
     );
 }
 
-export default UserGroupManagement;
+export default UserGroup;

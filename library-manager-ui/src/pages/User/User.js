@@ -12,7 +12,13 @@ const options = [
     { value: 'fullName', label: 'Họ tên' },
 ];
 
-function UserManagement() {
+const statusMappings = {
+    ACTIVATED: 'Đã kích hoạt',
+    DEACTIVATED: 'Chưa kích hoạt',
+    SUSPENDED: 'Tạm dừng',
+};
+
+function User() {
     const navigate = useNavigate();
 
     const [meta, setMeta] = useState(INITIAL_META);
@@ -113,6 +119,7 @@ function UserManagement() {
             key: 'status',
             sorter: true,
             showSorterTooltip: false,
+            render: (status) => <span>{statusMappings[status]}</span>,
         },
         {
             title: 'Nhóm',
@@ -208,4 +215,4 @@ function UserManagement() {
     );
 }
 
-export default UserManagement;
+export default User;

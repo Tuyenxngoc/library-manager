@@ -1,9 +1,7 @@
 package com.example.librarymanager.domain.dto.response.bookdefinition;
 
 import com.example.librarymanager.domain.dto.common.BaseEntityDto;
-import com.example.librarymanager.domain.entity.Book;
 import com.example.librarymanager.domain.entity.BookAuthor;
-import com.example.librarymanager.domain.entity.BookBorrow;
 import com.example.librarymanager.domain.entity.BookDefinition;
 import lombok.Getter;
 
@@ -27,18 +25,7 @@ public class BookForReaderResponseDto {
         this.id = bookDefinition.getId();
         this.title = bookDefinition.getTitle();
         this.imageUrl = bookDefinition.getImageUrl();
-
-        int count = 0;
-        List<Book> books = bookDefinition.getBooks();
-        for (Book book : books) {
-            boolean isReturn = book.getBookBorrows()
-                    .stream()
-                    .allMatch(BookBorrow::isReturned);
-            if (isReturn) {
-                count++;
-            }
-        }
-        this.quantity = count;
+        this.quantity = 0;
 
         List<BookAuthor> au = bookDefinition.getBookAuthors();
         if (au != null) {

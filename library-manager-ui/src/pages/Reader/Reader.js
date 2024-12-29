@@ -18,7 +18,7 @@ const options = [
 
 const cardTypeMapping = {
     TEACHER: { label: 'Giảng viên', color: 'blue' },
-    STUDENT: { label: 'Học sinh', color: 'green' },
+    STUDENT: { label: 'Sinh viên', color: 'green' },
 };
 
 const cardStatusMapping = {
