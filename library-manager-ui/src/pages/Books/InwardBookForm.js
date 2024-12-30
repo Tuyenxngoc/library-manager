@@ -48,6 +48,7 @@ function InwardBookForm() {
 
     const [quantity, setQuantity] = useState(1);
     const [selectedBookDefinitionId, setSelectedBookDefinitionId] = useState(null);
+    const [selectedBookDefinitions, setSelectedBookDefinitions] = useState([]);
 
     const [messageApi, contextHolder] = message.useMessage();
 
@@ -56,10 +57,6 @@ function InwardBookForm() {
             const formattedValues = {
                 ...values,
                 importDate: values.importDate ? values.importDate.format('YYYY-MM-DD') : null,
-                bookRequestDtos: values.bookRequestDtos.map((book) => ({
-                    bookDefinitionId: book.bookDefinitionId,
-                    quantity: book.quantity,
-                })),
             };
 
             let response;
@@ -69,9 +66,7 @@ function InwardBookForm() {
                 response = await createImportReceipt(formattedValues);
             }
 
-            if (response.status === 200) {
-                messageApi.success(response.data.data.message);
-            } else if (response.status === 201) {
+            if (response.status === 200 || response.status === 201) {
                 messageApi.success(response.data.data.message);
             }
         } catch (error) {
@@ -102,6 +97,26 @@ function InwardBookForm() {
         }
     };
 
+    const fetchSelectedBookDefinitions = async (bookList) => {
+        try {
+            const bookIds = bookList.map((item) => item.bookDefinitionId);
+            const response = await getBookDefinitionsByIds(bookIds);
+            const { data: books } = response.data;
+
+            const updatedBooks = bookList.map((item) => {
+                const bookDetails = books.find((book) => book.id === item.bookDefinitionId);
+                return {
+                    ...item,
+                    ...bookDetails,
+                };
+            });
+
+            setSelectedBookDefinitions(updatedBooks);
+        } catch (error) {
+            messageApi.error(error.message || 'Có lỗi xảy ra khi tải biên mục.');
+        }
+    };
+
     const handleAddNewColum = () => {
         if (!selectedBookDefinitionId) {
             messageApi.error('Bạn phải chọn một biên mục');
@@ -118,36 +133,29 @@ function InwardBookForm() {
             return;
         }
 
-        const bookDefinitionDetail = bookDefinitions.find((book) => book.id === selectedBookDefinitionId);
-        if (!bookDefinitionDetail) {
+        const selectedBookDefinition = bookDefinitions.find((book) => book.id === selectedBookDefinitionId);
+        if (!selectedBookDefinition) {
             messageApi.error('Không tìm thấy thông tin của biên mục');
             return;
         }
 
-        const updatedBooks = [
-            ...currentBooks,
-            {
-                quantity,
-                bookDefinitionId: selectedBookDefinitionId,
-                title: bookDefinitionDetail.title,
-                authors: bookDefinitionDetail.authors,
-                price: bookDefinitionDetail.price,
-                category: bookDefinitionDetail.category,
-                publisher: bookDefinitionDetail.publisher,
-                publishingYear: bookDefinitionDetail.publishingYear,
-            },
-        ];
-
+        const updatedBooks = [...currentBooks, { quantity, bookDefinitionId: selectedBookDefinitionId }];
         formik.setFieldValue('bookRequestDtos', updatedBooks);
+
+        const updatedSelectedBookDefinitions = [...selectedBookDefinitions, { quantity, ...selectedBookDefinition }];
+        setSelectedBookDefinitions(updatedSelectedBookDefinitions);
 
         setSelectedBookDefinitionId(null);
         setQuantity(1);
     };
 
-    const handleDeleteColum = (id) => {
+    const handleDeleteColum = (selectedId) => {
         const currentBooks = formik.values.bookRequestDtos;
-        const updatedBooks = currentBooks.filter((book) => book.bookDefinitionId !== id);
+        const updatedBooks = currentBooks.filter((book) => book.bookDefinitionId !== selectedId);
         formik.setFieldValue('bookRequestDtos', updatedBooks);
+
+        const updatedSelectedBookDefinitions = selectedBookDefinitions.filter((book) => book.id !== selectedId);
+        setSelectedBookDefinitions(updatedSelectedBookDefinitions);
     };
 
     useEffect(() => {
@@ -166,6 +174,7 @@ function InwardBookForm() {
                 } catch (error) {}
                 return;
             }
+
             if (!checkIdIsNumber(id)) {
                 navigate('/admin/books/inward');
                 return;
@@ -176,37 +185,16 @@ function InwardBookForm() {
                 const { receiptNumber, importDate, generalRecordNumber, fundingSource, importReason, books } =
                     response.data.data;
 
-                const bookDefinitionIds = books.map((book) => book.bookDefinitionId);
+                formik.setValues({
+                    receiptNumber,
+                    importDate: importDate ? dayjs(importDate) : null,
+                    generalRecordNumber,
+                    fundingSource,
+                    importReason,
+                    bookRequestDtos: books,
+                });
 
-                try {
-                    const responseBooks = await getBookDefinitionsByIds(bookDefinitionIds);
-                    const bookDetails = responseBooks.data.data;
-
-                    const updatedBooks = books.map((book) => {
-                        const bookDetail = bookDetails.find((detail) => detail.id === book.bookDefinitionId);
-
-                        return {
-                            ...book,
-                            title: bookDetail.title,
-                            authors: bookDetail.authors,
-                            price: bookDetail.price,
-                            category: bookDetail.category,
-                            publisher: bookDetail.publisher,
-                            publishingYear: bookDetail.publishingYear,
-                        };
-                    });
-
-                    formik.setValues({
-                        receiptNumber,
-                        importDate: importDate ? dayjs(importDate) : null,
-                        generalRecordNumber,
-                        fundingSource,
-                        importReason,
-                        bookRequestDtos: updatedBooks,
-                    });
-                } catch (error) {
-                    messageApi.error('Không thể tải thông tin biên mục sách');
-                }
+                fetchSelectedBookDefinitions(books);
             } catch (error) {
                 messageApi.error('Không thể tải thông tin phiếu nhập');
             }
@@ -255,28 +243,9 @@ function InwardBookForm() {
             render: (publishingYear) => publishingYear || 'N/A',
         },
         {
-            title: 'Giá bìa',
-            dataIndex: 'price',
-            key: 'price',
-            render: (price) => (price !== null ? `${price.toLocaleString()} đ` : 'N/A'),
-        },
-        {
             title: 'Số bản',
             dataIndex: 'quantity',
             key: 'quantity',
-        },
-        {
-            title: 'Thành tiền',
-            key: 'totalPrice',
-            render: (record) => {
-                const price = record.price;
-                const quantity = record.quantity || 0;
-                if (price === null) {
-                    return 'Không xác định';
-                }
-                const total = price * quantity;
-                return total.toLocaleString() + ' đ';
-            },
         },
         {
             title: '',
@@ -412,7 +381,7 @@ function InwardBookForm() {
                             rowKey="bookDefinitionId"
                             scroll={{ x: 'max-content' }}
                             columns={columns}
-                            dataSource={formik.values.bookRequestDtos}
+                            dataSource={selectedBookDefinitions}
                             pagination={false}
                         />
                         <div className="text-danger">

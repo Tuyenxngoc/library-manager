@@ -164,7 +164,7 @@ function BookListByCode() {
         {
             title: 'Nhan đề',
             dataIndex: 'bookDefinition',
-            key: 'bookDefinition',
+            key: 'title',
             sorter: true,
             showSorterTooltip: false,
             render: (text) => <span>{text.title}</span>,
@@ -172,7 +172,7 @@ function BookListByCode() {
         {
             title: 'KHPL',
             dataIndex: 'bookDefinition',
-            key: 'bookDefinition',
+            key: 'classificationSymbol',
             sorter: true,
             showSorterTooltip: false,
             render: (text) => <span>{text.classificationSymbol ? text.classificationSymbol.name : ''}</span>,
@@ -180,7 +180,7 @@ function BookListByCode() {
         {
             title: 'Tác giả',
             dataIndex: 'bookDefinition',
-            key: 'bookDefinition',
+            key: 'authors',
             sorter: true,
             showSorterTooltip: false,
             render: (text) => (
@@ -197,7 +197,7 @@ function BookListByCode() {
         {
             title: 'Nhà xuất bản',
             dataIndex: 'bookDefinition',
-            key: 'bookDefinition',
+            key: 'publisher',
             sorter: true,
             showSorterTooltip: false,
             render: (text) => <span>{text.publisher ? text.publisher.name : 'Không có'}</span>,
@@ -205,7 +205,7 @@ function BookListByCode() {
         {
             title: 'Năm xuất bản',
             dataIndex: 'bookDefinition',
-            key: 'bookDefinition',
+            key: 'publishingYear',
             sorter: true,
             showSorterTooltip: false,
             render: (text) => text.publishingYear,

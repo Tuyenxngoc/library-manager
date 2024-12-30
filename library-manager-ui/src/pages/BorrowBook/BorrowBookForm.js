@@ -149,7 +149,7 @@ function BorrowBookForm() {
 
         const selectedBook = books.find((book) => book.bookCode === selectedBookCode);
         if (!selectedBook) {
-            messageApi.error('Sách không tồn tại');
+            messageApi.error('Không tìm thấy thông tin của cuốn sách');
             return;
         }
 
@@ -163,7 +163,8 @@ function BorrowBookForm() {
     };
 
     const handleDeleteColum = (selectedBookCode) => {
-        const updatedBooks = formik.values.books.filter((bookCode) => bookCode !== selectedBookCode);
+        const currentBooks = formik.values.books;
+        const updatedBooks = currentBooks.filter((bookCode) => bookCode !== selectedBookCode);
         formik.setFieldValue('books', updatedBooks);
 
         const updatedSelectedBooks = selectedBooks.filter((book) => book.bookCode !== selectedBookCode);
@@ -385,10 +386,10 @@ function BorrowBookForm() {
                     <div className="col-md-12">
                         <Table
                             bordered
-                            columns={columns}
-                            dataSource={selectedBooks}
                             rowKey="bookCode"
                             scroll={{ x: 'max-content' }}
+                            columns={columns}
+                            dataSource={selectedBooks}
                             pagination={false}
                         />
                         <div className="text-danger">{formik.touched.books && formik.errors.books}</div>
