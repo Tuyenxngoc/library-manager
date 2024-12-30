@@ -61,7 +61,13 @@ function ReturnRenewBook() {
     const handleReturnBook = async (bookId) => {
         try {
             setIsLoading(true);
-            const response = await returnBooks([bookId]);
+            const selectedBook = entityData.find((book) => bookId === book.id);
+            const requestPayload = {
+                bookBorrowId: selectedBook.id,
+                bookStatus: selectedBook.bookStatus,
+            };
+
+            const response = await returnBooks([requestPayload]);
             if (response.status === 200) {
                 messageApi.success('Trả sách thành công!');
                 handleChangePage(1);
@@ -89,14 +95,21 @@ function ReturnRenewBook() {
     };
 
     const handleBulkReturnBooks = async () => {
+        if (selectedRowKeys.length === 0) {
+            messageApi.warning('Vui lòng chọn ít nhất một sách để trả.');
+            return;
+        }
+
         try {
             setIsLoading(true);
-            if (selectedRowKeys.length === 0) {
-                messageApi.warning('Vui lòng chọn ít nhất một sách để trả.');
-                return;
-            }
 
-            const response = await returnBooks(selectedRowKeys);
+            const selectedBooks = entityData.filter((book) => selectedRowKeys.includes(book.id));
+            const requestPayload = selectedBooks.map((book) => ({
+                bookBorrowId: book.id,
+                bookStatus: book.bookStatus,
+            }));
+
+            const response = await returnBooks(requestPayload);
             if (response.status === 200) {
                 messageApi.success('Trả sách hàng loạt thành công!');
                 setSelectedRowKeys([]);
@@ -111,12 +124,13 @@ function ReturnRenewBook() {
     };
 
     const handleBulkReportLostBooks = async () => {
+        if (selectedRowKeys.length === 0) {
+            messageApi.warning('Vui lòng chọn ít nhất một sách để báo mất.');
+            return;
+        }
+
         try {
             setIsLoading(true);
-            if (selectedRowKeys.length === 0) {
-                messageApi.warning('Vui lòng chọn ít nhất một sách để báo mất.');
-                return;
-            }
 
             const response = await reportLostBooks(selectedRowKeys);
             if (response.status === 200) {
@@ -130,6 +144,11 @@ function ReturnRenewBook() {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleStatusChange = (newStatus, bookId) => {
+        const updatedData = entityData.map((item) => (item.id === bookId ? { ...item, bookStatus: newStatus } : item));
+        setEntityData(updatedData);
     };
 
     useEffect(() => {
@@ -189,6 +208,25 @@ function ReturnRenewBook() {
             key: 'dueDate',
         },
         {
+            title: 'Trạng thái',
+            dataIndex: 'bookStatus',
+            key: 'bookStatus',
+            render: (status, record) => (
+                <Select
+                    size="small"
+                    value={status}
+                    onChange={(value) => handleStatusChange(value, record.id)}
+                    options={[
+                        { value: 'USABLE', label: 'Sử dụng được' },
+                        { value: 'DAMAGED', label: 'Rách nát' },
+                        { value: 'OUTDATED', label: 'Lạc hậu' },
+                        { value: 'INFESTED', label: 'Mối mọt' },
+                        { value: 'OBSOLETE_PROGRAM', label: 'Chương trình cũ' },
+                    ]}
+                />
+            ),
+        },
+        {
             title: 'Thao tác',
             key: 'action',
             render: (text, record) => (
@@ -234,7 +272,13 @@ function ReturnRenewBook() {
                 onOk={() => handleBulkReturnBooks()}
                 onCancel={() => setIsReturnModalOpen(false)}
             >
-                <span> {selectedRowKeys.length} sách sẽ được trả về thư viện?</span>
+                <p>Các sách sau sẽ được trả về thư viện:</p>
+                <ul>
+                    {selectedRowKeys.map((key) => {
+                        const book = entityData.find((item) => item.id === key);
+                        return <li key={key}>{book?.bookCode || 'Không rõ'}</li>;
+                    })}
+                </ul>
             </Modal>
 
             <Modal
@@ -246,7 +290,13 @@ function ReturnRenewBook() {
                 onOk={() => handleBulkReportLostBooks()}
                 onCancel={() => setIsLostModalOpen(false)}
             >
-                <span> {selectedRowKeys.length} sách sẽ được báo mất?</span>
+                <p>Các sách sau sẽ được báo mất:</p>
+                <ul>
+                    {selectedRowKeys.map((key) => {
+                        const book = entityData.find((item) => item.id === key);
+                        return <li key={key}>{book?.bookCode || 'Không rõ'}</li>;
+                    })}
+                </ul>
             </Modal>
 
             <h2>Trả sách</h2>

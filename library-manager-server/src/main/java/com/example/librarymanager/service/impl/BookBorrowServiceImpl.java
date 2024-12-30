@@ -6,6 +6,7 @@ import com.example.librarymanager.domain.dto.filter.TimeFilter;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
+import com.example.librarymanager.domain.dto.request.BookReturnRequestDto;
 import com.example.librarymanager.domain.dto.response.bookborrow.BookBorrowResponseDto;
 import com.example.librarymanager.domain.entity.Book;
 import com.example.librarymanager.domain.entity.BookBorrow;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -80,23 +82,31 @@ public class BookBorrowServiceImpl implements BookBorrowService {
     }
 
     @Override
-    public CommonResponseDto returnBooksByIds(Set<Long> ids, String userId) {
+    public CommonResponseDto returnBooksByIds(List<BookReturnRequestDto> requestDtos, String userId) {
         //Lấy ra danh sách sách dựa vào id
-        Set<BookBorrow> bookBorrows = ids.stream()
-                .map(id -> {
-                    BookBorrow bookBorrow = getEntity(id);
-                    if (BookBorrowStatus.RETURNED.equals(bookBorrow.getStatus())) {
-                        throw new ConflictException(ErrorMessage.BookBorrow.ERR_ALREADY_MARKED_AS_RETURNED, id);
-                    }
-                    return bookBorrow;
-                })
-                .collect(Collectors.toSet());
+        Map<BookBorrow, BookStatus> bookBorrowsWithStatus = requestDtos.stream()
+                .collect(Collectors.toMap(
+                        requestDto -> {
+                            BookBorrow bookBorrow = getEntity(requestDto.getBookBorrowId());
+                            if (BookBorrowStatus.RETURNED.equals(bookBorrow.getStatus())) {
+                                throw new ConflictException(
+                                        ErrorMessage.BookBorrow.ERR_ALREADY_MARKED_AS_RETURNED,
+                                        requestDto
+                                );
+                            }
+                            return bookBorrow;
+                        },
+                        BookReturnRequestDto::getBookStatus
+                ));
 
         //Cập nhật trạng thái sách
-        bookBorrows.forEach(bookBorrow -> {
+        bookBorrowsWithStatus.forEach((bookBorrow, newStatus) -> {
             //Đánh dấu sách đang rảnh
             Book book = bookBorrow.getBook();
             book.setBookCondition(BookCondition.AVAILABLE);
+            if (newStatus != null) {
+                book.setBookStatus(newStatus);
+            }
 
             //Đánh dấu sách đã trả
             bookBorrow.setReturnDate(LocalDate.now());
@@ -110,7 +120,11 @@ public class BookBorrowServiceImpl implements BookBorrowService {
             bookBorrowRepository.save(bookBorrow);
             borrowReceiptRepository.save(borrowReceipt);
 
-            logService.createLog(TAG, EventConstants.EDIT, "Trả sách về thư viện mã: " + bookBorrow.getBook().getBookCode(), userId);
+            if (newStatus != null) {
+                logService.createLog(TAG, EventConstants.EDIT, "Trả sách về thư viện mã: " + bookBorrow.getBook().getBookCode() + ", trạng thái: " + newStatus.getName(), userId);
+            } else {
+                logService.createLog(TAG, EventConstants.EDIT, "Trả sách về thư viện mã: " + bookBorrow.getBook().getBookCode(), userId);
+            }
         });
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());

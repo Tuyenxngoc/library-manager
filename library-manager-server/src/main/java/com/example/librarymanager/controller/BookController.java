@@ -1,10 +1,13 @@
 package com.example.librarymanager.controller;
 
+import com.example.librarymanager.annotation.CurrentUser;
 import com.example.librarymanager.annotation.RestApiV1;
 import com.example.librarymanager.base.VsResponseUtil;
 import com.example.librarymanager.constant.BookCondition;
+import com.example.librarymanager.constant.BookStatus;
 import com.example.librarymanager.constant.UrlConstant;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
+import com.example.librarymanager.security.CustomUserDetails;
 import com.example.librarymanager.service.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,6 +30,17 @@ import java.util.Set;
 public class BookController {
 
     BookService bookService;
+
+    @Operation(summary = "API Update Book Status")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BOOK')")
+    @PatchMapping(UrlConstant.Book.UPDATE_STATUS)
+    public ResponseEntity<?> updateBookStatus(
+            @PathVariable Long id,
+            @RequestParam BookStatus status,
+            @CurrentUser CustomUserDetails userDetails
+    ) {
+        return VsResponseUtil.success(bookService.updateStatus(id, status, userDetails.getUserId()));
+    }
 
     @Operation(summary = "API Get All Books")
     @PreAuthorize("hasAnyRole('ROLE_MANAGE_BOOK', 'ROLE_MANAGE_EXPORT_RECEIPT')")

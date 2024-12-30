@@ -53,8 +53,8 @@ public class ReaderResponseDto {
         this.expiryDate = reader.getExpiryDate();
         this.status = reader.getStatus();
 
-        // Tính số sách đang mượn (số lượng BorrowReceipts chưa được trả)
-        this.currentBorrowedBooks = 0;
+        // Tính số phiếu mượn
+        this.currentBorrowedBooks = reader.getBorrowReceipts().size();
 
         // Tính số lượt vào thư viện
         this.libraryVisitCount = reader.getLibraryVisits().size();

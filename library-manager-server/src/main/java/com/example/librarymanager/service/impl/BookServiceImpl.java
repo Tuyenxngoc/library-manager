@@ -1,8 +1,7 @@
 package com.example.librarymanager.service.impl;
 
-import com.example.librarymanager.constant.BookCondition;
-import com.example.librarymanager.constant.ErrorMessage;
-import com.example.librarymanager.constant.SortByDataConstant;
+import com.example.librarymanager.constant.*;
+import com.example.librarymanager.domain.dto.common.CommonResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
 import com.example.librarymanager.domain.dto.pagination.PagingMeta;
@@ -12,9 +11,12 @@ import com.example.librarymanager.domain.specification.EntitySpecification;
 import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.BookRepository;
 import com.example.librarymanager.service.BookService;
+import com.example.librarymanager.service.LogService;
 import com.example.librarymanager.service.PdfService;
 import com.example.librarymanager.util.PaginationUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,12 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
 
+    private static final String TAG = "Quản lý sách";
+
+    private final LogService logService;
+
+    private final MessageSource messageSource;
+
     private final BookRepository bookRepository;
 
     private final PdfService pdfService;
@@ -33,6 +41,18 @@ public class BookServiceImpl implements BookService {
     private Book getEntity(long id) {
         return bookRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.Book.ERR_NOT_FOUND_ID, id));
+    }
+
+    @Override
+    public CommonResponseDto updateStatus(Long id, BookStatus status, String userId) {
+        Book book = getEntity(id);
+        book.setBookStatus(status);
+        bookRepository.save(book);
+
+        logService.createLog(TAG, EventConstants.EDIT, "Cập nhật trạng thái sách mã: " + book.getBookCode(), userId);
+
+        String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
+        return new CommonResponseDto(message, new BookResponseDto(book));
     }
 
     @Override

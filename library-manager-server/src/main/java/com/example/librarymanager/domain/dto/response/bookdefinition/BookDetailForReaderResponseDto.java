@@ -1,5 +1,6 @@
 package com.example.librarymanager.domain.dto.response.bookdefinition;
 
+import com.example.librarymanager.constant.BookCondition;
 import com.example.librarymanager.domain.dto.common.BaseEntityDto;
 import com.example.librarymanager.domain.entity.*;
 import lombok.AllArgsConstructor;
@@ -20,7 +21,7 @@ public class BookDetailForReaderResponseDto {
 
     private final Integer pageCount;
 
-    private final int bookCount;
+    private final long bookCount;
 
     private final String bookSize;
 
@@ -72,6 +73,8 @@ public class BookDetailForReaderResponseDto {
         BookSet b = bookDefinition.getBookSet();
         this.bookSet = b != null ? new BaseEntityDto(b.getId(), b.getName()) : null;
 
-        this.bookCount = 0;
+        this.bookCount = bookDefinition.getBooks().stream()
+                .filter(bd -> bd.getBookCondition() == BookCondition.AVAILABLE)
+                .count();
     }
 }

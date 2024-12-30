@@ -147,6 +147,7 @@ public enum SortByDataConstant implements SortByInterface {
             return switch (sortBy) {
                 case "bookCode" -> "bookCode";
                 case "bookCondition" -> "bookCondition";
+                case "bookStatus" -> "bookStatus";
                 default -> "id";
             };
         }

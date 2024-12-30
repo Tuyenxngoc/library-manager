@@ -1,5 +1,6 @@
 package com.example.librarymanager.domain.dto.response.bookdefinition;
 
+import com.example.librarymanager.constant.BookCondition;
 import com.example.librarymanager.domain.dto.common.BaseEntityDto;
 import com.example.librarymanager.domain.entity.BookAuthor;
 import com.example.librarymanager.domain.entity.BookDefinition;
@@ -17,7 +18,7 @@ public class BookForReaderResponseDto {
 
     private final String imageUrl;
 
-    private final int quantity;
+    private final long quantity;
 
     private final List<BaseEntityDto> authors = new ArrayList<>();
 
@@ -25,7 +26,9 @@ public class BookForReaderResponseDto {
         this.id = bookDefinition.getId();
         this.title = bookDefinition.getTitle();
         this.imageUrl = bookDefinition.getImageUrl();
-        this.quantity = 0;
+        this.quantity = bookDefinition.getBooks().stream()
+                .filter(bd -> bd.getBookCondition() == BookCondition.AVAILABLE)
+                .count();
 
         List<BookAuthor> au = bookDefinition.getBookAuthors();
         if (au != null) {

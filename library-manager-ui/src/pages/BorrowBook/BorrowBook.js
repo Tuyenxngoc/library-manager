@@ -418,11 +418,9 @@ function BorrowBook() {
             <h2>Mượn sách</h2>
 
             <Flex wrap justify="space-between" align="center">
-                <Space>
-                    <Link to="/admin/circulation/borrow">Tất cả</Link>
-                    <Link to="?type=1">Chưa trả</Link>
-                    <Link to="?type=2">Đã trả</Link>
-                    <Link to="?type=3">Chưa trả đủ</Link>
+                <Space align="center">
+                    <Link to="/admin/circulation/borrow">Tất cả</Link>|<Link to="?type=1">Chưa trả</Link>|
+                    <Link to="?type=2">Đã trả</Link>|<Link to="?type=3">Chưa trả đủ</Link>|
                     <Link to="?type=4">Quá hạn</Link>
                 </Space>
                 <Space>

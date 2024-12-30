@@ -300,7 +300,7 @@ function Reader() {
             title: 'Thống kê',
             children: [
                 {
-                    title: 'Sách mượn',
+                    title: 'Phiếu mượn',
                     dataIndex: 'currentBorrowedBooks',
                     key: 'currentBorrowedBooks',
                 },

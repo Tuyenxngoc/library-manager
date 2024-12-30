@@ -197,6 +197,7 @@ public class UrlConstant {
         public static final String GET_BY_IDS = PRE_FIX + "/by-ids";
         public static final String GET_BY_ID = PRE_FIX + "/{id}";
         public static final String UPDATE = PRE_FIX + "/{id}";
+        public static final String UPDATE_STATUS = PRE_FIX + "/{id}/status";
         public static final String DELETE = PRE_FIX + "/{id}";
 
         public static final String BOOK_PDF = PRE_FIX + "/pdf";

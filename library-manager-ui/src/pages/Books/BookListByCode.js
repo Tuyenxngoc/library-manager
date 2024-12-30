@@ -11,6 +11,7 @@ import {
     getBookListPdf,
     getBookPdf,
 } from '~/services/bookService';
+
 const options = [
     { value: 'bookCode', label: 'Số ĐKCB' },
     { value: 'title', label: 'Nhan đề' },
@@ -19,6 +20,15 @@ const options = [
 const bookConditionMapping = {
     AVAILABLE: 'Sách có sẵn',
     ON_LOAN: 'Sách đang mượn',
+    LOST: 'Sách bị mất',
+};
+
+const bookStatusMapping = {
+    USABLE: 'Sử dụng được',
+    DAMAGED: 'Rách nát',
+    OUTDATED: 'Lạc hậu',
+    INFESTED: 'Mối mọt',
+    OBSOLETE_PROGRAM: 'Chương trình cũ',
 };
 
 function BookListByCode() {
@@ -211,7 +221,15 @@ function BookListByCode() {
             render: (text) => text.publishingYear,
         },
         {
-            title: 'Tình trạng',
+            title: 'Trạng thái sách',
+            dataIndex: 'bookStatus',
+            key: 'bookStatus',
+            sorter: true,
+            showSorterTooltip: false,
+            render: (text) => bookStatusMapping[text] || '',
+        },
+        {
+            title: 'Tình trạng sách',
             dataIndex: 'bookCondition',
             key: 'bookCondition',
             sorter: true,

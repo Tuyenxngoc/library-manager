@@ -8,11 +8,14 @@ import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.UrlConstant;
 import com.example.librarymanager.domain.dto.filter.TimeFilter;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
+import com.example.librarymanager.domain.dto.request.BookReturnRequestDto;
 import com.example.librarymanager.security.CustomUserDetails;
 import com.example.librarymanager.service.BookBorrowService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -39,20 +42,22 @@ public class BookBorrowController {
     @PreAuthorize("hasRole('ROLE_MANAGE_BORROW_RECEIPT')")
     @PutMapping(UrlConstant.BookBorrow.RETURN_BOOKS)
     public ResponseEntity<?> returnBooks(
-            @RequestBody
+            @Valid @RequestBody
             @NotNull(message = ErrorMessage.INVALID_ARRAY_IS_REQUIRED)
-            Set<@NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED) Long> ids,
+            @Size(min = 1, message = ErrorMessage.INVALID_ARRAY_LENGTH)
+            List<BookReturnRequestDto> requestDtos,
             @CurrentUser CustomUserDetails userDetails
     ) {
-        return VsResponseUtil.success(bookBorrowService.returnBooksByIds(ids, userDetails.getUserId()));
+        return VsResponseUtil.success(bookBorrowService.returnBooksByIds(requestDtos, userDetails.getUserId()));
     }
 
     @Operation(summary = "API Report Lost Books by List of IDs")
     @PreAuthorize("hasRole('ROLE_MANAGE_BORROW_RECEIPT')")
     @PutMapping(UrlConstant.BookBorrow.REPORT_LOST)
     public ResponseEntity<?> reportLostBooks(
-            @RequestBody
+            @Valid @RequestBody
             @NotNull(message = ErrorMessage.INVALID_ARRAY_IS_REQUIRED)
+            @Size(min = 1, message = ErrorMessage.INVALID_ARRAY_LENGTH)
             Set<@NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED) Long> ids,
             @CurrentUser CustomUserDetails userDetails
     ) {

@@ -5,6 +5,7 @@ import com.example.librarymanager.domain.dto.common.CommonResponseDto;
 import com.example.librarymanager.domain.dto.filter.TimeFilter;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.pagination.PaginationResponseDto;
+import com.example.librarymanager.domain.dto.request.BookReturnRequestDto;
 import com.example.librarymanager.domain.dto.response.bookborrow.BookBorrowResponseDto;
 
 import java.util.List;
@@ -14,7 +15,7 @@ public interface BookBorrowService {
 
     PaginationResponseDto<BookBorrowResponseDto> findAll(PaginationFullRequestDto requestDto, TimeFilter timeFilter, List<BookBorrowStatus> status);
 
-    CommonResponseDto returnBooksByIds(Set<Long> ids, String userId);
+    CommonResponseDto returnBooksByIds(List<BookReturnRequestDto> requestDtos, String userId);
 
     CommonResponseDto reportLostBooksByIds(Set<Long> ids, String userId);
 

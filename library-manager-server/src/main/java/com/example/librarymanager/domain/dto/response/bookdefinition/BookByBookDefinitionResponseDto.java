@@ -1,10 +1,7 @@
 package com.example.librarymanager.domain.dto.response.bookdefinition;
 
 import com.example.librarymanager.domain.dto.common.BaseEntityDto;
-import com.example.librarymanager.domain.entity.BookAuthor;
-import com.example.librarymanager.domain.entity.BookDefinition;
-import com.example.librarymanager.domain.entity.ClassificationSymbol;
-import com.example.librarymanager.domain.entity.Publisher;
+import com.example.librarymanager.domain.entity.*;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -22,11 +19,11 @@ public class BookByBookDefinitionResponseDto {
 
     private final long totalBooks; // Tổng số sách
 
-    private final long availableBooks; // Số sách đang trong thư viện
+    private long availableBooks; // Số sách đang trong thư viện
 
-    private final long borrowedBooks; // Số sách đang mượn
+    private long borrowedBooks; // Số sách đang mượn
 
-    private final long lostBooks; // Số sách đã mất
+    private long lostBooks; // Số sách đã mất
 
     private final BaseEntityDto classificationSymbol;
 
@@ -39,10 +36,23 @@ public class BookByBookDefinitionResponseDto {
         this.title = bookDefinition.getTitle();
         this.bookCode = bookDefinition.getBookCode();
         this.publishingYear = bookDefinition.getPublishingYear();
-        this.totalBooks = 0;
+        this.totalBooks = bookDefinition.getBooks().size();
         this.availableBooks = 0;
         this.borrowedBooks = 0;
         this.lostBooks = 0;
+        for (Book book : bookDefinition.getBooks()) {
+            switch (book.getBookCondition()) {
+                case AVAILABLE:
+                    this.availableBooks++;
+                    break;
+                case ON_LOAN:
+                    this.borrowedBooks++;
+                    break;
+                case LOST:
+                    this.lostBooks++;
+                    break;
+            }
+        }
 
         // Set authors
         List<BookAuthor> au = bookDefinition.getBookAuthors();
