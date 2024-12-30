@@ -62,6 +62,11 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    public List<BookResponseDto> findByCodes(Set<String> codes) {
+        return bookRepository.findBooksByCodes(codes);
+    }
+
+    @Override
     public BookResponseDto findById(Long id) {
         return new BookResponseDto(getEntity(id));
     }

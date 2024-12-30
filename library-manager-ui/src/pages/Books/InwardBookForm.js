@@ -113,7 +113,6 @@ function InwardBookForm() {
         }
 
         const currentBooks = formik.values.bookRequestDtos;
-
         if (currentBooks.some((book) => book.bookDefinitionId === selectedBookDefinitionId)) {
             messageApi.error('Biên mục đã tồn tại trong danh sách');
             return;

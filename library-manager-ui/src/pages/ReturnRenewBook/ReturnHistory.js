@@ -186,20 +186,20 @@ function ReturnHistory() {
             showSorterTooltip: false,
             render: (status) => bookBorrowReceiptMapping[status],
         },
-        {
-            title: '',
-            key: 'action',
-            render: (_, record) => (
-                <Space>
-                    <Button type="link" onClick={() => handleCancelReturn(record.id)}>
-                        Hủy trả
-                    </Button>
-                    <Button type="link" onClick={() => handleDelete(record.id)} danger>
-                        Xóa
-                    </Button>
-                </Space>
-            ),
-        },
+        // {
+        //     title: '',
+        //     key: 'action',
+        //     render: (_, record) => (
+        //         <Space>
+        //             <Button type="link" onClick={() => handleCancelReturn(record.id)}>
+        //                 Hủy trả
+        //             </Button>
+        //             <Button type="link" onClick={() => handleDelete(record.id)} danger>
+        //                 Xóa
+        //             </Button>
+        //         </Space>
+        //     ),
+        // },
     ];
 
     const rowSelection = {

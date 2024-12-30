@@ -12,7 +12,7 @@ const options = [
 
 function ReturnRenewBook() {
     const [meta, setMeta] = useState(INITIAL_META);
-    const [filters, setFilters] = useState({ ...INITIAL_FILTERS, status: ['NOT_RETURNED', 'OVERDUE'] });
+    const [filters, setFilters] = useState({ ...INITIAL_FILTERS, status: ['NOT_RETURNED'] });
 
     const [entityData, setEntityData] = useState(null);
 

@@ -13,6 +13,8 @@ public interface BookService {
 
     List<BookResponseDto> findByIds(Set<Long> ids);
 
+    List<BookResponseDto> findByCodes(Set<String> codes);
+
     BookResponseDto findById(Long id);
 
     byte[] getBooksPdfContent(Set<Long> ids);

@@ -5,6 +5,7 @@ import com.example.librarymanager.domain.entity.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -22,5 +23,10 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
     @Query("SELECT new com.example.librarymanager.domain.dto.response.book.BookResponseDto(b) " +
             "FROM Book b " +
             "WHERE b.id IN :ids")
-    List<BookResponseDto> findBooksByIds(Set<Long> ids);
+    List<BookResponseDto> findBooksByIds(@Param("ids") Set<Long> ids);
+
+    @Query("SELECT new com.example.librarymanager.domain.dto.response.book.BookResponseDto(b) " +
+            "FROM Book b " +
+            "WHERE b.bookCode IN :codes")
+    List<BookResponseDto> findBooksByCodes(@Param("codes") Set<String> codes);
 }

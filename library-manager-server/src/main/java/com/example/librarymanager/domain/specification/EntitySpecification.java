@@ -3,6 +3,7 @@ package com.example.librarymanager.domain.specification;
 import com.example.librarymanager.constant.*;
 import com.example.librarymanager.domain.dto.filter.LibraryVisitFilter;
 import com.example.librarymanager.domain.dto.filter.LogFilter;
+import com.example.librarymanager.domain.dto.filter.TimeFilter;
 import com.example.librarymanager.domain.entity.*;
 import com.example.librarymanager.util.SpecificationsUtil;
 import jakarta.persistence.criteria.Join;
@@ -563,6 +564,27 @@ public class EntitySpecification {
 
             if (status != null && !status.isEmpty()) {
                 predicate = builder.and(predicate, root.get(BookBorrow_.status).in(status));
+            }
+
+            return predicate;
+        };
+    }
+
+    public static Specification<BookBorrow> filterBookBorrows(TimeFilter timeFilter) {
+        return (root, query, builder) -> {
+            query.distinct(true);
+            Predicate predicate = builder.conjunction();
+
+            if (timeFilter != null) {
+                if (timeFilter.getStartDate() != null) {
+                    predicate = builder.and(predicate,
+                            builder.greaterThanOrEqualTo(root.get(BookBorrow_.returnDate), timeFilter.getStartDate()));
+                }
+
+                if (timeFilter.getEndDate() != null) {
+                    predicate = builder.and(predicate,
+                            builder.lessThanOrEqualTo(root.get(BookBorrow_.returnDate), timeFilter.getEndDate()));
+                }
             }
 
             return predicate;

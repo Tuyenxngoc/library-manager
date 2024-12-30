@@ -16,6 +16,10 @@ export const getBooksByIds = (values) => {
     return axiosPrivate.post('books/by-ids', values);
 };
 
+export const getBooksByCodes = (values) => {
+    return axiosPrivate.post('books/by-codes', values);
+};
+
 export const getBookPdf = (values) => {
     return axiosPrivate.post('books/pdf', values, {
         responseType: 'arraybuffer',

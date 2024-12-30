@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Drawer, Dropdown, Flex, Input, message, Popconfirm, Select, Space, Table, Tag } from 'antd';
 import { MdOutlineModeEdit } from 'react-icons/md';
 import { FaRegTrashAlt, FaPrint } from 'react-icons/fa';
@@ -415,8 +415,16 @@ function BorrowBook() {
                 )}
             </Drawer>
 
+            <h2>Mượn sách</h2>
+
             <Flex wrap justify="space-between" align="center">
-                <h2>Mượn sách</h2>
+                <Space>
+                    <Link to="/admin/circulation/borrow">Tất cả</Link>
+                    <Link to="?type=1">Chưa trả</Link>
+                    <Link to="?type=2">Đã trả</Link>
+                    <Link to="?type=3">Chưa trả đủ</Link>
+                    <Link to="?type=4">Quá hạn</Link>
+                </Space>
                 <Space>
                     <Space.Compact className="my-2">
                         <Select

@@ -45,6 +45,13 @@ public class BookController {
         return VsResponseUtil.success(bookService.findByIds(ids));
     }
 
+    @Operation(summary = "API Get Book By List of Codes")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGE_BOOK', 'ROLE_MANAGE_BORROW_RECEIPT')")
+    @PostMapping(UrlConstant.Book.GET_BY_CODES)
+    public ResponseEntity<?> getBooksByCodes(@RequestBody Set<String> codes) {
+        return VsResponseUtil.success(bookService.findByCodes(codes));
+    }
+
     @Operation(summary = "API Get Book By Id")
     @PreAuthorize("hasRole('ROLE_MANAGE_BOOK')")
     @GetMapping(UrlConstant.Book.GET_BY_ID)

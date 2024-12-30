@@ -2,10 +2,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { Button, DatePicker, Divider, message, Select, Space, Table } from 'antd';
+import { Button, DatePicker, message, Select, Space, Table } from 'antd';
 import { FaPlusCircle } from 'react-icons/fa';
 import { FaRegTrashAlt } from 'react-icons/fa';
-import { FaPlus } from 'react-icons/fa6';
 import queryString from 'query-string';
 import dayjs from 'dayjs';
 import FormInput from '~/components/FormInput';
@@ -104,8 +103,7 @@ function OutwardBookForm() {
         }
 
         const currentBooks = formik.values.bookIds;
-
-        if (currentBooks.includes(selectedBookId)) {
+        if (currentBooks.some((book) => book.bookId === selectedBookId)) {
             messageApi.error('Cuốn sách đã tồn tại trong danh sách');
             return;
         }
@@ -131,7 +129,6 @@ function OutwardBookForm() {
         ];
 
         formik.setFieldValue('bookIds', updatedBooks);
-
         setSelectedBookId(null);
     };
 
@@ -290,22 +287,6 @@ function OutwardBookForm() {
                             loading={isBooksLoading}
                             value={selectedBookId}
                             onChange={(value) => setSelectedBookId(value)}
-                            dropdownRender={(menu) => (
-                                <>
-                                    {menu}
-                                    <Divider className="my-2" />
-                                    <Space className="py-2 px-1 pt-0">
-                                        <a
-                                            className="d-flex align-items-center"
-                                            href="/admin/book-definitions/new"
-                                            target="_blank"
-                                        >
-                                            <FaPlus />
-                                            Thêm mới
-                                        </a>
-                                    </Space>
-                                </>
-                            )}
                         />
                     </div>
 

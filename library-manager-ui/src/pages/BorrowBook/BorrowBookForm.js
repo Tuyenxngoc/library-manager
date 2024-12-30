@@ -1,17 +1,16 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { Button, DatePicker, Divider, message, Select, Space, Table } from 'antd';
+import { Button, DatePicker, message, Select, Space, Table } from 'antd';
 import { FaPlusCircle } from 'react-icons/fa';
 import { FaRegTrashAlt } from 'react-icons/fa';
-import { FaPlus } from 'react-icons/fa6';
 import queryString from 'query-string';
 import dayjs from 'dayjs';
 import FormInput from '~/components/FormInput';
 import FormTextArea from '~/components/FormTextArea';
 import { handleError } from '~/utils/errorHandler';
-import { getBooks } from '~/services/bookService';
+import { getBooks, getBooksByCodes } from '~/services/bookService';
 import {
     createBorrowReceipt,
     generateReceiptNumber,
@@ -45,22 +44,15 @@ const validationSchema = yup.object({
 
     note: yup.string(),
 
-    readerId: yup.number('ID bạn đọc phải là số hợp lệ').required('ID bạn đọc là bắt buộc'),
+    readerId: yup.number().required('ID bạn đọc là bắt buộc'),
 
     books: yup.array().min(1, 'Bạn phải chọn ít nhất một cuốn sách'),
 });
 
 function BorrowBookForm() {
     const { id } = useParams();
-    const location = useLocation();
     const navigate = useNavigate();
-
-    // Hàm để lấy giá trị tham số cartId từ URL
-    const getQueryParams = () => {
-        const queryParams = new URLSearchParams(location.search);
-        return queryParams.get('cartId');
-    };
-    const cartId = getQueryParams();
+    const [searchParams] = useSearchParams();
 
     const [books, setBooks] = useState([]);
     const [isBooksLoading, setIsBooksLoading] = useState(true);
@@ -69,6 +61,7 @@ function BorrowBookForm() {
     const [isReadersLoading, setIsReadersLoading] = useState(true);
 
     const [selectedBookCode, setSelectedBookCode] = useState(null);
+    const [selectedBooks, setSelectedBooks] = useState([]);
 
     const [messageApi, contextHolder] = message.useMessage();
 
@@ -78,7 +71,6 @@ function BorrowBookForm() {
                 ...values,
                 borrowDate: values.borrowDate ? values.borrowDate.format('YYYY-MM-DD') : null,
                 dueDate: values.dueDate ? values.dueDate.format('YYYY-MM-DD') : null,
-                books: values.books.map((book) => book.bookCode),
             };
 
             let response;
@@ -133,6 +125,16 @@ function BorrowBookForm() {
         }
     };
 
+    const fetchSelectedBooks = async (codes) => {
+        try {
+            const response = await getBooksByCodes(codes);
+            const { data } = response.data;
+            setSelectedBooks(data);
+        } catch (error) {
+            messageApi.error(error.message || 'Có lỗi xảy ra khi tải sách.');
+        }
+    };
+
     const handleAddNewColum = () => {
         if (!selectedBookCode) {
             messageApi.error('Bạn phải chọn một cuốn sách');
@@ -140,19 +142,32 @@ function BorrowBookForm() {
         }
 
         const currentBooks = formik.values.books;
-        if (currentBooks.some((bookCode) => bookCode === selectedBookCode)) {
+        if (currentBooks.includes(selectedBookCode)) {
             messageApi.error('Cuốn sách đã tồn tại trong danh sách');
             return;
         }
 
-        const updatedBooks = [...currentBooks, { bookCode: selectedBookCode }];
+        const selectedBook = books.find((book) => book.bookCode === selectedBookCode);
+        if (!selectedBook) {
+            messageApi.error('Sách không tồn tại');
+            return;
+        }
+
+        const updatedBooks = [...currentBooks, selectedBookCode];
         formik.setFieldValue('books', updatedBooks);
+
+        const updatedSelectedBooks = [...selectedBooks, selectedBook];
+        setSelectedBooks(updatedSelectedBooks);
+
         setSelectedBookCode(null);
     };
 
     const handleDeleteColum = (selectedBookCode) => {
-        const updatedBooks = formik.values.books.filter((book) => book.bookCode !== selectedBookCode);
+        const updatedBooks = formik.values.books.filter((bookCode) => bookCode !== selectedBookCode);
         formik.setFieldValue('books', updatedBooks);
+
+        const updatedSelectedBooks = selectedBooks.filter((book) => book.bookCode !== selectedBookCode);
+        setSelectedBooks(updatedSelectedBooks);
     };
 
     useEffect(() => {
@@ -178,17 +193,21 @@ function BorrowBookForm() {
                         dueDate: dueDate ? dayjs(dueDate) : null,
                         note,
                         readerId,
-                        books: books.map((bookCode) => ({ bookCode })),
+                        books,
                     });
+
+                    fetchSelectedBooks(books);
                 } else {
+                    const cartId = searchParams.get('cartId');
                     if (cartId) {
                         const response = await getBorrowReceiptByCartId(cartId);
                         const { readerId, books } = response.data.data;
                         formik.setValues({
                             ...formik.values,
                             readerId,
-                            books: books.map((bookCode) => ({ bookCode })),
+                            books,
                         });
+                        fetchSelectedBooks(books);
                     }
 
                     const response = await generateReceiptNumber();
@@ -203,14 +222,51 @@ function BorrowBookForm() {
 
         fetchData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [id]);
+    }, [id, searchParams]);
 
     const columns = [
         {
-            title: 'Mã Sách',
+            title: 'Nhan đề',
+            dataIndex: 'bookDefinition',
+            key: 'title',
+            render: ({ title }) => title,
+        },
+        {
+            title: 'Số ĐKCB',
             dataIndex: 'bookCode',
             key: 'bookCode',
-            align: 'center',
+        },
+        {
+            title: 'Tác giả',
+            dataIndex: 'bookDefinition',
+            key: 'authors',
+            render: ({ authors }) =>
+                authors.length > 0
+                    ? authors.map((author, index) => (
+                          <span key={author.id || index}>
+                              {author.name}
+                              {index < authors.length - 1 && ', '}
+                          </span>
+                      ))
+                    : 'N/A',
+        },
+        {
+            title: 'Loại sách',
+            dataIndex: 'bookDefinition',
+            key: 'category',
+            render: ({ category }) => category?.name || 'N/A',
+        },
+        {
+            title: 'Nhà xuất bản',
+            dataIndex: 'bookDefinition',
+            key: 'publisher',
+            render: ({ publisher }) => publisher?.name || 'N/A',
+        },
+        {
+            title: 'Năm xuất bản',
+            dataIndex: 'bookDefinition',
+            key: 'publishingYear',
+            render: ({ publishingYear }) => publishingYear || 'N/A',
         },
         {
             title: '',
@@ -317,22 +373,6 @@ function BorrowBookForm() {
                             loading={isBooksLoading}
                             value={selectedBookCode}
                             onChange={(value) => setSelectedBookCode(value)}
-                            dropdownRender={(menu) => (
-                                <>
-                                    {menu}
-                                    <Divider className="my-2" />
-                                    <Space className="py-2 px-1 pt-0">
-                                        <a
-                                            className="d-flex align-items-center"
-                                            href="/admin/book-definitions/new"
-                                            target="_blank"
-                                        >
-                                            <FaPlus />
-                                            Thêm mới
-                                        </a>
-                                    </Space>
-                                </>
-                            )}
                         />
                     </div>
 
@@ -346,7 +386,7 @@ function BorrowBookForm() {
                         <Table
                             bordered
                             columns={columns}
-                            dataSource={formik.values.books}
+                            dataSource={selectedBooks}
                             rowKey="bookCode"
                             scroll={{ x: 'max-content' }}
                             pagination={false}
