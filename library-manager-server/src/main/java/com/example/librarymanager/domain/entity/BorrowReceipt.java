@@ -8,6 +8,7 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -49,4 +50,16 @@ public class BorrowReceipt {//Phiếu mượn sách
     @JsonIgnore
     private List<BookBorrow> bookBorrows = new ArrayList<>();//Các sách mượn
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BorrowReceipt that = (BorrowReceipt) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }

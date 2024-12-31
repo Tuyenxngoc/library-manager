@@ -12,6 +12,8 @@ import com.example.librarymanager.domain.dto.response.borrowreceipt.BorrowReceip
 import com.example.librarymanager.domain.dto.response.borrowreceipt.BorrowReceiptResponseDto;
 import com.example.librarymanager.domain.entity.BorrowReceipt;
 
+import java.util.Set;
+
 public interface BorrowReceiptService {
     String generateReceiptNumber();
 
@@ -33,5 +35,9 @@ public interface BorrowReceiptService {
 
     BorrowReceiptDetailsDto findDetailsById(Long id);
 
+    CommonResponseDto cancelReturn(Set<Long> borrowIds, String userId);
+
     byte[] createPdfForReceipts(CreateBorrowReceiptRequestDto requestDto, String userId);
+
+    byte[] exportReturnData();
 }

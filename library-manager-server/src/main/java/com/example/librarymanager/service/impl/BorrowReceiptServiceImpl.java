@@ -20,6 +20,7 @@ import com.example.librarymanager.exception.ForbiddenException;
 import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.*;
 import com.example.librarymanager.service.BorrowReceiptService;
+import com.example.librarymanager.service.ExcelExportService;
 import com.example.librarymanager.service.LogService;
 import com.example.librarymanager.service.PdfService;
 import com.example.librarymanager.util.PaginationUtil;
@@ -32,6 +33,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -63,6 +65,8 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
     private final UserRepository userRepository;
 
     private final PdfService pdfService;
+
+    private final ExcelExportService excelExportService;
 
     private BorrowReceipt getEntity(Long id) {
         return borrowReceiptRepository.findById(id)
@@ -229,8 +233,17 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
 
     @Override
     public void updateBorrowStatus(BorrowReceipt borrowReceipt) {
-        boolean allReturned = borrowReceipt.getBookBorrows().stream()
-                .allMatch(bookBorrow -> BookBorrowStatus.RETURNED.equals(bookBorrow.getStatus()));
+        boolean allReturned = true;
+        boolean partiallyReturned = false;
+
+        for (BookBorrow bookBorrow : borrowReceipt.getBookBorrows()) {
+            if (!BookBorrowStatus.RETURNED.equals(bookBorrow.getStatus())) {
+                allReturned = false;
+            } else {
+                partiallyReturned = true;
+            }
+        }
+
         if (allReturned) {
             borrowReceipt.setStatus(BorrowStatus.RETURNED);
             return;
@@ -242,8 +255,6 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
             return;
         }
 
-        boolean partiallyReturned = borrowReceipt.getBookBorrows().stream()
-                .anyMatch(bookBorrow -> BookBorrowStatus.RETURNED.equals(bookBorrow.getStatus()));
         if (partiallyReturned) {
             borrowReceipt.setStatus(BorrowStatus.PARTIALLY_RETURNED);
             return;
@@ -343,6 +354,57 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
     }
 
     @Override
+    public CommonResponseDto cancelReturn(Set<Long> borrowIds, String userId) {
+        List<BorrowReceipt> borrowReceipts = borrowReceiptRepository.findAllByIdIn(borrowIds);
+        if (borrowReceipts.isEmpty()) {
+            throw new BadRequestException(ErrorMessage.BorrowReceipt.ERR_NOT_FOUND_ID, borrowIds);
+        }
+
+        final LocalDate now = LocalDate.now();
+        List<Book> updatedBooks = new ArrayList<>();
+        List<BookBorrow> updatedBookBorrows = new ArrayList<>();
+        List<BorrowReceipt> updateBorrowReceipts = new ArrayList<>();
+        List<String> receiptNumbers = new ArrayList<>();
+
+        borrowReceipts.forEach(borrowReceipt -> {
+            //Cập nhật trạng thái phiếu mượn
+            if (borrowReceipt.getDueDate().isBefore(now)) {
+                borrowReceipt.setStatus(BorrowStatus.OVERDUE);
+            } else {
+                borrowReceipt.setStatus(BorrowStatus.NOT_RETURNED);
+            }
+
+            //Cập nhật trạng thái sách
+            borrowReceipt.getBookBorrows().forEach(bookBorrow -> {
+                Book book = bookBorrow.getBook();
+                if (book.getBookCondition().equals(BookCondition.ON_LOAN)) {
+                  throw new ConflictException(ErrorMessage.BookBorrow.dsads);
+                }
+                book.setBookCondition(BookCondition.ON_LOAN);
+
+                bookBorrow.setReturnDate(null);
+                bookBorrow.setStatus(BookBorrowStatus.NOT_RETURNED);
+
+                updatedBooks.add(book);
+                updatedBookBorrows.add(bookBorrow);
+            });
+
+            updateBorrowReceipts.add(borrowReceipt);
+            receiptNumbers.add(borrowReceipt.getReceiptNumber());
+        });
+
+        //Lưu thay đổi
+        bookRepository.saveAll(updatedBooks);
+        bookBorrowRepository.saveAll(updatedBookBorrows);
+        borrowReceiptRepository.saveAll(updateBorrowReceipts);
+
+        logService.createLog(TAG, EventConstants.EDIT, "Hủy trả sách cho các phiếu mượn: " + String.join(", ", receiptNumbers), userId);
+
+        String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
+        return new CommonResponseDto(message);
+    }
+
+    @Override
     public byte[] createPdfForReceipts(CreateBorrowReceiptRequestDto requestDto, String userId) {
         if (requestDto.getBorrowIds().isEmpty()) {
             return pdfService.createReceiptWithFourPerPage(requestDto);
@@ -357,6 +419,15 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
         }
 
         return pdfService.createReceipt(user, requestDto, borrowReceipts);
+    }
+
+    @Override
+    public byte[] exportReturnData() {
+        try {
+            return excelExportService.createBorrowingReport(borrowReceiptRepository.findAll());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

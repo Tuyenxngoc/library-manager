@@ -4,6 +4,7 @@ import com.example.librarymanager.annotation.CurrentUser;
 import com.example.librarymanager.annotation.RestApiV1;
 import com.example.librarymanager.base.VsResponseUtil;
 import com.example.librarymanager.constant.BorrowStatus;
+import com.example.librarymanager.constant.ErrorMessage;
 import com.example.librarymanager.constant.UrlConstant;
 import com.example.librarymanager.domain.dto.pagination.PaginationFullRequestDto;
 import com.example.librarymanager.domain.dto.request.BorrowReceiptRequestDto;
@@ -13,6 +14,8 @@ import com.example.librarymanager.service.BorrowReceiptService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,6 +26,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Set;
 
 @RestApiV1
 @RequiredArgsConstructor
@@ -112,6 +117,19 @@ public class BorrowReceiptController {
         return VsResponseUtil.success(borrowReceiptService.findDetailsById(id));
     }
 
+    @Operation(summary = "API Cancel Return")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BORROW_RECEIPT')")
+    @PutMapping(UrlConstant.BorrowReceipt.CANCEL_RETURN)
+    public ResponseEntity<?> cancelReturn(
+            @Valid @RequestBody
+            @NotNull(message = ErrorMessage.INVALID_ARRAY_IS_REQUIRED)
+            @Size(max = 100, message = ErrorMessage.INVALID_ARRAY_LENGTH)
+            Set<@NotNull(message = ErrorMessage.INVALID_SOME_THING_FIELD_IS_REQUIRED) Long> borrowIds,
+            @CurrentUser CustomUserDetails userDetails
+    ) {
+        return VsResponseUtil.success(borrowReceiptService.cancelReturn(borrowIds, userDetails.getUserId()));
+    }
+
     @Operation(summary = "API Print Borrow Receipts")
     @PreAuthorize("hasRole('ROLE_MANAGE_BORROW_RECEIPT')")
     @PostMapping(UrlConstant.BorrowReceipt.PRINT)
@@ -126,5 +144,18 @@ public class BorrowReceiptController {
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE);
 
         return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+    }
+
+    @Operation(summary = "API Export Return Data")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BORROW_RECEIPT')")
+    @GetMapping(UrlConstant.BorrowReceipt.EXPORT_RETURN_DATA)
+    public ResponseEntity<byte[]> exportReturnData() {
+        byte[] excelBytes = borrowReceiptService.exportReturnData();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=return_data.xlsx");
+        headers.add(HttpHeaders.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+        return new ResponseEntity<>(excelBytes, headers, HttpStatus.OK);
     }
 }

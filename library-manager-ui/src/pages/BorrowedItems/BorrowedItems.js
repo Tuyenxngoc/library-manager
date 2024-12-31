@@ -19,9 +19,6 @@ function BorrowedItems() {
     const [searchInput, setSearchInput] = useState('');
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
-    const [overdueCount, setOverdueCount] = useState(0);
-    const [pendingCount, setPendingCount] = useState(0);
-
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState(null);
 
@@ -51,19 +48,6 @@ function BorrowedItems() {
                 const response = await getCartDetails(params);
                 const { data } = response.data;
                 setEntityData(data);
-
-                let overdue = 0;
-                let pending = 0;
-                data.forEach((item) => {
-                    if (dayjs(item.borrowTo).isBefore(dayjs())) {
-                        overdue += 1;
-                    } else {
-                        pending += 1;
-                    }
-                });
-
-                setOverdueCount(overdue);
-                setPendingCount(pending);
             } catch (error) {
                 setErrorMessage(error.message);
             } finally {
@@ -216,11 +200,11 @@ function BorrowedItems() {
                     <div className="col-4">
                         <Space>
                             <Link to="?type=1" className="text-success">
-                                Chưa xử lý ({pendingCount})
+                                Chưa xử lý
                             </Link>
                             <span> | </span>
                             <Link to="?type=2" className="text-danger">
-                                Quá hạn mượn ({overdueCount})
+                                Quá hạn
                             </Link>
                             <Button type="default" onClick={handleDelete} disabled={!selectedRowKeys.length}>
                                 Xóa

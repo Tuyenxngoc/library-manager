@@ -4,10 +4,15 @@ import { Button, Drawer, Dropdown, Flex, Input, Menu, message, Popconfirm, Selec
 import { MdOutlineModeEdit } from 'react-icons/md';
 import { FaRegTrashAlt, FaPrint } from 'react-icons/fa';
 import { GrPrint } from 'react-icons/gr';
+import { IoIosMore } from 'react-icons/io';
+import { CiExport } from 'react-icons/ci';
+import { MdOutlineCancel } from 'react-icons/md';
 import queryString from 'query-string';
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
 import {
+    cancelReturn,
     deleteBorrowReceipt,
+    exportBorrowReceipts,
     getBorrowReceiptDetails,
     getBorrowReceipts,
     printBorrowReceipts,
@@ -195,6 +200,50 @@ function BorrowBook() {
         }
     };
 
+    const handleCancelReturn = async () => {
+        setIsLoading(true);
+        try {
+            const response = await cancelReturn(selectedRowKeys);
+            if (response.status === 200) {
+                messageApi.success(response.data.data.message);
+                handleChangePage(1);
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi xử lý.';
+            messageApi.error(errorMessage);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleExportReturnData = async () => {
+        setIsLoading(true);
+        try {
+            const response = await exportBorrowReceipts();
+            if (response.status === 200) {
+                const fileBlob = new Blob([response.data], {
+                    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                });
+
+                const fileURL = URL.createObjectURL(fileBlob);
+
+                const a = document.createElement('a');
+                a.href = fileURL;
+                a.download = 'export_borrow_receipts.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+
+                URL.revokeObjectURL(fileURL);
+            }
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Có lỗi xảy ra khi xuất dữ liệu.';
+            messageApi.error(errorMessage);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
         const fetchEntities = async () => {
             setIsLoading(true);
@@ -283,6 +332,7 @@ function BorrowBook() {
             key: 'status',
             sorter: true,
             showSorterTooltip: false,
+            align: 'center',
             render: (status) => borrowReceiptMapping[status],
         },
         {
@@ -312,7 +362,7 @@ function BorrowBook() {
         },
     ];
 
-    const items = [
+    const printActions = [
         {
             key: '1',
             icon: <GrPrint />,
@@ -334,7 +384,23 @@ function BorrowBook() {
         },
     ];
 
-    const menuItems = [
+    const returnActions = [
+        {
+            key: '1',
+            icon: <MdOutlineCancel />,
+            label: 'Hủy trả',
+            disabled: selectedRowKeys.length === 0,
+            onClick: handleCancelReturn,
+        },
+        {
+            key: '2',
+            icon: <CiExport />,
+            label: 'Xuất file',
+            onClick: handleExportReturnData,
+        },
+    ];
+
+    const navItems = [
         {
             key: 'ALL',
             label: <Link to="/admin/circulation/borrow">Tất cả</Link>,
@@ -434,7 +500,7 @@ function BorrowBook() {
             <h2>Mượn sách</h2>
 
             <Flex wrap justify="space-between" align="center">
-                <Menu mode="horizontal" selectedKeys={[filters.status || 'ALL']} items={menuItems} />
+                <Menu mode="horizontal" selectedKeys={[filters.status || 'ALL']} items={navItems} />
                 <Space>
                     <Space.Compact className="my-2">
                         <Select
@@ -460,8 +526,12 @@ function BorrowBook() {
                         Lập phiếu mượn
                     </Button>
 
-                    <Dropdown menu={{ items }}>
+                    <Dropdown menu={{ items: printActions }}>
                         <Button icon={<FaPrint />}>In</Button>
+                    </Dropdown>
+
+                    <Dropdown menu={{ items: returnActions }}>
+                        <Button icon={<IoIosMore />}></Button>
                     </Dropdown>
                 </Space>
             </Flex>

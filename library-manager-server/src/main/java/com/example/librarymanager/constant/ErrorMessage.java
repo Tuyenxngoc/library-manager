@@ -191,6 +191,7 @@ public class ErrorMessage {
         public static final String ERR_NOT_FOUND_ID = "exception.book.borrow.not.found.id";
         public static final String ERR_ALREADY_MARKED_AS_RETURNED = "exception.book.borrow.already.marked.as.returned";
         public static final String ERR_ALREADY_MARKED_AS_LOST = "exception.book.borrow.already.marked.as.lost";
+        public static final String dsads = "exception.book.borrow.already.marked.as.lostdsadsads";
     }
 
     public static class Cart {

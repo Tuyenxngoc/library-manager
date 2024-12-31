@@ -251,12 +251,7 @@ function InwardBookForm() {
             title: '',
             key: 'action',
             render: (_, record) => (
-                <Button
-                    type="text"
-                    danger
-                    icon={<FaRegTrashAlt />}
-                    onClick={() => handleDeleteColum(record.bookDefinitionId)}
-                />
+                <Button type="text" danger icon={<FaRegTrashAlt />} onClick={() => handleDeleteColum(record.id)} />
             ),
         },
     ];
@@ -378,7 +373,7 @@ function InwardBookForm() {
                     <div className="col-md-12">
                         <Table
                             bordered
-                            rowKey="bookDefinitionId"
+                            rowKey="id"
                             scroll={{ x: 'max-content' }}
                             columns={columns}
                             dataSource={selectedBookDefinitions}

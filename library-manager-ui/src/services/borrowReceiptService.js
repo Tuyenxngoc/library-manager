@@ -41,3 +41,13 @@ export const printBorrowReceipts = (values) => {
         responseType: 'arraybuffer',
     });
 };
+
+export const cancelReturn = (values) => {
+    return axiosPrivate.put('admin/borrow-receipts/cancel-return', values);
+};
+
+export const exportBorrowReceipts = () => {
+    return axiosPrivate.get('admin/borrow-receipts/export-return-data', {
+        responseType: 'blob',
+    });
+};
