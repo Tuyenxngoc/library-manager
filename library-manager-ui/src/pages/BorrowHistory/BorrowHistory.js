@@ -116,14 +116,6 @@ function BorrowHistory() {
             showSorterTooltip: false,
         },
         {
-            title: 'Ngày trả',
-            dataIndex: 'returnDate',
-            key: 'returnDate',
-            sorter: true,
-            showSorterTooltip: false,
-            render: (returnDate) => returnDate || 'Chưa trả',
-        },
-        {
             title: 'Trạng thái',
             dataIndex: 'status',
             key: 'status',

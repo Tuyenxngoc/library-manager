@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Drawer, Dropdown, Flex, Input, message, Popconfirm, Select, Space, Table, Tag } from 'antd';
+import { Button, Drawer, Dropdown, Flex, Input, Menu, message, Popconfirm, Select, Space, Table, Tag } from 'antd';
 import { MdOutlineModeEdit } from 'react-icons/md';
 import { FaRegTrashAlt, FaPrint } from 'react-icons/fa';
 import { GrPrint } from 'react-icons/gr';
@@ -278,13 +278,6 @@ function BorrowBook() {
             showSorterTooltip: false,
         },
         {
-            title: 'Ngày trả',
-            dataIndex: 'returnDate',
-            key: 'returnDate',
-            sorter: true,
-            showSorterTooltip: false,
-        },
-        {
             title: 'Trạng thái',
             dataIndex: 'status',
             key: 'status',
@@ -338,6 +331,29 @@ function BorrowBook() {
             icon: <GrPrint />,
             label: 'Danh sách mượn quá hạn chưa trả',
             onClick: handlePrintOverdueList,
+        },
+    ];
+
+    const menuItems = [
+        {
+            key: 'ALL',
+            label: <Link to="/admin/circulation/borrow">Tất cả</Link>,
+        },
+        {
+            key: 'NOT_RETURNED',
+            label: <Link to="?type=1">Chưa trả</Link>,
+        },
+        {
+            key: 'RETURNED',
+            label: <Link to="?type=2">Đã trả</Link>,
+        },
+        {
+            key: 'PARTIALLY_RETURNED',
+            label: <Link to="?type=3">Chưa trả đủ</Link>,
+        },
+        {
+            key: 'OVERDUE',
+            label: <Link to="?type=4">Quá hạn</Link>,
         },
     ];
 
@@ -418,11 +434,7 @@ function BorrowBook() {
             <h2>Mượn sách</h2>
 
             <Flex wrap justify="space-between" align="center">
-                <Space align="center">
-                    <Link to="/admin/circulation/borrow">Tất cả</Link>|<Link to="?type=1">Chưa trả</Link>|
-                    <Link to="?type=2">Đã trả</Link>|<Link to="?type=3">Chưa trả đủ</Link>|
-                    <Link to="?type=4">Quá hạn</Link>
-                </Space>
+                <Menu mode="horizontal" selectedKeys={[filters.status || 'ALL']} items={menuItems} />
                 <Space>
                     <Space.Compact className="my-2">
                         <Select
@@ -453,6 +465,8 @@ function BorrowBook() {
                     </Dropdown>
                 </Space>
             </Flex>
+
+            <br />
 
             <Table
                 bordered

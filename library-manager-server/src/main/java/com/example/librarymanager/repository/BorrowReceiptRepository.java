@@ -3,8 +3,10 @@ package com.example.librarymanager.repository;
 import com.example.librarymanager.domain.entity.BorrowReceipt;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -26,4 +28,10 @@ public interface BorrowReceiptRepository extends JpaRepository<BorrowReceipt, Lo
 
     @Query("SELECT br FROM BorrowReceipt br WHERE br.dueDate < CURRENT_DATE AND br.status != 'RETURNED'")
     List<BorrowReceipt> findRecordsByReturnDate();
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE BorrowReceipt b SET b.status = 'OVERDUE' WHERE b.dueDate < CURRENT_DATE AND b.status NOT IN ('RETURNED', 'OVERDUE')")
+    void updateOverdueStatus();
+
 }

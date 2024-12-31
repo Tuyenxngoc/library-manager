@@ -33,9 +33,6 @@ public class BorrowReceipt {//Phiếu mượn sách
     @Column(name = "due_date", nullable = false)
     private LocalDate dueDate; // Ngày hẹn trả
 
-    @Column(name = "return_date")
-    private LocalDate returnDate; // Ngày trả thực tế
-
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private BorrowStatus status; // Trạng thái phiếu mượn

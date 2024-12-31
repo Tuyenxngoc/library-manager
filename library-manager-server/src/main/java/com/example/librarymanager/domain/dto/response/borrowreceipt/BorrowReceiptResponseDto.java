@@ -16,8 +16,6 @@ public class BorrowReceiptResponseDto {
 
     private final LocalDate dueDate;
 
-    private final LocalDate returnDate;
-
     private final BorrowStatus status;
 
     private final String note;
@@ -33,7 +31,6 @@ public class BorrowReceiptResponseDto {
         this.receiptNumber = borrowReceipt.getReceiptNumber();
         this.borrowDate = borrowReceipt.getBorrowDate();
         this.dueDate = borrowReceipt.getDueDate();
-        this.returnDate = borrowReceipt.getReturnDate();
         this.status = borrowReceipt.getStatus();
         this.note = borrowReceipt.getNote();
         this.cardNumber = borrowReceipt.getReader().getCardNumber();

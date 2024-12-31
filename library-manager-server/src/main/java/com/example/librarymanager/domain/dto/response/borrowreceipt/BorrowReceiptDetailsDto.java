@@ -32,7 +32,6 @@ public class BorrowReceiptDetailsDto {
     private final String fullName;
     private final LocalDate borrowDate;
     private final LocalDate dueDate;
-    private final LocalDate returnDate;
     private final BorrowStatus status;
     private final List<BookDto> books;
 
@@ -42,7 +41,6 @@ public class BorrowReceiptDetailsDto {
         this.fullName = borrowReceipt.getReader().getFullName();
         this.borrowDate = borrowReceipt.getBorrowDate();
         this.dueDate = borrowReceipt.getDueDate();
-        this.returnDate = borrowReceipt.getReturnDate();
         this.status = borrowReceipt.getStatus();
         this.books = borrowReceipt.getBookBorrows().stream()
                 .map(BookDto::new)
