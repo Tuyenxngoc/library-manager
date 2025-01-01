@@ -292,9 +292,18 @@ function BorrowBook() {
             sorter: true,
             showSorterTooltip: false,
             render: (text, record) => (
-                <span style={{ color: '#0997eb', cursor: 'pointer' }} onClick={() => showDrawer(record.id)}>
-                    {text}
-                </span>
+                <Space>
+                    <span style={{ color: '#0997eb', cursor: 'pointer' }} onClick={() => showDrawer(record.id)}>
+                        {text}
+                    </span>
+
+                    <Link
+                        to="/admin/circulation/return-renew"
+                        state={{ searchBy: 'receiptNumber', keyword: record.receiptNumber }}
+                    >
+                        Trả sách
+                    </Link>
+                </Space>
             ),
         },
         {

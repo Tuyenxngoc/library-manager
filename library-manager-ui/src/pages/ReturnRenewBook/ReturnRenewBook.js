@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Button, Flex, Input, message, Modal, Select, Space, Table } from 'antd';
 import queryString from 'query-string';
 import { INITIAL_FILTERS, INITIAL_META } from '~/common/commonConstants';
@@ -11,13 +12,16 @@ const options = [
 ];
 
 function ReturnRenewBook() {
+    const location = useLocation();
+    const { searchBy, keyword } = location.state || {};
+
     const [meta, setMeta] = useState(INITIAL_META);
-    const [filters, setFilters] = useState({ ...INITIAL_FILTERS, status: ['NOT_RETURNED'] });
+    const [filters, setFilters] = useState({ ...INITIAL_FILTERS, status: ['NOT_RETURNED'], searchBy, keyword });
 
     const [entityData, setEntityData] = useState(null);
 
-    const [searchInput, setSearchInput] = useState('');
-    const [activeFilterOption, setActiveFilterOption] = useState(options[0].value);
+    const [searchInput, setSearchInput] = useState(keyword || '');
+    const [activeFilterOption, setActiveFilterOption] = useState(searchBy || options[0].value);
 
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState(null);
