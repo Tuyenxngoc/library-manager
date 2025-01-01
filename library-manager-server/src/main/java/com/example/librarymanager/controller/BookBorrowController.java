@@ -48,7 +48,7 @@ public class BookBorrowController {
             List<BookReturnRequestDto> requestDtos,
             @CurrentUser CustomUserDetails userDetails
     ) {
-        return VsResponseUtil.success(bookBorrowService.returnBooksByIds(requestDtos, userDetails.getUserId()));
+        return VsResponseUtil.success(bookBorrowService.returnBooks(requestDtos, userDetails.getUserId()));
     }
 
     @Operation(summary = "API Report Lost Books by List of IDs")

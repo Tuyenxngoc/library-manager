@@ -360,25 +360,19 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
             throw new BadRequestException(ErrorMessage.BorrowReceipt.ERR_NOT_FOUND_ID, borrowIds);
         }
 
-        final LocalDate now = LocalDate.now();
+        LocalDate now = LocalDate.now();
         List<Book> updatedBooks = new ArrayList<>();
         List<BookBorrow> updatedBookBorrows = new ArrayList<>();
         List<BorrowReceipt> updateBorrowReceipts = new ArrayList<>();
         List<String> receiptNumbers = new ArrayList<>();
 
-        borrowReceipts.forEach(borrowReceipt -> {
-            //Cập nhật trạng thái phiếu mượn
-            if (borrowReceipt.getDueDate().isBefore(now)) {
-                borrowReceipt.setStatus(BorrowStatus.OVERDUE);
-            } else {
-                borrowReceipt.setStatus(BorrowStatus.NOT_RETURNED);
-            }
-
+        //Cập nhật trạng thái phiếu mượn
+        for (BorrowReceipt borrowReceipt : borrowReceipts) {
             //Cập nhật trạng thái sách
-            borrowReceipt.getBookBorrows().forEach(bookBorrow -> {
+            for (BookBorrow bookBorrow : borrowReceipt.getBookBorrows()) {
                 Book book = bookBorrow.getBook();
                 if (book.getBookCondition().equals(BookCondition.ON_LOAN)) {
-                  throw new ConflictException(ErrorMessage.BookBorrow.dsads);
+                    throw new ConflictException(ErrorMessage.BookBorrow.ERR_NOT_RETURNED_IN_ANOTHER_RECEIPT, book.getBookCode());
                 }
                 book.setBookCondition(BookCondition.ON_LOAN);
 
@@ -387,13 +381,18 @@ public class BorrowReceiptServiceImpl implements BorrowReceiptService {
 
                 updatedBooks.add(book);
                 updatedBookBorrows.add(bookBorrow);
-            });
+            }
 
+            if (borrowReceipt.getDueDate().isBefore(now)) {
+                borrowReceipt.setStatus(BorrowStatus.OVERDUE);
+            } else {
+                borrowReceipt.setStatus(BorrowStatus.NOT_RETURNED);
+            }
             updateBorrowReceipts.add(borrowReceipt);
-            receiptNumbers.add(borrowReceipt.getReceiptNumber());
-        });
 
-        //Lưu thay đổi
+            receiptNumbers.add(borrowReceipt.getReceiptNumber());
+        }
+
         bookRepository.saveAll(updatedBooks);
         bookBorrowRepository.saveAll(updatedBookBorrows);
         borrowReceiptRepository.saveAll(updateBorrowReceipts);

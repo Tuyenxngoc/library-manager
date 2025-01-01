@@ -12,7 +12,7 @@ import com.example.librarymanager.domain.entity.Book;
 import com.example.librarymanager.domain.entity.BookBorrow;
 import com.example.librarymanager.domain.entity.BorrowReceipt;
 import com.example.librarymanager.domain.specification.EntitySpecification;
-import com.example.librarymanager.exception.ConflictException;
+import com.example.librarymanager.exception.BadRequestException;
 import com.example.librarymanager.exception.NotFoundException;
 import com.example.librarymanager.repository.BookBorrowRepository;
 import com.example.librarymanager.repository.BookRepository;
@@ -31,8 +31,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -82,65 +82,45 @@ public class BookBorrowServiceImpl implements BookBorrowService {
 
     @Override
     @Transactional
-    public CommonResponseDto returnBooksByIds(List<BookReturnRequestDto> requestDtos, String userId) {
-        //Lấy ra danh sách sách dựa vào id
-        Map<BookBorrow, BookStatus> bookBorrowsWithStatus = requestDtos.stream()
-                .collect(Collectors.toMap(
-                        requestDto -> {
-                            BookBorrow bookBorrow = getEntity(requestDto.getBookBorrowId());
-                            if (BookBorrowStatus.RETURNED.equals(bookBorrow.getStatus())) {
-                                throw new ConflictException(
-                                        ErrorMessage.BookBorrow.ERR_ALREADY_MARKED_AS_RETURNED,
-                                        requestDto.getBookBorrowId()
-                                );
-                            }
-                            return bookBorrow;
-                        },
-                        BookReturnRequestDto::getBookStatus
-                ));
+    public CommonResponseDto returnBooks(List<BookReturnRequestDto> requestDtos, String userId) {
+        boolean isReturned = false;
+        StringBuilder logMessage = new StringBuilder();
+        for (BookReturnRequestDto requestDto : requestDtos) {
+            BookBorrow bookBorrow = getEntity(requestDto.getBookBorrowId());
+            if (!bookBorrow.getStatus().equals(BookBorrowStatus.NOT_RETURNED)) {
+                continue;
+            }
 
-        // Khởi tạo danh sách để cập nhật
-        List<Book> updatedBooks = new ArrayList<>();
-        List<BookBorrow> updatedBookBorrows = new ArrayList<>();
-        Set<BorrowReceipt> updatedBorrowReceipts = new HashSet<>();
-        List<String> logMessages = new ArrayList<>();
-
-        // Xử lý trạng thái sách và sách mượn
-        bookBorrowsWithStatus.forEach((bookBorrow, newStatus) -> {
-            // Cập nhật trạng thái sách mượn
             bookBorrow.setReturnDate(LocalDate.now());
             bookBorrow.setStatus(BookBorrowStatus.RETURNED);
-            updatedBookBorrows.add(bookBorrow);
 
-            // Đánh dấu sách đã trả
             Book book = bookBorrow.getBook();
             book.setBookCondition(BookCondition.AVAILABLE);
-            if (newStatus != null) {
-                book.setBookStatus(newStatus);
+            if (requestDto.getBookStatus() != null) {
+                book.setBookStatus(requestDto.getBookStatus());
             }
-            updatedBooks.add(book);
 
-            //Thêm phiếu mượn vào danh sách
             BorrowReceipt borrowReceipt = bookBorrow.getBorrowReceipt();
-            updatedBorrowReceipts.add(borrowReceipt);
+            borrowReceiptService.updateBorrowStatus(borrowReceipt);
 
-            // Thêm log
-            if (newStatus != null) {
-                logMessages.add("{mã: " + book.getBookCode() + ", trạng thái: " + newStatus.getName() + "}");
-            } else {
-                logMessages.add("{mã: " + book.getBookCode() + "}");
-            }
-        });
+            logMessage.append(book.getBookCode()).append(", ");
 
-        // Cập nhật trạng thái phiếu mượn
-        updatedBorrowReceipts.forEach(borrowReceiptService::updateBorrowStatus); //todo
+            bookRepository.save(book);
+            bookBorrowRepository.save(bookBorrow);
+            borrowReceiptRepository.save(borrowReceipt);
 
-        bookRepository.saveAll(updatedBooks);
-        bookBorrowRepository.saveAll(updatedBookBorrows);
-        borrowReceiptRepository.saveAll(updatedBorrowReceipts);
+            isReturned = true;
+        }
 
-        String logMessage = "Trả sách: [" + String.join(", ", logMessages) + "]";
-        logService.createLog(TAG, EventConstants.EDIT, logMessage, userId);
+        if (!isReturned) {
+            throw new BadRequestException(ErrorMessage.BookBorrow.ERR_NOT_FOUND_IDS);
+        }
+
+        if (logMessage.length() > 2) {
+            logMessage.setLength(logMessage.length() - 2);
+        }
+
+        logService.createLog(TAG, EventConstants.EDIT, "Trả sách mã: " + logMessage, userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message);
@@ -149,51 +129,40 @@ public class BookBorrowServiceImpl implements BookBorrowService {
     @Override
     @Transactional
     public CommonResponseDto reportLostBooksByIds(Set<Long> ids, String userId) {
-        //Lấy ra danh sách sách dựa vào id
-        Set<BookBorrow> bookBorrows = ids.stream()
-                .map(id -> {
-                    BookBorrow bookBorrow = getEntity(id);
-                    if (BookBorrowStatus.LOST.equals(bookBorrow.getStatus())) {
-                        throw new ConflictException(ErrorMessage.BookBorrow.ERR_ALREADY_MARKED_AS_LOST, id);
-                    }
-                    return bookBorrow;
-                })
-                .collect(Collectors.toSet());
+        boolean isLostReported = false;
+        StringBuilder logMessage = new StringBuilder();
+        for (Long id : ids) {
+            BookBorrow bookBorrow = getEntity(id);
+            if (!bookBorrow.getStatus().equals(BookBorrowStatus.NOT_RETURNED)) {
+                continue;
+            }
 
-        // Khởi tạo danh sách để cập nhật
-        List<Book> updatedBooks = new ArrayList<>();
-        List<BookBorrow> updatedBookBorrows = new ArrayList<>();
-        Set<BorrowReceipt> updatedBorrowReceipts = new HashSet<>();
-        List<String> lostBookCodes = new ArrayList<>();
-
-        //Cập nhật trạng thái sách và phiếu mượn
-        bookBorrows.forEach(bookBorrow -> {
-            //Đánh dấu sách mượn mất
             bookBorrow.setStatus(BookBorrowStatus.LOST);
-            updatedBookBorrows.add(bookBorrow);
 
-            //Đánh dấu sách bị mất
             Book book = bookBorrow.getBook();
             book.setBookCondition(BookCondition.LOST);
-            updatedBooks.add(book);
 
-            //Thêm phiếu mượn vào danh sách
             BorrowReceipt borrowReceipt = bookBorrow.getBorrowReceipt();
-            updatedBorrowReceipts.add(borrowReceipt);
+            borrowReceiptService.updateBorrowStatus(borrowReceipt);
 
-            // Ghi mã sách mất
-            lostBookCodes.add(book.getBookCode());
-        });
+            logMessage.append(book.getBookCode()).append(", ");
 
-        // Cập nhật trạng thái phiếu mượn
-        updatedBorrowReceipts.forEach(borrowReceiptService::updateBorrowStatus); //todo
+            bookRepository.save(book);
+            bookBorrowRepository.save(bookBorrow);
+            borrowReceiptRepository.save(borrowReceipt);
 
-        bookRepository.saveAll(updatedBooks);
-        bookBorrowRepository.saveAll(updatedBookBorrows);
-        borrowReceiptRepository.saveAll(updatedBorrowReceipts);
+            isLostReported = true;
+        }
 
-        String logMessage = "Báo mất sách với mã: " + String.join(", ", lostBookCodes);
-        logService.createLog(TAG, EventConstants.EDIT, logMessage, userId);
+        if (!isLostReported) {
+            throw new BadRequestException(ErrorMessage.BookBorrow.ERR_NOT_FOUND_IDS);
+        }
+
+        if (logMessage.length() > 2) {
+            logMessage.setLength(logMessage.length() - 2);
+        }
+
+        logService.createLog(TAG, EventConstants.EDIT, "Báo mất sách với mã: " + logMessage, userId);
 
         String message = messageSource.getMessage(SuccessMessage.UPDATE, null, LocaleContextHolder.getLocale());
         return new CommonResponseDto(message);

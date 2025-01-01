@@ -15,7 +15,7 @@ public interface BookBorrowService {
 
     PaginationResponseDto<BookBorrowResponseDto> findAll(PaginationFullRequestDto requestDto, TimeFilter timeFilter, List<BookBorrowStatus> status);
 
-    CommonResponseDto returnBooksByIds(List<BookReturnRequestDto> requestDtos, String userId);
+    CommonResponseDto returnBooks(List<BookReturnRequestDto> requestDtos, String userId);
 
     CommonResponseDto reportLostBooksByIds(Set<Long> ids, String userId);
 

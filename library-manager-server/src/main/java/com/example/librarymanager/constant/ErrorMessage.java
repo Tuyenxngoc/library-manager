@@ -153,7 +153,6 @@ public class ErrorMessage {
     public static class ImportReceipt {
         public static final String ERR_NOT_FOUND_ID = "exception.import.receipt.not.found.id";
         public static final String ERR_DUPLICATE_NUMBER = "exception.import.receipt.duplicate.code";
-        public static final String ERR_HAS_LINKED_BOOKS = "exception.import.receipt.has.linked";
     }
 
     public static class ExportReceipt {
@@ -163,7 +162,6 @@ public class ErrorMessage {
 
     public static class NewsArticle {
         public static final String ERR_NOT_FOUND_ID = "exception.news.not.found.id";
-        public static final String ERR_NOT_FOUND_TITLE = "exception.news.not.found.tile";
     }
 
     public static class UserGroup {
@@ -189,9 +187,8 @@ public class ErrorMessage {
 
     public static class BookBorrow {
         public static final String ERR_NOT_FOUND_ID = "exception.book.borrow.not.found.id";
-        public static final String ERR_ALREADY_MARKED_AS_RETURNED = "exception.book.borrow.already.marked.as.returned";
-        public static final String ERR_ALREADY_MARKED_AS_LOST = "exception.book.borrow.already.marked.as.lost";
-        public static final String dsads = "exception.book.borrow.already.marked.as.lostdsadsads";
+        public static final String ERR_NOT_FOUND_IDS = "exception.book.borrow.not.found.ids";
+        public static final String ERR_NOT_RETURNED_IN_ANOTHER_RECEIPT = "exception.book.borrow.not.returned.in.another.receipt";
     }
 
     public static class Cart {
