@@ -42,6 +42,12 @@ export const printBorrowReceipts = (values) => {
     });
 };
 
+export const printBorrowReceiptOverdues = () => {
+    return axiosPrivate.get('admin/borrow-receipts/print-overdue', {
+        responseType: 'arraybuffer',
+    });
+};
+
 export const cancelReturn = (values) => {
     return axiosPrivate.put('admin/borrow-receipts/cancel-return', values);
 };

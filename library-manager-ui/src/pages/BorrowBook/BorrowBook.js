@@ -15,6 +15,7 @@ import {
     exportBorrowReceipts,
     getBorrowReceiptDetails,
     getBorrowReceipts,
+    printBorrowReceiptOverdues,
     printBorrowReceipts,
 } from '~/services/borrowReceiptService';
 import { bookBorrowReceiptMapping } from '~/common/borrowConstants';
@@ -178,11 +179,7 @@ function BorrowBook() {
     const handlePrintOverdueList = async () => {
         setIsLoading(true);
         try {
-            const response = await printBorrowReceipts({
-                schoolName: 'Trường Đại học Công nghiệp Hà Nội',
-                overdueOnly: true,
-            });
-
+            const response = await printBorrowReceiptOverdues();
             if (response.status === 200) {
                 const pdfBlob = new Blob([response.data], { type: 'application/pdf' });
                 const url = URL.createObjectURL(pdfBlob);

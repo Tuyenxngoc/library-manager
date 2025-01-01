@@ -23,4 +23,6 @@ public interface PdfService {
     byte[] createLabelType2Pdf(List<Book> books);
 
     byte[] createBookListPdf(List<Book> books);
+
+    byte[] createOverdueListPdf(List<BorrowReceipt> borrowReceipts);
 }

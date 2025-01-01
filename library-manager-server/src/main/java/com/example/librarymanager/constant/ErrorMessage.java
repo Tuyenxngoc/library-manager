@@ -182,6 +182,7 @@ public class ErrorMessage {
 
     public static class BorrowReceipt {
         public static final String ERR_NOT_FOUND_ID = "exception.borrow.receipt.not.found.id";
+        public static final String ERR_NOT_FOUND_OVERDUE = "exception.borrow.receipt.not.found.overdue";
         public static final String ERR_DUPLICATE_RECEIPT_NUMBER = "exception.borrow.receipt.duplicate.number";
     }
 

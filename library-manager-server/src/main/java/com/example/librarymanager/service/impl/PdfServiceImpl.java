@@ -12,9 +12,13 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.time.temporal.ChronoUnit.DAYS;
 
 @Slf4j
 @Service
@@ -683,4 +687,102 @@ public class PdfServiceImpl implements PdfService {
         return new byte[0];
     }
 
+    @Override
+    public byte[] createOverdueListPdf(List<BorrowReceipt> borrowReceipts) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        Document document = new Document(PageSize.A4.rotate(), 10, 10, 10, 10);
+
+        try {
+            PdfWriter.getInstance(document, outputStream);
+            document.open();
+
+            // Tiêu đề
+            Paragraph title = new Paragraph("DANH SÁCH MƯỢN QUÁ HẠN CHƯA TRẢ", headerFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            document.add(title);
+
+            // Ngày tháng
+            Paragraph date = new Paragraph("Đến ngày: " + LocalDate.now().format(formatter), boldFontMedium);
+            date.setAlignment(Element.ALIGN_CENTER);
+            date.setSpacingBefore(10);
+            date.setSpacingAfter(20);
+            document.add(date);
+
+            PdfPTable table = new PdfPTable(9);
+            table.setWidthPercentage(100);
+            table.setSpacingBefore(10);
+            float[] columnWidths = {0.5f, 2f, 2f, 2f, 2f, 3f, 2f, 2f, 1.5f};
+            table.setWidths(columnWidths);
+
+            String[] headers = {"STT", "Họ và tên", "Số điện thoại", "Số ĐKCB", "Nhan đề", "Tác giả", "Ngày mượn", "Ngày hẹn trả", "Số ngày quá hạn"};
+            for (String header : headers) {
+                PdfPCell cell = new PdfPCell(new Phrase(header, boldFontSmall));
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                table.addCell(cell);
+            }
+
+            int index = 1;
+            for (BorrowReceipt receipt : borrowReceipts) {
+                Reader reader = receipt.getReader();
+                LocalDate borrowDate = receipt.getBorrowDate();
+                LocalDate dueDate = receipt.getDueDate();
+
+                for (BookBorrow bookBorrow : receipt.getBookBorrows()) {
+                    PdfPCell cell;
+                    cell = new PdfPCell(new Phrase(String.valueOf(index++), normalFontSmall));
+                    cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                    table.addCell(cell);
+
+                    table.addCell(new PdfPCell(new Phrase(reader.getFullName(), normalFontSmall)));
+
+                    table.addCell(new PdfPCell(new Phrase(reader.getPhoneNumber(), normalFontSmall)));
+
+                    String bookCode = bookBorrow.getBook().getBookCode();
+                    table.addCell(new PdfPCell(new Phrase(bookCode, normalFontSmall)));
+
+                    String bookTitle = bookBorrow.getBook().getBookDefinition().getTitle();
+                    table.addCell(new PdfPCell(new Phrase(bookTitle, normalFontSmall)));
+
+                    String authors = bookBorrow.getBook().getBookDefinition().getBookAuthors().stream()
+                            .map(BookAuthor::getAuthor)
+                            .map(Author::getFullName)
+                            .collect(Collectors.joining(", "));
+                    table.addCell(new PdfPCell(new Phrase(authors, normalFontSmall)));
+
+                    cell = new PdfPCell(new Phrase(borrowDate.toString(), normalFontSmall));
+                    cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                    table.addCell(cell);
+
+                    cell = new PdfPCell(new Phrase(dueDate.toString(), normalFontSmall));
+                    cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                    table.addCell(cell);
+
+                    long overdueDays = DAYS.between(dueDate, LocalDate.now());
+                    cell = new PdfPCell(new Phrase(String.valueOf(overdueDays), normalFontSmall));
+                    cell.setHorizontalAlignment(PdfPCell.ALIGN_RIGHT);
+                    table.addCell(cell);
+                }
+            }
+
+            // Thêm bảng vào tài liệu
+            document.add(table);
+
+            // Chữ ký
+            Paragraph signature = new Paragraph("Hà Nội, ngày " +
+                    LocalDate.now().getDayOfMonth() + " tháng " +
+                    LocalDate.now().getMonthValue() + " năm " +
+                    LocalDate.now().getYear() + "\nCán bộ thư viện", italicFontMedium);
+            signature.setSpacingBefore(20);
+            signature.setAlignment(Element.ALIGN_RIGHT);
+            document.add(signature);
+
+        } catch (DocumentException e) {
+            log.error("Error while creating PDF document", e);
+        } finally {
+            document.close();
+        }
+
+        return outputStream.toByteArray();
+    }
 }

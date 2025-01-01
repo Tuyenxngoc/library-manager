@@ -39,5 +39,7 @@ public interface BorrowReceiptService {
 
     byte[] createPdfForReceipts(CreateBorrowReceiptRequestDto requestDto, String userId);
 
+    byte[] createOverdueListPdf();
+
     byte[] exportReturnData();
 }

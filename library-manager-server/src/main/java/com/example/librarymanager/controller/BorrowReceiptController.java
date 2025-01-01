@@ -146,6 +146,19 @@ public class BorrowReceiptController {
         return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
     }
 
+    @Operation(summary = "API Print Overdue Borrow List")
+    @PreAuthorize("hasRole('ROLE_MANAGE_BORROW_RECEIPT')")
+    @GetMapping(UrlConstant.BorrowReceipt.PRINT_OVERDUE_LIST)
+    public ResponseEntity<byte[]> printOverdueList() {
+        byte[] pdfBytes = borrowReceiptService.createOverdueListPdf();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=overdue_list.pdf");
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE);
+
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+    }
+
     @Operation(summary = "API Export Return Data")
     @PreAuthorize("hasRole('ROLE_MANAGE_BORROW_RECEIPT')")
     @GetMapping(UrlConstant.BorrowReceipt.EXPORT_RETURN_DATA)
