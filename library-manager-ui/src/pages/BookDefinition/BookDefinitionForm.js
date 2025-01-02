@@ -93,10 +93,7 @@ const validationSchema = yup.object({
 
     summary: yup.string().nullable(),
 
-    isbn: yup
-        .string()
-        .nullable()
-        .matches(/^(97(8|9))?\d{9}(\d|X)$/, 'ISBN phải đúng định dạng hợp lệ'),
+    isbn: yup.string().nullable(),
 
     keywords: yup.string().nullable(),
 

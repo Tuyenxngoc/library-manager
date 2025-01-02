@@ -80,12 +80,12 @@ const menuConfig = [
         label: 'Quản lý sách',
         key: '/admin/books',
         icon: <FaBook />,
-        roles: [ROLES.ManageBook, ROLES.ManageImportReceipt],
+        roles: [ROLES.ManageBook, ROLES.ManageImportReceipt, ROLES.ManageExportReceipt],
         children: [
             { label: 'Danh sách sách', key: '/admin/books/list', roles: [ROLES.ManageBook] },
             { label: 'Nhập sách', key: '/admin/books/inward', roles: [ROLES.ManageImportReceipt] },
             // { label: 'Kiểm kê sách', key: '/admin/books/inventory', roles: [ROLES.ManageBook] },
-            { label: 'Xuất sách', key: '/admin/books/outward', roles: [ROLES.ManageBook] },
+            { label: 'Xuất sách', key: '/admin/books/outward', roles: [ROLES.ManageExportReceipt] },
         ],
     },
     {

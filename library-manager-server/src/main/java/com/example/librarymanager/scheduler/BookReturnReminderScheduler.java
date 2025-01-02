@@ -8,6 +8,7 @@ import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ public class BookReturnReminderScheduler {
     private final BorrowReceiptRepository borrowReceiptRepository;
 
     @Scheduled(cron = "0 0 8 * * ?") // Chạy lúc 8:00 AM mỗi ngày
+    @Transactional
     public void sendReminderEmails() {
         List<BorrowReceipt> overdueRecords = borrowReceiptRepository.findRecordsByReturnDate();
 

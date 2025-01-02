@@ -214,7 +214,7 @@ function BorrowedItems() {
 
                     <div className="col-4">
                         <div className="text-end">
-                            <span>1 mục</span>
+                            <span> {isLoading ? '0 mục' : `${entityData.length} mục`}</span>
                         </div>
                     </div>
                 </div>
