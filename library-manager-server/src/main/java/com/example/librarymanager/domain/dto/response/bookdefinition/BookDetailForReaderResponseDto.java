@@ -74,7 +74,7 @@ public class BookDetailForReaderResponseDto {
         this.bookSet = b != null ? new BaseEntityDto(b.getId(), b.getName()) : null;
 
         this.bookCount = bookDefinition.getBooks().stream()
-                .filter(bd -> bd.getBookCondition() == BookCondition.AVAILABLE)
+                .filter(bd -> bd.getBookCondition() == BookCondition.AVAILABLE && bd.getExportReceipt() == null)
                 .count();
     }
 }

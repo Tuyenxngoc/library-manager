@@ -155,7 +155,7 @@ public class NewsArticleServiceImpl implements NewsArticleService {
         Pageable pageable = PaginationUtil.buildPageable(requestDto, SortByDataConstant.NEWS_ARTICLE);
 
         Page<NewsArticle> page = newsArticleRepository.findAll(
-                EntitySpecification.filterNewsArticles(requestDto.getKeyword(), requestDto.getSearchBy(), requestDto.getActiveFlag()),
+                EntitySpecification.filterNewsArticles(requestDto.getKeyword(), requestDto.getSearchBy(), true),
                 pageable);
 
         List<NewsArticleResponseDto> items = page.getContent().stream()

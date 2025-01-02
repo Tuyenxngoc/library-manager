@@ -54,7 +54,7 @@ public class CartController {
     @PreAuthorize("hasRole('ROLE_READER')")
     @DeleteMapping(UrlConstant.Cart.REMOVE)
     public ResponseEntity<?> removeFromCart(
-            @RequestParam Long cartDetailId,
+            @RequestParam Long cartDetailId,//todo update to list
             @CurrentUser CustomUserDetails userDetails
     ) {
         return VsResponseUtil.success(cartService.removeFromCart(userDetails.getCardNumber(), cartDetailId));

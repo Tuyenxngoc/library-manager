@@ -17,7 +17,7 @@ public class BookByBookDefinitionResponseDto {
 
     private final String publishingYear;
 
-    private final long totalBooks; // Tổng số sách
+    private long totalBooks; // Tổng số sách
 
     private long availableBooks; // Số sách đang trong thư viện
 
@@ -36,11 +36,15 @@ public class BookByBookDefinitionResponseDto {
         this.title = bookDefinition.getTitle();
         this.bookCode = bookDefinition.getBookCode();
         this.publishingYear = bookDefinition.getPublishingYear();
-        this.totalBooks = bookDefinition.getBooks().size();
+        this.totalBooks = 0;
         this.availableBooks = 0;
         this.borrowedBooks = 0;
         this.lostBooks = 0;
         for (Book book : bookDefinition.getBooks()) {
+            if (book.getExportReceipt() != null) {
+                continue;
+            }
+            this.totalBooks++;
             switch (book.getBookCondition()) {
                 case AVAILABLE:
                     this.availableBooks++;

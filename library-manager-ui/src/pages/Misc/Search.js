@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import queryString from 'query-string';
 import { Parallax } from 'react-parallax';
-import { Collapse, Pagination, Tabs } from 'antd';
+import { Collapse, message, Pagination, Tabs } from 'antd';
 import { backgrounds } from '~/assets';
 import Product from '~/components/Product';
 import Breadcrumb from '~/components/Breadcrumb';
@@ -26,6 +26,8 @@ function Search() {
 
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState(null);
+
+    const [messageApi, contextHolder] = message.useMessage();
 
     const handleChangePage = (newPage) => {
         setFilters((prev) => ({ ...prev, pageNum: newPage }));
@@ -136,6 +138,8 @@ function Search() {
 
     return (
         <>
+            {contextHolder}
+
             <Parallax bgImage={backgrounds.bgparallax7} strength={500}>
                 <div className="innerbanner">
                     <div className="container">
@@ -185,7 +189,12 @@ function Search() {
                         <>
                             {entityData.length > 0 ? (
                                 entityData.map((entity, index) => (
-                                    <Product key={index} className={'col-2 mx-2 my-1'} data={entity} />
+                                    <Product
+                                        key={index}
+                                        className={'col-2 mx-2 my-1'}
+                                        data={entity}
+                                        messageApi={messageApi}
+                                    />
                                 ))
                             ) : (
                                 <div className="alert alert-info">
